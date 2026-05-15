@@ -73,6 +73,7 @@ body { font-family: var(--body); background: var(--bg); color: var(--text); min-
   display: flex; background: var(--bg2);
   border-top: 2px solid var(--amber); flex-shrink: 0;
 }
+.bottom-nav.hidden { display: none !important; }
 .nav-btn {
   flex: 1; padding: 10px 4px 8px;
   font-family: var(--head); font-size: 10px; font-weight: 600;
@@ -305,9 +306,9 @@ input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer
 .results-section { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); margin-bottom: 8px; overflow: hidden; }
 .results-header { background: var(--panel); display: flex; align-items: center; gap: 8px; padding: 7px 12px; border-bottom: 1px solid var(--border); }
 .results-header-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--text-dim); flex-shrink: 0; }
-.results-section.corrected .results-header-dot { background: var(--amber); }
+.results-section.corrected .results-header-dot { background: var(--green); }
 .results-header-text { font-family: var(--head); font-size: 11px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; color: var(--text-dim); }
-.results-section.corrected .results-header-text { color: var(--amber); }
+.results-section.corrected .results-header-text { color: var(--green); }
 .results-row { display: flex; align-items: stretch; border-bottom: 1px solid var(--border); }
 .results-row:last-child { border-bottom: none; }
 .results-label { flex: 1; padding: 0 12px; font-family: var(--head); font-size: 12px; font-weight: 500; letter-spacing: 1.2px; text-transform: uppercase; color: var(--text-label); display: flex; align-items: center; flex-wrap: wrap; gap: 4px; }
@@ -316,7 +317,7 @@ input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer
 .results-metric:first-child { border-left: none; }
 .results-metric-unit { font-family: var(--head); font-size: 8px; font-weight: 500; letter-spacing: 1.5px; text-transform: uppercase; color: var(--text-dim); margin-bottom: 2px; }
 .results-metric-val { font-family: var(--mono); font-size: 26px; color: var(--text); line-height: 1; }
-.results-section.corrected .results-metric-val { color: var(--amber2); }
+.results-section.corrected .results-metric-val { color: var(--green); }
 .results-metric-ft { font-family: var(--mono); font-size: 10px; color: var(--text-dim); margin-top: 2px; }
 .delta-badge { display: inline-flex; align-items: center; font-family: var(--mono); font-size: 10px; padding: 2px 5px; border-radius: 3px; opacity: 0.9; }
 .delta-badge.neg { background: rgba(34,197,94,0.15); color: var(--green); }
@@ -453,12 +454,10 @@ input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer
 <div class="screen" id="screen-perf">
   <div class="perf-tabs">
     <button class="perf-tab active" id="ptab-to" onclick="showPerfTab('to',this)">
-      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12l5-3 4 6 5-8 6 10"/><line x1="2" y1="20" x2="22" y2="20"/></svg>
-      TAKE-OFF
+TAKE-OFF
     </button>
     <button class="perf-tab" id="ptab-ld" onclick="showPerfTab('ld',this)">
-      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12l-5 3-4-6-5 8-6-10"/><line x1="2" y1="20" x2="22" y2="20"/></svg>
-      LANDING
+LANDING
     </button>
   </div>
   <div class="perf-content">
@@ -469,6 +468,22 @@ input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer
         <div class="input-card"><div class="input-card-label">Weight · kg</div><div class="input-card-val"><select id="to-weight" onchange="calcTakeoff()"><option value="1180">1180</option><option value="1080">1080</option><option value="930">930</option></select></div></div>
         <div class="input-card"><div class="input-card-label">Press. Alt · ft</div><div class="input-card-val"><select id="to-alt" onchange="calcTakeoff()"><option value="0">0</option><option value="1000">1000</option><option value="2000">2000</option><option value="3000">3000</option><option value="4000">4000</option><option value="5000">5000</option><option value="6000">6000</option><option value="7000">7000</option><option value="8000">8000</option><option value="9000">9000</option><option value="10000">10000</option></select></div></div>
         <div class="input-card"><div class="input-card-label">OAT · °C</div><div class="input-card-val"><input type="number" id="to-oat" value="15" step="1" min="-40" max="60" oninput="calcTakeoff()"></div></div>
+      </div>
+      <div class="corr-panel">
+        <div class="corr-panel-title">Runway Conditions</div>
+        <div class="corr-row"><div class="corr-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 19V5M5 12l7-7 7 7"/></svg></div><div class="corr-label">Wind (kt)</div><div class="corr-input"><input type="number" id="to-wind" value="0" step="1" min="-30" max="30" oninput="calcTakeoff()"></div></div>
+        <div class="corr-row"><div class="corr-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="11" width="18" height="2" rx="1"/><path d="M3 17h18M3 7h18"/></svg></div><div class="corr-label">Runway</div><div class="corr-input"><select id="to-runway" onchange="calcTakeoff()"><option value="0">0</option><option value="1">1</option></select></div></div>
+        <div class="corr-row"><div class="corr-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></div><div class="corr-label">Slope (%)</div><div class="corr-input"><input type="number" id="to-slope" value="0" step="0.1" min="-5" max="5" oninput="calcTakeoff()"></div></div>
+      </div>
+      <div class="results-section">
+        <div class="results-header"><div class="results-header-dot"></div><div class="results-header-text">Base values (no corrections)</div></div>
+        <div class="results-row"><div class="results-label">Ground Roll</div><div class="results-block"><div class="results-metric"><div class="results-metric-unit">metres</div><div class="results-metric-val" id="to-base-gr-m">–</div><div class="results-metric-ft" id="to-base-gr-ft">– ft</div></div></div></div>
+        <div class="results-row"><div class="results-label">Dist. to 50ft</div><div class="results-block"><div class="results-metric"><div class="results-metric-unit">metres</div><div class="results-metric-val" id="to-base-50-m">–</div><div class="results-metric-ft" id="to-base-50-ft">– ft</div></div></div></div>
+      </div>
+      <div class="results-section corrected">
+        <div class="results-header"><div class="results-header-dot"></div><div class="results-header-text">With all corrections applied</div></div>
+        <div class="results-row"><div class="results-label">Ground Roll <span class="delta-badge zero" id="to-delta-gr">±0</span></div><div class="results-block"><div class="results-metric"><div class="results-metric-unit">metres</div><div class="results-metric-val" id="to-corr-gr-m">–</div><div class="results-metric-ft" id="to-corr-gr-ft">– ft</div></div></div></div>
+        <div class="results-row"><div class="results-label">Dist. to 50ft <span class="delta-badge zero" id="to-delta-50">±0</span></div><div class="results-block"><div class="results-metric"><div class="results-metric-unit">metres</div><div class="results-metric-val" id="to-corr-50-m">–</div><div class="results-metric-ft" id="to-corr-50-ft">– ft</div></div></div></div>
       </div>
       <div class="info-panel">
         <div class="info-row"><span class="info-key">Flaps</span><span class="info-val">T/O</span></div>
@@ -484,22 +499,6 @@ input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer
         <div class="info-row"><span class="info-key">Paved rwy</span><span class="info-val">−6% GR</span></div>
         <div class="info-row"><span class="info-key">Slope</span><span class="info-val">+5%/+1%</span></div>
       </div>
-      <div class="corr-panel">
-        <div class="corr-panel-title">Runway Conditions</div>
-        <div class="corr-row"><div class="corr-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 19V5M5 12l7-7 7 7"/></svg></div><div class="corr-label">Wind (kt)<span class="corr-hint">+ head · − tail</span></div><div class="corr-input"><input type="number" id="to-wind" value="0" step="1" min="-30" max="30" oninput="calcTakeoff()"></div></div>
-        <div class="corr-row"><div class="corr-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="11" width="18" height="2" rx="1"/><path d="M3 17h18M3 7h18"/></svg></div><div class="corr-label">Runway<span class="corr-hint">0 = Grass · 1 = Paved</span></div><div class="corr-input"><select id="to-runway" onchange="calcTakeoff()"><option value="0">0</option><option value="1">1</option></select></div></div>
-        <div class="corr-row"><div class="corr-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></div><div class="corr-label">Slope (%)<span class="corr-hint">+ upslope</span></div><div class="corr-input"><input type="number" id="to-slope" value="0" step="0.1" min="-5" max="5" oninput="calcTakeoff()"></div></div>
-      </div>
-      <div class="results-section">
-        <div class="results-header"><div class="results-header-dot"></div><div class="results-header-text">Base values (no corrections)</div></div>
-        <div class="results-row"><div class="results-label">Ground Roll</div><div class="results-block"><div class="results-metric"><div class="results-metric-unit">metres</div><div class="results-metric-val" id="to-base-gr-m">–</div><div class="results-metric-ft" id="to-base-gr-ft">– ft</div></div></div></div>
-        <div class="results-row"><div class="results-label">Dist. to 50ft</div><div class="results-block"><div class="results-metric"><div class="results-metric-unit">metres</div><div class="results-metric-val" id="to-base-50-m">–</div><div class="results-metric-ft" id="to-base-50-ft">– ft</div></div></div></div>
-      </div>
-      <div class="results-section corrected">
-        <div class="results-header"><div class="results-header-dot"></div><div class="results-header-text">With all corrections applied</div></div>
-        <div class="results-row"><div class="results-label">Ground Roll <span class="delta-badge zero" id="to-delta-gr">±0</span></div><div class="results-block"><div class="results-metric"><div class="results-metric-unit">metres</div><div class="results-metric-val" id="to-corr-gr-m">–</div><div class="results-metric-ft" id="to-corr-gr-ft">– ft</div></div></div></div>
-        <div class="results-row"><div class="results-label">Dist. to 50ft <span class="delta-badge zero" id="to-delta-50">±0</span></div><div class="results-block"><div class="results-metric"><div class="results-metric-unit">metres</div><div class="results-metric-val" id="to-corr-50-m">–</div><div class="results-metric-ft" id="to-corr-50-ft">– ft</div></div></div></div>
-      </div>
     </div>
 
     <!-- LANDING -->
@@ -508,6 +507,22 @@ input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer
         <div class="input-card"><div class="input-card-label">Weight · kg</div><div class="input-card-val"><select id="ld-weight" onchange="calcLanding()"><option value="1180">1180</option><option value="1080">1080</option><option value="930">930</option></select></div></div>
         <div class="input-card"><div class="input-card-label">Press. Alt · ft</div><div class="input-card-val"><select id="ld-alt" onchange="calcLanding()"><option value="0">0</option><option value="1000">1000</option><option value="2000">2000</option><option value="3000">3000</option><option value="4000">4000</option><option value="5000">5000</option><option value="6000">6000</option><option value="7000">7000</option><option value="8000">8000</option><option value="9000">9000</option><option value="10000">10000</option></select></div></div>
         <div class="input-card"><div class="input-card-label">OAT · °C</div><div class="input-card-val"><input type="number" id="ld-oat" value="15" step="1" min="-40" max="60" oninput="calcLanding()"></div></div>
+      </div>
+      <div class="corr-panel">
+        <div class="corr-panel-title">Runway Conditions</div>
+        <div class="corr-row"><div class="corr-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 19V5M5 12l7-7 7 7"/></svg></div><div class="corr-label">Wind (kt)</div><div class="corr-input"><input type="number" id="ld-wind" value="0" step="1" min="-30" max="30" oninput="calcLanding()"></div></div>
+        <div class="corr-row"><div class="corr-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="11" width="18" height="2" rx="1"/><path d="M3 17h18M3 7h18"/></svg></div><div class="corr-label">Runway</div><div class="corr-input"><select id="ld-runway" onchange="calcLanding()"><option value="0">0</option><option value="1">1</option></select></div></div>
+        <div class="corr-row"><div class="corr-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></div><div class="corr-label">Slope (%)</div><div class="corr-input"><input type="number" id="ld-slope" value="0" step="0.1" min="-5" max="5" oninput="calcLanding()"></div></div>
+      </div>
+      <div class="results-section">
+        <div class="results-header"><div class="results-header-dot"></div><div class="results-header-text">Base values (no corrections)</div></div>
+        <div class="results-row"><div class="results-label">Ground Roll</div><div class="results-block"><div class="results-metric"><div class="results-metric-unit">metres</div><div class="results-metric-val" id="ld-base-gr-m">–</div><div class="results-metric-ft" id="ld-base-gr-ft">– ft</div></div></div></div>
+        <div class="results-row"><div class="results-label">Landing Dist.</div><div class="results-block"><div class="results-metric"><div class="results-metric-unit">metres</div><div class="results-metric-val" id="ld-base-50-m">–</div><div class="results-metric-ft" id="ld-base-50-ft">– ft</div></div></div></div>
+      </div>
+      <div class="results-section corrected">
+        <div class="results-header"><div class="results-header-dot"></div><div class="results-header-text">With all corrections applied</div></div>
+        <div class="results-row"><div class="results-label">Ground Roll <span class="delta-badge zero" id="ld-delta-gr">±0</span></div><div class="results-block"><div class="results-metric"><div class="results-metric-unit">metres</div><div class="results-metric-val" id="ld-corr-gr-m">–</div><div class="results-metric-ft" id="ld-corr-gr-ft">– ft</div></div></div></div>
+        <div class="results-row"><div class="results-label">Landing Dist. <span class="delta-badge zero" id="ld-delta-50">±0</span></div><div class="results-block"><div class="results-metric"><div class="results-metric-unit">metres</div><div class="results-metric-val" id="ld-corr-50-m">–</div><div class="results-metric-ft" id="ld-corr-50-ft">– ft</div></div></div></div>
       </div>
       <div class="info-panel">
         <div class="info-row"><span class="info-key">Flaps</span><span class="info-val">LAND</span></div>
@@ -523,29 +538,10 @@ input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer
         <div class="info-row"><span class="info-key">Paved rwy</span><span class="info-val">−2% GR</span></div>
         <div class="info-row"><span class="info-key">Slope</span><span class="info-val">−2.5%/+1%</span></div>
       </div>
-      <div class="corr-panel">
-        <div class="corr-panel-title">Runway Conditions</div>
-        <div class="corr-row"><div class="corr-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 19V5M5 12l7-7 7 7"/></svg></div><div class="corr-label">Wind (kt)<span class="corr-hint">+ head · − tail</span></div><div class="corr-input"><input type="number" id="ld-wind" value="0" step="1" min="-30" max="30" oninput="calcLanding()"></div></div>
-        <div class="corr-row"><div class="corr-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="11" width="18" height="2" rx="1"/><path d="M3 17h18M3 7h18"/></svg></div><div class="corr-label">Runway<span class="corr-hint">0 = Grass · 1 = Paved</span></div><div class="corr-input"><select id="ld-runway" onchange="calcLanding()"><option value="0">0</option><option value="1">1</option></select></div></div>
-        <div class="corr-row"><div class="corr-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></div><div class="corr-label">Slope (%)<span class="corr-hint">+ upslope</span></div><div class="corr-input"><input type="number" id="ld-slope" value="0" step="0.1" min="-5" max="5" oninput="calcLanding()"></div></div>
-      </div>
-      <div class="results-section">
-        <div class="results-header"><div class="results-header-dot"></div><div class="results-header-text">Base values (no corrections)</div></div>
-        <div class="results-row"><div class="results-label">Ground Roll</div><div class="results-block"><div class="results-metric"><div class="results-metric-unit">metres</div><div class="results-metric-val" id="ld-base-gr-m">–</div><div class="results-metric-ft" id="ld-base-gr-ft">– ft</div></div></div></div>
-        <div class="results-row"><div class="results-label">Landing Dist.</div><div class="results-block"><div class="results-metric"><div class="results-metric-unit">metres</div><div class="results-metric-val" id="ld-base-50-m">–</div><div class="results-metric-ft" id="ld-base-50-ft">– ft</div></div></div></div>
-      </div>
-      <div class="results-section corrected">
-        <div class="results-header"><div class="results-header-dot"></div><div class="results-header-text">With all corrections applied</div></div>
-        <div class="results-row"><div class="results-label">Ground Roll <span class="delta-badge zero" id="ld-delta-gr">±0</span></div><div class="results-block"><div class="results-metric"><div class="results-metric-unit">metres</div><div class="results-metric-val" id="ld-corr-gr-m">–</div><div class="results-metric-ft" id="ld-corr-gr-ft">– ft</div></div></div></div>
-        <div class="results-row"><div class="results-label">Landing Dist. <span class="delta-badge zero" id="ld-delta-50">±0</span></div><div class="results-block"><div class="results-metric"><div class="results-metric-unit">metres</div><div class="results-metric-val" id="ld-corr-50-m">–</div><div class="results-metric-ft" id="ld-corr-50-ft">– ft</div></div></div></div>
-      </div>
     </div>
 
   </div><!-- /perf-content -->
-  <div class="footer">
-    <div class="footer-left">AFM §5 · EASA CS-23 · Data interpolated</div>
-    <div class="footer-warn">⚠ Not for operational use</div>
-  </div>
+
 </div>
 
 <!-- BOTTOM NAV -->
@@ -1120,7 +1116,7 @@ function showScreen(id) {
   });
   // Bottom nav only visible outside home
   const bnav = document.getElementById('bottom-nav');
-  bnav.style.display = (id === 'screen-home') ? 'none' : 'flex';
+  bnav.classList.toggle('hidden', id === 'screen-home');
   Object.entries(navBtns).forEach(([s,b]) => {
     document.getElementById(b).classList.toggle('active', s === id);
   });
@@ -1562,7 +1558,7 @@ openChecklist = function(id) {
 calcTakeoff();
 calcLanding();
 // Start on home — hide bottom nav
-document.getElementById('bottom-nav').style.display = 'none';
+document.getElementById('bottom-nav').classList.add('hidden');
 </script>
 </body>
 </html>
