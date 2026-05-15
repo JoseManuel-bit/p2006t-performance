@@ -1272,6 +1272,7 @@ function showScreen(id) {
     var b = document.getElementById(navBtns[s]);
     if(b) b.classList.toggle('active', s===id);
   });
+  if (id === 'screen-docs') buildDocsGrid();
 }
 
 function enterAircraft() { showScreen('screen-checklist'); }
@@ -1429,6 +1430,7 @@ updateOnline();
 document.body.classList.add('on-home');
 buildClGrid();
 buildEmergGrid();
+buildDocsGrid();
 calcTakeoff();
 calcLanding();
 </script>
