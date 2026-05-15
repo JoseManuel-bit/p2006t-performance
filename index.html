@@ -344,6 +344,40 @@ input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer
   .results-metric-val { font-size: 20px; }
 }
 
+
+/* ── AIRPORT SELECTOR ─────────────────────────── */
+.airport-selector {
+  background: var(--bg2); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 10px 12px; margin-bottom: 8px;
+}
+.airport-input-row { display: flex; align-items: center; gap: 12px; }
+.airport-icao-wrap { display: flex; flex-direction: column; gap: 4px; flex-shrink: 0; }
+.airport-label { font-family: var(--head); font-size: 9px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; color: var(--text-dim); }
+.icao-input {
+  width: 90px; background: var(--bg3); border: 1px solid var(--border);
+  border-radius: 4px; font-family: var(--mono); font-size: 22px; font-weight: 700;
+  color: var(--amber); text-align: center; text-transform: uppercase;
+  padding: 6px 4px; outline: none; letter-spacing: 3px;
+}
+.icao-input:focus { border-color: var(--amber); }
+.airport-info { flex: 1; }
+.airport-name { font-family: var(--head); font-size: 14px; font-weight: 600; color: var(--text); letter-spacing: 0.5px; }
+.airport-elev { font-family: var(--mono); font-size: 11px; color: var(--amber); margin-top: 3px; }
+
+
+/* ── RUNWAY SELECTOR ──────────────────────────── */
+.rwy-wrap { display:flex; flex-direction:column; gap:4px; flex-shrink:0; }
+.rwy-select {
+  background: var(--bg3); border: 1px solid var(--border); border-radius:4px;
+  font-family: var(--mono); font-size:18px; font-weight:700; color: var(--amber);
+  text-align:center; text-align-last:center; padding:6px 4px; outline:none;
+  -webkit-appearance:none; appearance:none; width:90px;
+}
+.rwy-avail {
+  font-family: var(--mono); font-size:11px; color: var(--green);
+  text-align:center; font-weight:700;
+}
+
 </style>
 </head>
 <body>
@@ -467,15 +501,32 @@ LANDING
 
     <!-- TAKE-OFF -->
     <div class="perf-page active" id="perf-to">
+      <div class="airport-selector">
+        <div class="airport-input-row">
+          <div class="airport-icao-wrap">
+            <div class="airport-label">DEPARTURE AIRPORT</div>
+            <input type="text" id="to-icao" placeholder="ICAO" maxlength="4" oninput="if(window.lookupAirport)lookupAirport('to')" class="icao-input">
+          </div>
+          <div class="airport-info" id="to-airport-info">
+            <div class="airport-name" id="to-airport-name">—</div>
+            <div class="airport-elev" id="to-airport-elev">Elev: — ft</div>
+          </div>
+          <div class="rwy-wrap" id="to-rwy-wrap">
+            <div class="airport-label">RUNWAY</div>
+            <select id="to-rwy-sel" onchange="selectRunway('to')" class="rwy-select"><option value="">—</option></select>
+            <div class="rwy-avail" id="to-rwy-avail" style="color:var(--text-dim);">— m</div>
+          </div>
+        </div>
+      </div>
       <div class="input-grid">
         <div class="input-card"><div class="input-card-label">Weight · kg</div><div class="input-card-val"><select id="to-weight" onchange="calcTakeoff()"><option value="1180">1180</option><option value="1080">1080</option><option value="930">930</option></select></div></div>
-        <div class="input-card"><div class="input-card-label">Press. Alt · ft</div><div class="input-card-val"><select id="to-alt" onchange="calcTakeoff()"><option value="0">0</option><option value="1000">1000</option><option value="2000">2000</option><option value="3000">3000</option><option value="4000">4000</option><option value="5000">5000</option><option value="6000">6000</option><option value="7000">7000</option><option value="8000">8000</option><option value="9000">9000</option><option value="10000">10000</option></select></div></div>
+        <div class="input-card"><div class="input-card-label">Press. Alt · ft</div><div class="input-card-val"><input type="number" id="to-alt" value="0" step="100" min="0" max="10000" oninput="calcTakeoff()"></div></div>
         <div class="input-card"><div class="input-card-label">OAT · °C</div><div class="input-card-val"><input type="number" id="to-oat" value="15" step="1" min="-40" max="60" oninput="calcTakeoff()"></div></div>
       </div>
       <div class="corr-panel">
         <div class="corr-panel-title">Runway Conditions</div>
         <div class="corr-row"><div class="corr-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 19V5M5 12l7-7 7 7"/></svg></div><div class="corr-label">Wind (kt)</div><div class="corr-input"><input type="number" id="to-wind" value="0" step="1" min="-30" max="30" oninput="calcTakeoff()"></div></div>
-        <div class="corr-row"><div class="corr-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="11" width="18" height="2" rx="1"/><path d="M3 17h18M3 7h18"/></svg></div><div class="corr-label">Runway</div><div class="corr-input"><select id="to-runway" onchange="calcTakeoff()"><option value="0">0</option><option value="1">1</option></select></div></div>
+        <div class="corr-row"><div class="corr-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="11" width="18" height="2" rx="1"/><path d="M3 17h18M3 7h18"/></svg></div><div class="corr-label">Runway</div><div class="corr-input"><select id="to-runway" onchange="calcTakeoff()"><option value="0">GRASS</option><option value="1">PAVED</option></select></div></div>
         <div class="corr-row"><div class="corr-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></div><div class="corr-label">Slope (%)</div><div class="corr-input"><input type="number" id="to-slope" value="0" step="0.1" min="-5" max="5" oninput="calcTakeoff()"></div></div>
       </div>
       <div class="results-section">
@@ -506,15 +557,32 @@ LANDING
 
     <!-- LANDING -->
     <div class="perf-page" id="perf-ld">
+      <div class="airport-selector">
+        <div class="airport-input-row">
+          <div class="airport-icao-wrap">
+            <div class="airport-label">DESTINATION AIRPORT</div>
+            <input type="text" id="ld-icao" placeholder="ICAO" maxlength="4" oninput="if(window.lookupAirport)lookupAirport('ld')" class="icao-input">
+          </div>
+          <div class="airport-info" id="ld-airport-info">
+            <div class="airport-name" id="ld-airport-name">—</div>
+            <div class="airport-elev" id="ld-airport-elev">Elev: — ft</div>
+          </div>
+          <div class="rwy-wrap" id="ld-rwy-wrap">
+            <div class="airport-label">RUNWAY</div>
+            <select id="ld-rwy-sel" onchange="selectRunway('ld')" class="rwy-select"><option value="">—</option></select>
+            <div class="rwy-avail" id="ld-rwy-avail" style="color:var(--text-dim);">— m</div>
+          </div>
+        </div>
+      </div>
       <div class="input-grid">
         <div class="input-card"><div class="input-card-label">Weight · kg</div><div class="input-card-val"><select id="ld-weight" onchange="calcLanding()"><option value="1180">1180</option><option value="1080">1080</option><option value="930">930</option></select></div></div>
-        <div class="input-card"><div class="input-card-label">Press. Alt · ft</div><div class="input-card-val"><select id="ld-alt" onchange="calcLanding()"><option value="0">0</option><option value="1000">1000</option><option value="2000">2000</option><option value="3000">3000</option><option value="4000">4000</option><option value="5000">5000</option><option value="6000">6000</option><option value="7000">7000</option><option value="8000">8000</option><option value="9000">9000</option><option value="10000">10000</option></select></div></div>
+        <div class="input-card"><div class="input-card-label">Press. Alt · ft</div><div class="input-card-val"><input type="number" id="ld-alt" value="0" step="100" min="0" max="10000" oninput="calcLanding()"></div></div>
         <div class="input-card"><div class="input-card-label">OAT · °C</div><div class="input-card-val"><input type="number" id="ld-oat" value="15" step="1" min="-40" max="60" oninput="calcLanding()"></div></div>
       </div>
       <div class="corr-panel">
         <div class="corr-panel-title">Runway Conditions</div>
         <div class="corr-row"><div class="corr-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 19V5M5 12l7-7 7 7"/></svg></div><div class="corr-label">Wind (kt)</div><div class="corr-input"><input type="number" id="ld-wind" value="0" step="1" min="-30" max="30" oninput="calcLanding()"></div></div>
-        <div class="corr-row"><div class="corr-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="11" width="18" height="2" rx="1"/><path d="M3 17h18M3 7h18"/></svg></div><div class="corr-label">Runway</div><div class="corr-input"><select id="ld-runway" onchange="calcLanding()"><option value="0">0</option><option value="1">1</option></select></div></div>
+        <div class="corr-row"><div class="corr-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="11" width="18" height="2" rx="1"/><path d="M3 17h18M3 7h18"/></svg></div><div class="corr-label">Runway</div><div class="corr-input"><select id="ld-runway" onchange="calcLanding()"><option value="0">GRASS</option><option value="1">PAVED</option></select></div></div>
         <div class="corr-row"><div class="corr-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></div><div class="corr-label">Slope (%)</div><div class="corr-input"><input type="number" id="ld-slope" value="0" step="0.1" min="-5" max="5" oninput="calcLanding()"></div></div>
       </div>
       <div class="results-section">
@@ -560,520 +628,466 @@ LANDING
   </button>
 </div>
 <script>
-// ═══════════════════════════════════════════════════
-// CHECKLIST DATA — AFM Section 4
-// type: 'proc' = item / action  |  'seq' = numbered sequence
-// memory: true = purple card
-// ═══════════════════════════════════════════════════
-const CHECKLISTS = [
-  {
-    id:'ifr-briefing', name:'Engine Start Sequence / IFR Briefing', icon:'seq', memory:false,
-    type:'seq',
-    items:[
-      {t:'Perform "Before Start Checklist"'},
-      {t:'Copy ATIS'},
-      {t:'Request Engine Start and ATC Clearance'},
-      {t:'Prepare and "SID Briefing"'},
-      {t:'WANT (Weather · Airspace · NOTAMs · TFRs)'},
-      {t:'Normal Briefing'},
-      {t:'Emergency Briefing'},
-      {t:'Engine Start'},
-      {t:'Ready to Taxi Call'},
-      {t:'Taxi Briefing'},
-    ]
-  },
-  {
-    id:'safety-cockpit', name:'Safety Cockpit', icon:'eye', memory:false,
-    type:'proc',
-    items:[
-      {t:'Drain wings and engines first',         a:''},
-      {t:'Docs / AFM / Garmin guide',             a:'O/B'},
-      {t:'Weight and balance',                    a:'CHK'},
-      {t:'Chocks, ropes, pitot c.',               a:'O/B'},
-      {t:'Control lock',                          a:'REMOVE'},
-      {t:'Parking brake',                         a:'ON'},
-      {t:'PFD and MFD',                           a:'CLEAN'},
-      {t:'Doors',                                 a:'CLOSED & LOCKED'},
-      {t:'LG control lever',                      a:'CHK DN'},
-      {t:'Breakers',                              a:'ALL IN'},
-      {t:'Master switch',                         a:'ON'},
-      {t:'Fuel quantity',                         a:'CHK'},
-      {t:'RH fuel selector',                      a:'RIGHT'},
-      {t:'LH fuel selector',                      a:'LEFT'},
-      {t:'RH electric fuel pump',                 a:'ON'},
-      {t:'Check fuel pressure gauge correct operation', a:''},
-      {t:'RH electric fuel pump',                 a:'OFF'},
-      {t:'LH electric fuel pump',                 a:'ON'},
-      {t:'Check fuel pressure gauge correct operation', a:''},
-      {t:'LH electric fuel pump',                 a:'OFF'},
-      {t:'Strobe lights',                         a:'ON'},
-      {t:'LG lights',                             a:'TEST'},
-      {t:'ELT',                                   a:'ARMED'},
-      {t:'Fire detectors',                        a:'TEST'},
-      {t:'Engine lever friction',                 a:'ADJUST'},
-      {t:'Flight controls',                       a:'CHK FREE'},
-      {t:'Alternate static port',                 a:'CHK CLSD'},
-      {t:'Cabin heat',                            a:'CLSD'},
-      {t:'Flaps — Operate to FULL, verify extension', a:''},
-      {t:'Pitch trim control',                    a:'NEUTRAL'},
-      {t:'Rudder trim control',                   a:'NEUTRAL'},
-      {t:'Eng. starting battery voltmeter',       a:'CHK 12-14V'},
-      {t:'Exterior lights — All switches',        a:'OFF'},
-      {t:'Master switch',                         a:'OFF'},
-    ]
-  },
-  {
-    id:'walkaround', name:'EXT Walkaround', icon:'eye', memory:false,
-    type:'proc',
-    items:[
-      {t:'Pitot, door and cabin',                 a:'CHK'},
-      {t:'Left main LG',                          a:'CHK'},
-      {t:'Wheel chock',                           a:'CHK'},
-      {t:'Propeller and spinner',                 a:'CHK'},
-      {t:'Left engine nacelle',                   a:'CHK'},
-      {t:'Air induction system',                  a:'CHK'},
-      {t:'Left fuel tank',                        a:'CHK'},
-      {t:'Oil quantity',                          a:'CHK'},
-      {t:'Left wing leading edge',                a:'CHK'},
-      {t:'Left wing top and bottom panels',       a:'CHK'},
-      {t:'Static discharge wicks',                a:'CHK'},
-      {t:'Left winglet',                          a:'CHK'},
-      {t:'Left aileron and balance mass',         a:'CHK'},
-      {t:'Left flaps and hinges',                 a:'CHK'},
-      {t:'Left static port',                      a:'CHK'},
-      {t:'Antennas',                              a:'CHK'},
-      {t:'Gear pump',                             a:'MIN 20 PSI'},
-      {t:'Ext pwr & bat',                         a:'CHK'},
-      {t:'Horizontal and vertical empennage and tabs', a:'CHK'},
-      {t:'Static discharge wicks',                a:'CHK'},
-      {t:'Stabilator leading edge',               a:'CHK'},
-      {t:'Fuselage top and bottom skin',          a:'CHK'},
-      {t:'Right flap and hinges',                 a:'CHK'},
-      {t:'Right aileron and balance mass',        a:'CHK'},
-      {t:'Right winglet',                         a:'CHK'},
-      {t:'Static discharge wick',                 a:'CHK'},
-      {t:'Right wing top and bottom panels',      a:'CHK'},
-      {t:'Right wing leading edge',               a:'CHK'},
-      {t:'Right fuel tank',                       a:'CHK'},
-      {t:'Oil quantity',                          a:'CHK'},
-      {t:'Propeller and spinner',                 a:'CHK'},
-      {t:'Right engine nacelle',                  a:'CHK'},
-      {t:'Pax door and cabin',                    a:'CHK'},
-      {t:'Right main LG',                         a:'CHK'},
-      {t:'Wheel chock',                           a:'CHK'},
-      {t:'Bottom fuselage antennas',              a:'CHK'},
-      {t:'Right cabin ram-air inlet',             a:'CHK'},
-      {t:'Right pitot tube',                      a:'CHK'},
-      {t:'Nose LG',                               a:'CHK'},
-      {t:'Radome',                                a:'CHK'},
-      {t:'Radome access door',                    a:'CHK'},
-      {t:'Left pitot tube',                       a:'CHK'},
-    ]
-  },
-  {
-    id:'before-start', name:'Before Start', icon:'power', memory:false,
-    type:'proc',
-    items:[
-      {t:'Preflight inspection',    a:'COMPLETED'},
-      {t:'Parking brake',           a:'ON'},
-      {t:'Brakes',                  a:'USE'},
-      {t:'Pax briefing',            a:'COMPLETE'},
-      {t:'Pitot cover',             a:'CHK O/B'},
-      {t:'Fuel selectors',          a:'ON L/R'},
-      {t:'Doors',                   a:'CLOSED & LATCHED'},
-      {t:'Master switch',           a:'ON'},
-      {t:'Coms',                    a:'SET'},
-      {t:'ATIS',                    a:'OBTAIN'},
-      {t:'Clearance',               a:'OBTAIN'},
-      {t:'Breakers',                a:'ALL IN'},
-    ]
-  },
-  {
-    id:'engine-start', name:'Engine Start', icon:'power', memory:false,
-    type:'proc',
-    items:[
-      {t:'— RIGHT ENGINE STARTING —',              a:''},
-      {t:'RH throttle lever',                      a:'IDLE'},
-      {t:'RH carburettor heat',                    a:'OFF'},
-      {t:'RH propeller lever',                     a:'FULL FWD'},
-      {t:'RH choke',                               a:'AS REQUIRED'},
-      {t:'Master switch',                          a:'ON'},
-      {t:'RH electrical fuel pump',                a:'ON'},
-      {t:'Check advisory light ON and positive fuel press build up', a:''},
-      {t:'Strobes',                                a:'ON'},
-      {t:'RH engine propeller zone',               a:'FREE'},
-      {t:'RH ignition switches',                   a:'BOTH ON'},
-      {t:'RH start pushbutton',                    a:'PUSH'},
-      {t:'RH engine oil gauge — increase within 10 sec, max 7 bar', a:'CHK'},
-      {t:'RH throttle lever',                      a:'1200 RPM'},
-      {t:'RH choke',                               a:'OFF'},
-      {t:'RH field',                               a:'ON'},
-      {t:'RH avionics',                            a:'ON'},
-      {t:'RH cross bus',                           a:'ON'},
-      {t:'RH ammeter',                             a:'CHK POSITIVE'},
-      {t:'RH voltmeter',                           a:'CHK 12-14 V'},
-      {t:'RH electrical fuel pump',                a:'OFF'},
-      {t:'— REPEAT PROCEDURE LH ENGINE —',         a:''},
-    ]
-  },
-  {
-    id:'after-start', name:'After Start', icon:'location', memory:false,
-    type:'proc',
-    items:[
-      {t:'Throttle',              a:'1200 RPM'},
-      {t:'Nav lights',            a:'ON'},
-      {t:'Radio and nav',         a:'SET'},
-      {t:'XPDR',                  a:'STBY'},
-      {t:'PFD',                   a:'ALIGNED'},
-      {t:'Altimeters',            a:'SET AND X-CHK'},
-      {t:'Gyro',                  a:'PRE-SELECTED'},
-      {t:'Seat belts',            a:'FASTENED'},
-      {t:'Headphones',            a:'A/R'},
-      {t:'Flight controls',       a:'CHK'},
-      {t:'Flaps',                 a:'RETRACT'},
-      {t:'ATIS',                  a:'OBTAINED'},
-      {t:'WANT / dep briefing',   a:'COMPLETED'},
-      {t:'Taxi clearance',        a:'OBTAIN'},
-      {t:'Taxi briefing',         a:'PERFORM'},
-    ]
-  },
-  {
-    id:'taxi', name:'Taxi', icon:'wind', memory:true,
-    type:'proc',
-    items:[
-      {t:'Do taxi until OIL T 50°C', a:''},
-      {t:'Taxi light',            a:'ON'},
-      {t:'L/R fuel selectors',    a:'A/R'},
-      {t:'L/R fuel pressure',     a:'MONITOR'},
-      {t:'Parking brake',         a:'RELEASE'},
-      {t:'Brakes',                a:'TEST'},
-      {t:'Flight instruments',    a:'CHK'},
-      {t:'Engine instruments',    a:'CHK'},
-      {t:'Altimeters',            a:'SET AND X-CHK'},
-    ]
-  },
-  {
-    id:'ground-check', name:'Ground Check', icon:'settings', memory:true,
-    type:'proc',
-    items:[
-      {t:'Taxi light',                    a:'OFF'},
-      {t:'Parking brake',                 a:'ON'},
-      {t:'RH fuel selector',              a:'RIGHT'},
-      {t:'LH fuel selector',              a:'LEFT'},
-      {t:'LH/RH fuel press',              a:'CHK'},
-      {t:'Engine instruments',            a:'IN LIMITS'},
-      {t:'LH/RH GEN lights',              a:'CHK OFF'},
-      {t:'LH/RH prop lever',              a:'FULL FWD'},
-      {t:'LH/RH throttle lever',          a:'1650 RPM'},
-      {t:'RH ignition switches',          a:'L/R/BOTH'},
-      {t:'Max drop 130 RPM · Max diff 50 RPM', a:''},
-      {t:'RH prop lever — Governor CHK',  a:''},
-      {t:'Reduce to 1200 RPM → full fwd, repeat 3x. Min 1150 RPM', a:''},
-      {t:'RH carb heat — Verify RPM drop ~100 RPM', a:'ON'},
-      {t:'RH carb heat',                  a:'OFF'},
-      {t:'RH engine instrument',          a:'CHK'},
-      {t:'LH/RH fuel quantity',           a:'CHK'},
-      {t:'LH/RH throttle lever',          a:'IDLE'},
-      {t:'LH/RH throttle lever',          a:'1200 RPM'},
-      {t:'Repeat procedure LH engine',    a:''},
-    ]
-  },
-  {
-    id:'before-to', name:'Before T/O', icon:'settings', memory:false,
-    type:'proc',
-    items:[
-      {t:'T/O briefing',          a:'CONFIRMED'},
-      {t:'RH fuel selector',      a:'RIGHT'},
-      {t:'LH fuel selector',      a:'LEFT'},
-      {t:'Pitch trim',            a:'SET'},
-      {t:'Rudder trim',           a:'SET'},
-      {t:'Flaps',                 a:'T/O'},
-      {t:'Pitot heat',            a:'A/R'},
-      {t:'Magnetic compass',      a:'CHK'},
-      {t:'AHRS',                  a:'X-CHK'},
-      {t:'Doors & Windows',       a:'CLOSED'},
-      {t:'Safety harness',        a:'FASTENED'},
-      {t:'Clearance',             a:'OBTAINED'},
-      {t:'CAS',                   a:'CHK'},
-    ]
-  },
-  {
-    id:'lineup', name:'Entering RWY', icon:'enter-rwy', memory:true,
-    type:'proc',
-    items:[
-      {t:'Final',                     a:'CLEAR'},
-      {t:'Parking brake',             a:'OFF'},
-      {t:'LDG light',                 a:'ON'},
-      {t:'XPDR',                      a:'ALT'},
-      {t:'LH/RH elec fuel pump',      a:'BOTH ON'},
-      {t:'LH/RH carb heat',           a:'CHK OFF'},
-      {t:'LH/RH prop lever',          a:'FULL FWD'},
-      {t:'Flight controls',           a:'CHK'},
-      {t:'Seatbelts fastened',        a:'CHK'},
-      {t:'Doors closed and locked',   a:'CHK'},
-    ]
-  },
-  {
-    id:'takeoff', name:'Takeoff', icon:'takeoff', memory:true,
-    type:'proc',
-    items:[
-      {t:'L/R throttle lever',        a:'FULL PWR'},
-      {t:'Rotation MTOW 1230 kg',     a:'Vr = 65 KIAS'},
-      {t:'Initial climb',             a:'75 KIAS'},
-      {t:'Positive rate',             a:'GEAR UP'},
-    ]
-  },
-  {
-    id:'after-to', name:'After T/O 500AGL', icon:'climb', memory:true,
-    type:'proc',
-    items:[
-      {t:'LDG gear',          a:'UP, NO LIGHTS'},
-      {t:'Airspeed',          a:'85 KIAS / Vy=80 KIAS if req.'},
-      {t:'Flaps',             a:'RETRACT'},
-      {t:'Climb power',       a:'25" / 2250 RPM'},
-      {t:'Max T/O power limited to 5 minutes', a:''},
-      {t:'LDG light',         a:'OFF'},
-      {t:'Fuel pumps',        a:'OFF'},
-    ]
-  },
-  {
-    id:'climb', name:'En-Route Climb', icon:'climb2', memory:false,
-    type:'proc',
-    items:[
-      {t:'Airspeed',           a:'Vy = 85 KIAS'},
-      {t:'Climb power',        a:'SET'},
-      {t:'Engine parameters',  a:'MONITOR — per performance tables'},
-    ]
-  },
-  {
-    id:'cruise', name:'Cruise', icon:'cruise', memory:false,
-    type:'proc',
-    items:[
-      {t:'Throttle',           a:'TABLE SET'},
-      {t:'L/R prop levers',    a:'TABLE SET'},
-      {t:'Engine parameters',  a:'CHK'},
-      {t:'Carb heat',          a:'A/R'},
-      {t:'Altimeters',         a:'SET'},
-      {t:'Trims',              a:'A/R'},
-    ]
-  },
-  {
-    id:'descent', name:'Before Descent', icon:'descent', memory:false,
-    type:'proc',
-    items:[
-      {t:'ATIS',               a:'RECEIVED'},
-      {t:'APP briefing',       a:'COMPLETED'},
-      {t:'MSA',                a:'CHK'},
-      {t:'COM / NAV',          a:'SET'},
-      {t:'Propeller',          a:'A/R'},
-      {t:'Carb heat',          a:'A/R'},
-      {t:'Altimeters',         a:'SET'},
-      {t:'Engine parameters',  a:'CHK'},
-    ]
-  },
-  {
-    id:'approach', name:'Approach', icon:'approach', memory:false,
-    type:'proc',
-    items:[
-      {t:'Breakers',           a:'ALL IN'},
-      {t:'RH fuel selector',   a:'RIGHT'},
-      {t:'LH fuel selector',   a:'LEFT'},
-      {t:'Carb heat',          a:'A/R'},
-      {t:'Altimeters',         a:'SET'},
-      {t:'Safety harness',     a:'CHK'},
-      {t:'Rear pax seat',      a:'FULL AFT POS'},
-    ]
-  },
-  {
-    id:'landing', name:'Landing', icon:'landing', memory:false,
-    type:'proc',
-    items:[
-      {t:'Rear pax seat',      a:'FULL AFT POS'},
-      {t:'L/R elec fuel pump', a:'BOTH ON'},
-      {t:'Flaps',              a:'A/R'},
-      {t:'L/R carb heat',      a:'A/R'},
-      {t:'L/R prop lever',     a:'FULL FWD'},
-      {t:'LDG gear',           a:'DOWN, 3 GREEN'},
-      {t:'LDG light',          a:'ON'},
-      {t:'Airspeed',           a:'T/O 90 KIAS'},
-    ]
-  },
-  {
-    id:'final', name:'Final', icon:'final', memory:true,
-    type:'proc',
-    items:[
-      {t:'LDG gear',                              a:'DOWN, 3 GREENS'},
-      {t:'LDG light',                             a:'ON'},
-      {t:'L/R prop lever',                        a:'FULL FWD'},
-      {t:'Carb heat',                             a:'CHK OFF'},
-      {t:'Flaps',                                 a:'SET'},
-      {t:'Approach speed — Flap T/O',             a:'90 KIAS'},
-      {t:'Approach speed — Flap FULL',            a:'75 KIAS'},
-      {t:'Landing clearance or runway clear',     a:'OBTAINED / CHK'},
-      {t:'Touchdown speed',                       a:''},
-    ]
-  },
-  {
-    id:'goaround', name:'Go Around', icon:'goaround', memory:true,
-    type:'proc',
-    items:[
-      {t:'Throttle',          a:'MAX'},
-      {t:'Flaps',             a:'T/O'},
-      {t:'Speed',             a:'OVER 62 KIAS'},
-      {t:'Positive climb',    a:'GEAR UP'},
-      {t:'Airspeed',          a:'75 KIAS'},
-      {t:'At 500 AGL',        a:'80 KIAS'},
-      {t:'Flaps',             a:'UP'},
-      {t:'Climb power',       a:'25" / 2250 RPM'},
-      {t:'ATC',               a:'NOTIFY'},
-    ]
-  },
-  {
-    id:'rwy-vacated', name:'RWY Vacated', icon:'vacated', memory:true,
-    type:'proc',
-    items:[
-      {t:'L/R elec fuel pump', a:'BOTH OFF'},
-      {t:'Flaps',              a:'UP'},
-      {t:'Pitot heat',         a:'OFF'},
-      {t:'LDG lights',         a:'OFF'},
-      {t:'Taxi lights',        a:'ON'},
-      {t:'XPDR',               a:'STBY'},
-      {t:'Not necessary equip',a:'OFF'},
-    ]
-  },
-  {
-    id:'shutdown', name:'Engine Shutdown', icon:'shutdown', memory:false,
-    type:'proc',
-    items:[
-      {t:'Parking brake',      a:'ON'},
-      {t:'Taxi and NAV lights',a:'OFF'},
-      {t:'Trims',              a:'NEUTRAL'},
-      {t:'Engines — Ensure at lowest idle before selecting ignitions off', a:'IDLE 1 MINUTE'},
-      {t:'Ignition switches — Turn off one at a time', a:'OFF'},
-      {t:'L/R avionic bus',    a:'OFF'},
-      {t:'L/R cross bus',      a:'OFF'},
-      {t:'L/R field',          a:'OFF'},
-      {t:'All ext light switches', a:'OFF'},
-      {t:'Master switch',      a:'OFF'},
-      {t:'EMG BAT',            a:'OFF'},
-      {t:'EMG cockpit light',  a:'OFF'},
-      {t:'EMG ADI switches',   a:'OFF'},
-      {t:'Before disembarkation verify propellers fully stopped', a:''},
-      {t:'Pitot cover',        a:'SET'},
-      {t:'Chocks & Ropes',     a:'SET'},
-      {t:'Sunshield',          a:'SET'},
-    ]
-  },
-];
+// ── AIRPORT DATABASE ──────────────────────────────
+const AIRPORTS = {
+  'LECU': {name:'Madrid Cuatro Vientos', elev:2269},
+  'LEMD': {name:'Madrid Barajas', elev:2000},
+  'LEPA': {name:'Palma de Mallorca', elev:27},
+  'LEBL': {name:'Barcelona El Prat', elev:12},
+  'LEZL': {name:'Sevilla', elev:112},
+  'LEBB': {name:'Bilbao', elev:138},
+  'LEVC': {name:'Valencia', elev:240},
+  'LEAL': {name:'Alicante', elev:142},
+  'LEMG': {name:'Malaga', elev:53},
+  'LEGR': {name:'Granada', elev:1860},
+  'LEZG': {name:'Zaragoza', elev:863},
+  'LEVX': {name:'Vigo', elev:856},
+  'LECO': {name:'La Coruna', elev:326},
+  'LEST': {name:'Santiago de Compostela', elev:1213},
+  'LEAM': {name:'Almeria', elev:70},
+  'GCFV': {name:'Fuerteventura', elev:85},
+  'GCLP': {name:'Gran Canaria', elev:78},
+  'GCTS': {name:'Tenerife Sur', elev:209},
+  'GCXO': {name:'Tenerife Norte', elev:2076},
+  'GCLA': {name:'La Palma', elev:1368},
+  'LEIB': {name:'Ibiza', elev:24},
+  'LEMH': {name:'Menorca', elev:302},
+  'LELL': {name:'Sabadell', elev:485},
+  'LEBA': {name:'Burgos', elev:2945},
+  'LEVD': {name:'Valladolid', elev:2776},
+  'LEMO': {name:'Moron', elev:285},
+  'LEOC': {name:'Ocana', elev:2405},
+  'LEFM': {name:'Fuentemilanos', elev:3307},
+  'LELT': {name:'La Torre', elev:1706},
+  'LECV': {name:'Casarrubios', elev:1896},
+  'LERM': {name:'Rozas', elev:2600},
+  'LESB': {name:'Son Bonet', elev:157},
+  'LEMT': {name:'Montijo', elev:0},
+  'LEAG': {name:'Algeciras', elev:25},
+  'LERI': {name:'Logrono', elev:1161},
+  'LPPT': {name:'Lisboa', elev:374},
+  'LPPO': {name:'Porto', elev:228},
+  'LPFR': {name:'Faro', elev:24},
+  'LFPG': {name:'Paris CDG', elev:392},
+  'LFPO': {name:'Paris Orly', elev:292},
+  'EGLL': {name:'London Heathrow', elev:83},
+  'LIRF': {name:'Roma Fiumicino', elev:13},
+  'LIMC': {name:'Milan Malpensa', elev:768},
+  'GMMN': {name:'Casablanca', elev:656},
+  'LEAL': {name:'Alicante', elev:142},
+  'LEMU': {name:'Muchamiel', elev:475},
+};
 
-// Icon SVG paths
-function getIcon(id) {
-  const icons = {
-    eye:       '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>',
-    shield:    '<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>',
-    power:     '<path d="M18.36 6.64a9 9 0 1 1-12.73 0"/><line x1="12" y1="2" x2="12" y2="12"/>',
-    location:  '<path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/>',
-    wind:      '<path d="M9.59 4.59A2 2 0 1 1 11 8H2m10.59 11.41A2 2 0 1 0 14 16H2m15.73-8.27A2.5 2.5 0 1 1 19.5 12H2"/>',
-    settings:  '<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>',
-    'enter-rwy':'<polyline points="15 17 20 12 15 7"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="20" x2="4" y2="4"/>',
-    takeoff:   '<path d="M17.8 19.2L16 11l3.5-3.5C21 6 21 4 19 4s-2 1-3.5 2.5L7 8 .8 9.6C.3 9.7 0 10.3.2 10.7L2 13l4-1 2 4 2-2-1-3 4-4 1 5z"/>',
-    climb:     '<polyline points="17 11 12 6 7 11"/><polyline points="17 18 12 13 7 18"/>',
-    climb2:    '<polyline points="18 15 12 9 6 15"/>',
-    cruise:    '<line x1="22" y1="12" x2="2" y2="12"/><path d="M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/>',
-    descent:   '<polyline points="7 13 12 18 17 13"/><polyline points="7 6 12 11 17 6"/>',
-    approach:  '<path d="M22 12l-5 3-4-6-5 8-6-10"/><line x1="2" y1="20" x2="22" y2="20"/>',
-    landing:   '<path d="M2.5 19h19M2 12l4.5 4.5L10 10l4 6 2.5-5L20 15"/>',
-    final:     '<polyline points="5 12 3 12 12 3 21 12 19 12"/><path d="M9 21v-6a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v6"/>',
-    goaround:  '<polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.36"/>',
-    vacated:   '<path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5M2 12l10 5 10-5"/>',
-    shutdown:  '<circle cx="12" cy="12" r="10"/><line x1="8" y1="12" x2="16" y2="12"/>',
-    postflight:'<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/>',
-  };
-  return icons[id] || icons.location;
+// Runway database: ICAO -> { runway_id: { tora, lda, surface } }
+// TORA = Take-Off Run Available (m), LDA = Landing Distance Available (m)
+const RUNWAYS = {
+  'LECU': {
+    '09': {tora:1500, lda:1500, surface:'PAVED'},
+    '27': {tora:1500, lda:1500, surface:'PAVED'},
+  },
+  'LEMD': {
+    '32L':{tora:3500, lda:3500, surface:'PAVED'},
+    '32R':{tora:4350, lda:4350, surface:'PAVED'},
+    '18L':{tora:3500, lda:3500, surface:'PAVED'},
+    '18R':{tora:4350, lda:4350, surface:'PAVED'},
+    '14L':{tora:3500, lda:3500, surface:'PAVED'},
+    '14R':{tora:4350, lda:4350, surface:'PAVED'},
+  },
+  'LEPA': {
+    '06L':{tora:2990, lda:2990, surface:'PAVED'},
+    '06R':{tora:3270, lda:3270, surface:'PAVED'},
+    '24L':{tora:3270, lda:3270, surface:'PAVED'},
+    '24R':{tora:2990, lda:2990, surface:'PAVED'},
+  },
+  'LEBL': {
+    '07L':{tora:2540, lda:2540, surface:'PAVED'},
+    '07R':{tora:3352, lda:3352, surface:'PAVED'},
+    '25L':{tora:3352, lda:3352, surface:'PAVED'},
+    '25R':{tora:2540, lda:2540, surface:'PAVED'},
+  },
+  'LEZL': {
+    '09': {tora:2990, lda:2990, surface:'PAVED'},
+    '27': {tora:2990, lda:2990, surface:'PAVED'},
+  },
+  'LELL': {
+    '07': {tora:1200, lda:1200, surface:'PAVED'},
+    '25': {tora:1200, lda:1200, surface:'PAVED'},
+  },
+  'LEOC': {
+    '14': {tora:1000, lda:1000, surface:'GRASS'},
+    '32': {tora:1000, lda:1000, surface:'GRASS'},
+    '03': {tora:1200, lda:1200, surface:'GRASS'},
+    '21': {tora:1200, lda:1200, surface:'GRASS'},
+  },
+  'LEFM': {
+    '08': {tora:900,  lda:900,  surface:'GRASS'},
+    '26': {tora:900,  lda:900,  surface:'GRASS'},
+  },
+  'LELT': {
+    '17': {tora:800,  lda:800,  surface:'GRASS'},
+    '35': {tora:800,  lda:800,  surface:'GRASS'},
+  },
+  'LECV': {
+    '10': {tora:1000, lda:1000, surface:'GRASS'},
+    '28': {tora:1000, lda:1000, surface:'GRASS'},
+  },
+  'LERM': {
+    '03': {tora:800,  lda:800,  surface:'GRASS'},
+    '21': {tora:800,  lda:800,  surface:'GRASS'},
+  },
+  'LESB': {
+    '06': {tora:1350, lda:1350, surface:'PAVED'},
+    '24': {tora:1350, lda:1350, surface:'PAVED'},
+  },
+  'LEMO': {
+    '20': {tora:1800, lda:1800, surface:'PAVED'},
+    '02': {tora:1800, lda:1800, surface:'PAVED'},
+  },
+  'LEBB': {
+    '30': {tora:2880, lda:2880, surface:'PAVED'},
+    '12': {tora:2880, lda:2880, surface:'PAVED'},
+  },
+  'LEVC': {
+    '12': {tora:2660, lda:2660, surface:'PAVED'},
+    '30': {tora:2660, lda:2660, surface:'PAVED'},
+  },
+  'LEMG': {
+    '13': {tora:3200, lda:3200, surface:'PAVED'},
+    '31': {tora:3200, lda:3200, surface:'PAVED'},
+  },
+  'LEGR': {
+    '09': {tora:3000, lda:3000, surface:'PAVED'},
+    '27': {tora:3000, lda:3000, surface:'PAVED'},
+  },
+  'LEIB': {
+    '06': {tora:2800, lda:2800, surface:'PAVED'},
+    '24': {tora:2800, lda:2800, surface:'PAVED'},
+  },
+  'LEMH': {
+    '01': {tora:2350, lda:2350, surface:'PAVED'},
+    '19': {tora:2350, lda:2350, surface:'PAVED'},
+  },
+  'LPPT': {
+    '03': {tora:3805, lda:3805, surface:'PAVED'},
+    '21': {tora:3805, lda:3805, surface:'PAVED'},
+  },
+  'LEZG': {
+    '12': {tora:3658, lda:3658, surface:'PAVED'},
+    '30': {tora:3658, lda:3658, surface:'PAVED'},
+  },
+  'LEVX': {
+    '20': {tora:2700, lda:2700, surface:'PAVED'},
+    '02': {tora:2700, lda:2700, surface:'PAVED'},
+  },
+  'LECO': {
+    '03': {tora:2100, lda:2100, surface:'PAVED'},
+    '21': {tora:2100, lda:2100, surface:'PAVED'},
+  },
+  'LEST': {
+    '17': {tora:3200, lda:3200, surface:'PAVED'},
+    '35': {tora:3200, lda:3200, surface:'PAVED'},
+  },
+  'LEAM': {
+    '07': {tora:2300, lda:2300, surface:'PAVED'},
+    '25': {tora:2300, lda:2300, surface:'PAVED'},
+  },
+  'GCFV': {
+    '01': {tora:3100, lda:3100, surface:'PAVED'},
+    '19': {tora:3100, lda:3100, surface:'PAVED'},
+  },
+  'GCLP': {
+    '03L':{tora:3100, lda:3100, surface:'PAVED'},
+    '03R':{tora:2800, lda:2800, surface:'PAVED'},
+    '21L':{tora:3100, lda:3100, surface:'PAVED'},
+    '21R':{tora:2800, lda:2800, surface:'PAVED'},
+  },
+  'GCTS': {
+    '07': {tora:3200, lda:3200, surface:'PAVED'},
+    '25': {tora:3200, lda:3200, surface:'PAVED'},
+  },
+  'GCXO': {
+    '12': {tora:2400, lda:2400, surface:'PAVED'},
+    '30': {tora:2400, lda:2400, surface:'PAVED'},
+  },
+  'GCLA': {
+    '01': {tora:1800, lda:1800, surface:'PAVED'},
+    '19': {tora:1800, lda:1800, surface:'PAVED'},
+  },
+  'LEBA': {
+    '07': {tora:2300, lda:2300, surface:'PAVED'},
+    '25': {tora:2300, lda:2300, surface:'PAVED'},
+  },
+  'LEVD': {
+    '05': {tora:2400, lda:2400, surface:'PAVED'},
+    '23': {tora:2400, lda:2400, surface:'PAVED'},
+  },
+  'LEAG': {
+    '02': {tora:1750, lda:1750, surface:'PAVED'},
+    '20': {tora:1750, lda:1750, surface:'PAVED'},
+  },
+  'LERI': {
+    '09': {tora:2000, lda:2000, surface:'PAVED'},
+    '27': {tora:2000, lda:2000, surface:'PAVED'},
+  },
+  'LEMT': {
+    '10': {tora:1900, lda:1900, surface:'PAVED'},
+    '28': {tora:1900, lda:1900, surface:'PAVED'},
+  },
+  'LPPO': {
+    '17': {tora:3480, lda:3480, surface:'PAVED'},
+    '35': {tora:3480, lda:3480, surface:'PAVED'},
+  },
+  'LPFR': {
+    '10': {tora:2490, lda:2490, surface:'PAVED'},
+    '28': {tora:2490, lda:2490, surface:'PAVED'},
+  },
+  'LFPG': {
+    '08L':{tora:3600, lda:3600, surface:'PAVED'},
+    '08R':{tora:4200, lda:4200, surface:'PAVED'},
+    '26L':{tora:4200, lda:4200, surface:'PAVED'},
+    '26R':{tora:3600, lda:3600, surface:'PAVED'},
+    '09L':{tora:2700, lda:2700, surface:'PAVED'},
+    '09R':{tora:2700, lda:2700, surface:'PAVED'},
+    '27L':{tora:2700, lda:2700, surface:'PAVED'},
+    '27R':{tora:2700, lda:2700, surface:'PAVED'},
+  },
+  'LFPO': {
+    '08': {tora:3650, lda:3650, surface:'PAVED'},
+    '26': {tora:3650, lda:3650, surface:'PAVED'},
+    '07': {tora:2400, lda:2400, surface:'PAVED'},
+    '25': {tora:2400, lda:2400, surface:'PAVED'},
+  },
+  'EGLL': {
+    '09L':{tora:3902, lda:3902, surface:'PAVED'},
+    '09R':{tora:3658, lda:3658, surface:'PAVED'},
+    '27L':{tora:3658, lda:3658, surface:'PAVED'},
+    '27R':{tora:3902, lda:3902, surface:'PAVED'},
+  },
+  'LIRF': {
+    '07':{tora:3900, lda:3900, surface:'PAVED'},
+    '25':{tora:3900, lda:3900, surface:'PAVED'},
+    '16L':{tora:3900, lda:3900, surface:'PAVED'},
+    '16R':{tora:3307, lda:3307, surface:'PAVED'},
+    '34L':{tora:3307, lda:3307, surface:'PAVED'},
+    '34R':{tora:3900, lda:3900, surface:'PAVED'},
+  },
+  'LIMC': {
+    '17L':{tora:3920, lda:3920, surface:'PAVED'},
+    '17R':{tora:3920, lda:3920, surface:'PAVED'},
+    '35L':{tora:3920, lda:3920, surface:'PAVED'},
+    '35R':{tora:3920, lda:3920, surface:'PAVED'},
+  },
+  'GMMN': {
+    '17L':{tora:4000, lda:4000, surface:'PAVED'},
+    '17R':{tora:3720, lda:3720, surface:'PAVED'},
+    '35L':{tora:3720, lda:3720, surface:'PAVED'},
+    '35R':{tora:4000, lda:4000, surface:'PAVED'},
+  },
+  'LEAL': {
+    '10': {tora:3000, lda:3000, surface:'PAVED'},
+    '28': {tora:3000, lda:3000, surface:'PAVED'},
+  },
+  'LEMU': {
+    '30': {tora:1000, lda:1000, surface:'PAVED'},
+    '12': {tora:1000, lda:1000, surface:'PAVED'},
+  },
+};
+
+function lookupAirport(prefix) {
+  var icao = document.getElementById(prefix+'-icao').value.toUpperCase().trim();
+  var nameEl = document.getElementById(prefix+'-airport-name');
+  var elevEl = document.getElementById(prefix+'-airport-elev');
+  var altEl  = document.getElementById(prefix+'-alt');
+  var rwyWrap = document.getElementById(prefix+'-rwy-wrap');
+  var rwySel  = document.getElementById(prefix+'-rwy-sel');
+  if (icao.length < 4) {
+    nameEl.textContent='—'; elevEl.textContent='Elev: — ft'; return;
+  }
+  var ap = AIRPORTS[icao];
+  if (ap) {
+    nameEl.textContent = ap.name;
+    elevEl.textContent = 'Elev: ' + ap.elev + ' ft';
+    altEl.value = ap.elev;
+    // Populate runway selector
+    var rwys = RUNWAYS[icao];
+    rwySel.innerHTML = '<option value="">—</option>';
+    if (rwys) {
+      Object.keys(rwys).forEach(function(rwy) {
+        var opt = document.createElement('option');
+        opt.value = rwy;
+        opt.textContent = rwy;
+        rwySel.appendChild(opt);
+      });
+      selectRunway(prefix);
+    } else {
+      document.getElementById(prefix+'-rwy-avail').textContent = '— m';
+      document.getElementById(prefix+'-rwy-avail').style.color = 'var(--text-dim)';
+    }
+    if (prefix==='to') calcTakeoff(); else calcLanding();
+  } else {
+    nameEl.textContent = 'Not found - set alt manually';
+    elevEl.textContent = '';
+    rwySel.innerHTML = '<option value="">—</option>';
+    document.getElementById(prefix+'-rwy-avail').textContent = '— m';
+  }
 }
 
-// State
-let currentCL = null;
-let checkedItems = {};
+function selectRunway(prefix) {
+  var icao = document.getElementById(prefix+'-icao').value.toUpperCase().trim();
+  var rwySel = document.getElementById(prefix+'-rwy-sel');
+  var rwyAvail = document.getElementById(prefix+'-rwy-avail');
+  var rwyData = RUNWAYS[icao] && RUNWAYS[icao][rwySel.value];
+  if (rwyData) {
+    rwyAvail.textContent = rwyData.tora + ' m';
+    rwyAvail.style.color = 'var(--green)';
+    var rwyType = document.getElementById(prefix+'-runway');
+    if (rwyType) rwyType.value = rwyData.surface==='PAVED' ? '1' : '0';
+    if (prefix==='to') calcTakeoff(); else calcLanding();
+  } else {
+    rwyAvail.textContent = '— m';
+    rwyAvail.style.color = 'var(--text-dim)';
+  }
+}
 
-// Build checklist grid
+function getRwyAvailable(prefix) {
+  var icao = document.getElementById(prefix+'-icao').value.toUpperCase().trim();
+  var rwyWrap = document.getElementById(prefix+'-rwy-wrap');
+  if (!icao || rwyWrap.style.display==='none') return null;
+  var rwySel = document.getElementById(prefix+'-rwy-sel');
+  var rwyData = RUNWAYS[icao] && RUNWAYS[icao][rwySel.value];
+  return rwyData ? (prefix==='to' ? rwyData.tora : rwyData.lda) : null;
+}
+
+// ── CHECKLIST DATA ─────────────────────────────────
+const CHECKLISTS = [
+  {id:'ifr-briefing',name:'Engine Start Sequence / IFR Briefing',icon:'seq',memory:false,type:'seq',items:[{t:'Perform "Before Start Checklist"'},{t:'Copy ATIS'},{t:'Request Engine Start and ATC Clearance'},{t:'Prepare and SID Briefing'},{t:'WANT (Weather, Airspace, NOTAMs, TFRs)'},{t:'Normal Briefing'},{t:'Emergency Briefing'},{t:'Engine Start'},{t:'Ready to Taxi Call'},{t:'Taxi Briefing'}]},
+  {id:'safety-cockpit',name:'Safety Cockpit',icon:'eye',memory:false,type:'proc',items:[{t:'Drain wings and engines first',a:''},{t:'Docs / AFM / Garmin guide',a:'O/B'},{t:'Weight and balance',a:'CHK'},{t:'Chocks, ropes, pitot c.',a:'O/B'},{t:'Control lock',a:'REMOVE'},{t:'Parking brake',a:'ON'},{t:'PFD and MFD',a:'CLEAN'},{t:'Doors',a:'CLOSED & LOCKED'},{t:'LG control lever',a:'CHK DN'},{t:'Breakers',a:'ALL IN'},{t:'Master switch',a:'ON'},{t:'Fuel quantity',a:'CHK'},{t:'RH fuel selector',a:'RIGHT'},{t:'LH fuel selector',a:'LEFT'},{t:'RH electric fuel pump',a:'ON'},{t:'Check fuel pressure gauge correct operation',a:''},{t:'RH electric fuel pump',a:'OFF'},{t:'LH electric fuel pump',a:'ON'},{t:'Check fuel pressure gauge correct operation',a:''},{t:'LH electric fuel pump',a:'OFF'},{t:'Strobe lights',a:'ON'},{t:'LG lights',a:'TEST'},{t:'ELT',a:'ARMED'},{t:'Fire detectors',a:'TEST'},{t:'Engine lever friction',a:'ADJUST'},{t:'Flight controls',a:'CHK FREE'},{t:'Alternate static port',a:'CHK CLSD'},{t:'Cabin heat',a:'CLSD'},{t:'Flaps - Operate to FULL, verify extension',a:''},{t:'Pitch trim control',a:'NEUTRAL'},{t:'Rudder trim control',a:'NEUTRAL'},{t:'Eng. starting battery voltmeter',a:'CHK 12-14V'},{t:'Exterior lights - All switches',a:'OFF'},{t:'Master switch',a:'OFF'}]},
+  {id:'walkaround',name:'EXT Walkaround',icon:'eye',memory:false,type:'proc',items:[{t:'Pitot, door and cabin',a:'CHK'},{t:'Left main LG',a:'CHK'},{t:'Wheel chock',a:'CHK'},{t:'Propeller and spinner',a:'CHK'},{t:'Left engine nacelle',a:'CHK'},{t:'Air induction system',a:'CHK'},{t:'Left fuel tank',a:'CHK'},{t:'Oil quantity',a:'CHK'},{t:'Left wing leading edge',a:'CHK'},{t:'Left wing top and bottom panels',a:'CHK'},{t:'Static discharge wicks',a:'CHK'},{t:'Left winglet',a:'CHK'},{t:'Left aileron and balance mass',a:'CHK'},{t:'Left flaps and hinges',a:'CHK'},{t:'Left static port',a:'CHK'},{t:'Antennas',a:'CHK'},{t:'Gear pump',a:'MIN 20 PSI'},{t:'Ext pwr and bat',a:'CHK'},{t:'Horizontal and vertical empennage and tabs',a:'CHK'},{t:'Static discharge wicks',a:'CHK'},{t:'Stabilator leading edge',a:'CHK'},{t:'Fuselage top and bottom skin',a:'CHK'},{t:'Right flap and hinges',a:'CHK'},{t:'Right aileron and balance mass',a:'CHK'},{t:'Right winglet',a:'CHK'},{t:'Static discharge wick',a:'CHK'},{t:'Right wing top and bottom panels',a:'CHK'},{t:'Right wing leading edge',a:'CHK'},{t:'Right fuel tank',a:'CHK'},{t:'Oil quantity',a:'CHK'},{t:'Propeller and spinner',a:'CHK'},{t:'Right engine nacelle',a:'CHK'},{t:'Pax door and cabin',a:'CHK'},{t:'Right main LG',a:'CHK'},{t:'Wheel chock',a:'CHK'},{t:'Bottom fuselage antennas',a:'CHK'},{t:'Right cabin ram-air inlet',a:'CHK'},{t:'Right pitot tube',a:'CHK'},{t:'Nose LG',a:'CHK'},{t:'Radome',a:'CHK'},{t:'Radome access door',a:'CHK'},{t:'Left pitot tube',a:'CHK'}]},
+  {id:'before-start',name:'Before Start',icon:'power',memory:false,type:'proc',items:[{t:'Preflight inspection',a:'COMPLETED'},{t:'Parking brake',a:'ON'},{t:'Brakes',a:'USE'},{t:'Pax briefing',a:'COMPLETE'},{t:'Pitot cover',a:'CHK O/B'},{t:'Fuel selectors',a:'ON L/R'},{t:'Doors',a:'CLOSED & LATCHED'},{t:'Master switch',a:'ON'},{t:'Coms',a:'SET'},{t:'ATIS',a:'OBTAIN'},{t:'Clearance',a:'OBTAIN'},{t:'Breakers',a:'ALL IN'}]},
+  {id:'engine-start',name:'Engine Start',icon:'power',memory:false,type:'proc',items:[{t:'— RIGHT ENGINE STARTING —',a:''},{t:'RH throttle lever',a:'IDLE'},{t:'RH carburettor heat',a:'OFF'},{t:'RH propeller lever',a:'FULL FWD'},{t:'RH choke',a:'AS REQUIRED'},{t:'Master switch',a:'ON'},{t:'RH electrical fuel pump',a:'ON'},{t:'Check advisory light ON and positive fuel press build up',a:''},{t:'Strobes',a:'ON'},{t:'RH engine propeller zone',a:'FREE'},{t:'RH ignition switches',a:'BOTH ON'},{t:'RH start pushbutton',a:'PUSH'},{t:'RH engine oil gauge',a:'CHK increasing 10 sec'},{t:'RH throttle lever',a:'1200 RPM'},{t:'RH choke',a:'OFF'},{t:'RH field',a:'ON'},{t:'RH avionics',a:'ON'},{t:'RH cross bus',a:'ON'},{t:'RH ammeter',a:'CHK POSITIVE'},{t:'RH voltmeter',a:'CHK 12-14 V'},{t:'RH electrical fuel pump',a:'OFF'},{t:'— REPEAT PROCEDURE LH ENGINE —',a:''}]},
+  {id:'after-start',name:'After Start',icon:'location',memory:false,type:'proc',items:[{t:'Throttle',a:'1200 RPM'},{t:'Nav lights',a:'ON'},{t:'Radio and nav',a:'SET'},{t:'XPDR',a:'STBY'},{t:'PFD',a:'ALIGNED'},{t:'Altimeters',a:'SET AND X-CHK'},{t:'Gyro',a:'PRE-SELECTED'},{t:'Seat belts',a:'FASTENED'},{t:'Headphones',a:'A/R'},{t:'Flight controls',a:'CHK'},{t:'Flaps',a:'RETRACT'},{t:'ATIS',a:'OBTAINED'},{t:'WANT / dep briefing',a:'COMPLETED'},{t:'Taxi clearance',a:'OBTAIN'},{t:'Taxi briefing',a:'PERFORM'}]},
+  {id:'taxi',name:'Taxi',icon:'wind',memory:true,type:'proc',items:[{t:'No taxi until OIL T 50 C',a:''},{t:'Taxi light',a:'ON'},{t:'L/R fuel selectors',a:'A/R'},{t:'L/R fuel pressure',a:'MONITOR'},{t:'Parking brake',a:'RELEASE'},{t:'Brakes',a:'TEST'},{t:'Flight instruments',a:'CHK'},{t:'Engine instruments',a:'CHK'},{t:'Altimeters',a:'SET AND X-CHK'}]},
+  {id:'ground-check',name:'Ground Check',icon:'settings',memory:true,type:'proc',items:[{t:'Taxi light',a:'OFF'},{t:'Parking brake',a:'ON'},{t:'RH fuel selector',a:'RIGHT'},{t:'LH fuel selector',a:'LEFT'},{t:'LH/RH fuel press',a:'CHK'},{t:'Engine instruments',a:'IN LIMITS'},{t:'LH/RH GEN lights',a:'CHK OFF'},{t:'LH/RH prop lever',a:'FULL FWD'},{t:'LH/RH throttle lever',a:'1650 RPM'},{t:'RH ignition switches',a:'L/R/BOTH'},{t:'Max drop 130 RPM - Max diff 50 RPM',a:''},{t:'RH prop lever - Governor CHK',a:''},{t:'Reduce 1200 RPM, full fwd, repeat 3x. Min 1150 RPM',a:''},{t:'RH carb heat - Verify RPM drop 100 RPM',a:'ON'},{t:'RH carb heat',a:'OFF'},{t:'RH engine instrument',a:'CHK'},{t:'LH/RH fuel quantity',a:'CHK'},{t:'LH/RH throttle lever',a:'IDLE'},{t:'LH/RH throttle lever',a:'1200 RPM'},{t:'Repeat procedure LH engine',a:''}]},
+  {id:'before-to',name:'Before T/O',icon:'settings',memory:false,type:'proc',items:[{t:'T/O briefing',a:'CONFIRMED'},{t:'RH fuel selector',a:'RIGHT'},{t:'LH fuel selector',a:'LEFT'},{t:'Pitch trim',a:'SET'},{t:'Rudder trim',a:'SET'},{t:'Flaps',a:'T/O'},{t:'Pitot heat',a:'A/R'},{t:'Magnetic compass',a:'CHK'},{t:'AHRS',a:'X-CHK'},{t:'Doors & Windows',a:'CLOSED'},{t:'Safety harness',a:'FASTENED'},{t:'Clearance',a:'OBTAINED'},{t:'CAS',a:'CHK'}]},
+  {id:'lineup',name:'Entering RWY',icon:'enter-rwy',memory:true,type:'proc',items:[{t:'Final',a:'CLEAR'},{t:'Parking brake',a:'OFF'},{t:'LDG light',a:'ON'},{t:'XPDR',a:'ALT'},{t:'LH/RH elec fuel pump',a:'BOTH ON'},{t:'LH/RH carb heat',a:'CHK OFF'},{t:'LH/RH prop lever',a:'FULL FWD'},{t:'Flight controls',a:'CHK'},{t:'Seatbelts fastened',a:'CHK'},{t:'Doors closed and locked',a:'CHK'}]},
+  {id:'takeoff',name:'Takeoff',icon:'takeoff',memory:true,type:'proc',items:[{t:'L/R throttle lever',a:'FULL PWR'},{t:'Rotation MTOW 1230 kg',a:'Vr = 65 KIAS'},{t:'Initial climb',a:'75 KIAS'},{t:'Positive rate',a:'GEAR UP'}]},
+  {id:'after-to',name:'After T/O 500AGL',icon:'climb',memory:true,type:'proc',items:[{t:'LDG gear',a:'UP, NO LIGHTS'},{t:'Airspeed',a:'85 KIAS / Vy=80 KIAS if req.'},{t:'Flaps',a:'RETRACT'},{t:'Climb power',a:'25" / 2250 RPM'},{t:'Max T/O power limited to 5 minutes',a:''},{t:'LDG light',a:'OFF'},{t:'Fuel pumps',a:'OFF'}]},
+  {id:'climb',name:'En-Route Climb',icon:'climb2',memory:false,type:'proc',items:[{t:'Airspeed',a:'Vy = 85 KIAS'},{t:'Climb power',a:'SET'},{t:'Engine parameters',a:'MONITOR - per performance tables'}]},
+  {id:'cruise',name:'Cruise',icon:'cruise',memory:false,type:'proc',items:[{t:'Throttle',a:'TABLE SET'},{t:'L/R prop levers',a:'TABLE SET'},{t:'Engine parameters',a:'CHK'},{t:'Carb heat',a:'A/R'},{t:'Altimeters',a:'SET'},{t:'Trims',a:'A/R'}]},
+  {id:'descent',name:'Before Descent',icon:'descent',memory:false,type:'proc',items:[{t:'ATIS',a:'RECEIVED'},{t:'APP briefing',a:'COMPLETED'},{t:'MSA',a:'CHK'},{t:'COM / NAV',a:'SET'},{t:'Propeller',a:'A/R'},{t:'Carb heat',a:'A/R'},{t:'Altimeters',a:'SET'},{t:'Engine parameters',a:'CHK'}]},
+  {id:'approach',name:'Approach',icon:'approach',memory:false,type:'proc',items:[{t:'Breakers',a:'ALL IN'},{t:'RH fuel selector',a:'RIGHT'},{t:'LH fuel selector',a:'LEFT'},{t:'Carb heat',a:'A/R'},{t:'Altimeters',a:'SET'},{t:'Safety harness',a:'CHK'},{t:'Rear pax seat',a:'FULL AFT POS'}]},
+  {id:'landing',name:'Landing',icon:'landing',memory:false,type:'proc',items:[{t:'Rear pax seat',a:'FULL AFT POS'},{t:'L/R elec fuel pump',a:'BOTH ON'},{t:'Flaps',a:'A/R'},{t:'L/R carb heat',a:'A/R'},{t:'L/R prop lever',a:'FULL FWD'},{t:'LDG gear',a:'DOWN, 3 GREEN'},{t:'LDG light',a:'ON'},{t:'Airspeed',a:'T/O 90 KIAS'}]},
+  {id:'final',name:'Final',icon:'final',memory:true,type:'proc',items:[{t:'LDG gear',a:'DOWN, 3 GREENS'},{t:'LDG light',a:'ON'},{t:'L/R prop lever',a:'FULL FWD'},{t:'Carb heat',a:'CHK OFF'},{t:'Flaps',a:'SET'},{t:'Approach speed - Flap T/O',a:'90 KIAS'},{t:'Approach speed - Flap FULL',a:'75 KIAS'},{t:'Landing clearance or runway clear',a:'OBTAINED / CHK'},{t:'Touchdown speed',a:''}]},
+  {id:'goaround',name:'Go Around',icon:'goaround',memory:true,type:'proc',items:[{t:'Throttle',a:'MAX'},{t:'Flaps',a:'T/O'},{t:'Speed',a:'OVER 62 KIAS'},{t:'Positive climb',a:'GEAR UP'},{t:'Airspeed',a:'75 KIAS'},{t:'At 500 AGL',a:'80 KIAS'},{t:'Flaps',a:'UP'},{t:'Climb power',a:'25" / 2250 RPM'},{t:'ATC',a:'NOTIFY'}]},
+  {id:'rwy-vacated',name:'RWY Vacated',icon:'vacated',memory:true,type:'proc',items:[{t:'L/R elec fuel pump',a:'BOTH OFF'},{t:'Flaps',a:'UP'},{t:'Pitot heat',a:'OFF'},{t:'LDG lights',a:'OFF'},{t:'Taxi lights',a:'ON'},{t:'XPDR',a:'STBY'},{t:'Not necessary equip',a:'OFF'}]},
+  {id:'shutdown',name:'Engine Shutdown',icon:'shutdown',memory:false,type:'proc',items:[{t:'Parking brake',a:'ON'},{t:'Taxi and NAV lights',a:'OFF'},{t:'Trims',a:'NEUTRAL'},{t:'Engines - lowest idle before ignitions off',a:'IDLE 1 MINUTE'},{t:'Ignition switches - one at a time',a:'OFF'},{t:'L/R avionic bus',a:'OFF'},{t:'L/R cross bus',a:'OFF'},{t:'L/R field',a:'OFF'},{t:'All ext light switches',a:'OFF'},{t:'Master switch',a:'OFF'},{t:'EMG BAT',a:'OFF'},{t:'EMG cockpit light',a:'OFF'},{t:'EMG ADI switches',a:'OFF'},{t:'Propellers fully stopped before disembark',a:''},{t:'Pitot cover',a:'SET'},{t:'Chocks & Ropes',a:'SET'},{t:'Sunshield',a:'SET'}]},
+];
+
+// ── EMERGENCY CHECKLISTS ───────────────────────────
+const EMERGENCY_CHECKLISTS = [
+  {id:'eng-fail-to-run',name:'Engine Failure During T/O Run',icon:'alert',type:'proc',memory:false,items:[{t:'Throttle Levers',a:'BOTH IDLE'},{t:'Rudder',a:'KEEP HEADING CONTROL'},{t:'Brakes',a:'AS REQUIRED'},{t:'Failed Engine Ignition',a:'BOTH OFF'},{t:'Failed Engine Field',a:'OFF'},{t:'Failed Engine Elec Fuel Pump',a:'OFF'}]},
+  {id:'eng-fail-after-to',name:'Engine Failure After T/O',icon:'alert',type:'proc',memory:false,items:[{t:'Operating Engine Throttle Lever',a:'FULL POWER'},{t:'Operating Engine Propeller Lever',a:'FULL FORWARD'},{t:'Heading',a:'KEEP CONTROL'},{t:'Attitude',a:'REDUCE - keep above 62 KIAS'},{t:'Inoperative Engine Prop Lever',a:'FEATHER'},{t:'Landing Gear',a:'UP'},{t:'Airspeed',a:'VXSE / VYSE'},{t:'Flaps',a:'0'},{t:'Inoperative Engine',a:'CONFIRM & SECURE'},{t:'Operating Engine Fuel Selector',a:'CHECK - crossfeed if needed'}]},
+  {id:'eng-fail-flight',name:'Engine Failure in Flight',icon:'alert',type:'proc',memory:false,items:[{t:'Autopilot',a:'OFF'},{t:'Heading',a:'KEEP CONTROL'},{t:'Attitude',a:'ADJUST - keep above 62 KIAS'},{t:'Operating Engine',a:'MONITOR instruments'},{t:'Operative Engine Elec Fuel Pump',a:'CHECK ON'},{t:'Operating Engine Fuel Selector',a:'CHECK - crossfeed if needed'},{t:'Inflight Engine Restart',a:'ATTEMPT if possible'},{t:'If restart unsuccessful',a:'LAND AS SOON AS POSSIBLE'}]},
+  {id:'eng-securing',name:'Engine Securing',icon:'alert',type:'proc',memory:false,items:[{t:'Throttle Lever',a:'IDLE'},{t:'Ignition',a:'BOTH OFF'},{t:'Propeller Lever',a:'FEATHER'},{t:'Fuel Selector',a:'OFF'},{t:'Electrical Fuel Pump',a:'OFF'}]},
+  {id:'eng-restart',name:'Inflight Engine Restart',icon:'alert',type:'proc',memory:false,items:[{t:'Carburettor Heat',a:'ON IF REQUIRED'},{t:'Electrical Fuel Pump',a:'ON'},{t:'Fuel Quantity',a:'CHECK'},{t:'Fuel Selector',a:'CHECK - crossfeed if needed'},{t:'Field',a:'OFF'},{t:'Ignition',a:'BOTH ON'},{t:'Operating Engine Throttle',a:'SET AS PRACTICAL'},{t:'Stopped Engine Throttle',a:'IDLE'},{t:'Stopped Engine Propeller Lever',a:'FULL FORWARD'},{t:'Start Pushbutton Inoperative Engine',a:'PUSH'},{t:'Propeller Lever Inoperative Engine',a:'SET desired RPM'},{t:'Field',a:'ON - check positive ammeter'},{t:'Engine Throttle Levers',a:'SET AS REQUIRED'}]},
+  {id:'oei-landing',name:'OEI Landing',icon:'alert',type:'proc',memory:false,items:[{t:'Seat Belts',a:'TIGHTLY FASTENED'},{t:'Landing Lights',a:'AS REQUIRED'},{t:'Operating Engine Fuel Selector',a:'CHECK - crossfeed if needed'},{t:'Inoperative Engine Prop Lever',a:'CHECK FEATHERED'},{t:'Inoperative Engine',a:'CHECK SECURED'},{t:'Operative Engine Elec Fuel Pump',a:'ON'},{t:'Flaps (final)',a:'T/O'},{t:'Landing Gear',a:'DOWN - 3 greens'},{t:'Approach Speed',a:'VYSE - 80 KIAS'},{t:'Touchdown Speed',a:'70 KIAS'}]},
+  {id:'eng-fire-ground',name:'Engine Fire on Ground',icon:'alert',type:'proc',memory:false,items:[{t:'Throttle Lever affected engine',a:'IDLE'},{t:'Ignition affected engine',a:'BOTH OFF'},{t:'Electrical Fuel Pump',a:'OFF'},{t:'Fuel Selector affected engine',a:'OFF'},{t:'Field affected engine',a:'OFF'},{t:'Master Switch',a:'OFF'},{t:'Evacuate aircraft',a:'IMMEDIATELY'}]},
+  {id:'eng-fire-flight',name:'Engine Fire in Flight',icon:'alert',type:'proc',memory:false,items:[{t:'Throttle Lever affected engine',a:'IDLE'},{t:'Airspeed',a:'INCREASE to extinguish fire'},{t:'If fire persists - Engine',a:'SECURE'},{t:'Land',a:'AS SOON AS POSSIBLE'}]},
+  {id:'elec-fire',name:'Electrical Fire / Smoke',icon:'alert',type:'proc',memory:false,items:[{t:'Master Switch',a:'OFF'},{t:'Field LH & RH',a:'BOTH OFF'},{t:'All avionics switches',a:'OFF'},{t:'Master Switch',a:'ON'},{t:'Field LH & RH',a:'BOTH ON - restore one at a time'},{t:'Land',a:'AS SOON AS POSSIBLE'}]},
+  {id:'single-gen-fail',name:'Single Generator Failure',icon:'alert',type:'proc',memory:false,items:[{t:'Affected Field (LH or RH)',a:'OFF'},{t:'Affected Field (LH or RH)',a:'ON'},{t:'If caution stays - Field',a:'OFF'},{t:'Avionics LH',a:'OFF'},{t:'ADF',a:'OFF'},{t:'Cross Bus (if needed)',a:'OFF'},{t:'Land',a:'AS SOON AS PRACTICABLE'}]},
+  {id:'both-gen-fail',name:'Both Generators Failure',icon:'alert',type:'proc',memory:false,items:[{t:'Field LH & RH',a:'BOTH OFF'},{t:'Field LH & RH',a:'BOTH ON'},{t:'If both fail - Field LH & RH',a:'BOTH OFF'},{t:'Cross Bus LH & RH',a:'BOTH OFF'},{t:'EMERG BATT (if installed)',a:'ON'},{t:'Land',a:'AS SOON AS POSSIBLE'}]},
+  {id:'emerg-descent',name:'Emergency Descent',icon:'alert',type:'proc',memory:false,items:[{t:'Power Levers',a:'IDLE'},{t:'Flaps',a:'UP'},{t:'IAS',a:'BELOW VLO/VLE'},{t:'Landing Gear',a:'DOWN'},{t:'Airspeed',a:'UP TO VLO/VLE'}]},
+  {id:'total-elec-fail',name:'Total Electrical Failure',icon:'alert',type:'proc',memory:false,items:[{t:'Emergency Light',a:'ON IF NEEDED'},{t:'Standby ADI switch',a:'ON'},{t:'Master Switch',a:'OFF'},{t:'Field LH & RH',a:'BOTH OFF'},{t:'Master Switch',a:'ON'},{t:'Field LH & RH',a:'BOTH ON'},{t:'If fails - EMERG BATT',a:'ON (if installed)'},{t:'Land',a:'AS SOON AS POSSIBLE'}]},
+  {id:'emerg-lg-ext',name:'Emergency LG Extension',icon:'alert',type:'proc',memory:false,items:[{t:'Airspeed',a:'REDUCE BELOW VLO'},{t:'LG Control Knob',a:'DOWN'},{t:'LG Green Lights',a:'CHECK 3 GREEN'},{t:'If not 3 green - Hydraulic Emergency Lever',a:'PULL'},{t:'LG Green Lights',a:'VERIFY 3 GREEN'},{t:'Land normally',a:''}]},
+  {id:'high-oil-temp',name:'High Oil Temperature',icon:'alert',type:'proc',memory:false,items:[{t:'Oil Pressure',a:'CHECK'},{t:'Affected Engine Power',a:'REDUCE TO MINIMUM'},{t:'Prop Speed',a:'KEEP ABOVE 2000 RPM'},{t:'If no improvement - Engine',a:'SECURE'},{t:'Land',a:'AS SOON AS POSSIBLE'}]},
+  {id:'low-oil-press',name:'Low Oil Pressure',icon:'alert',type:'proc',memory:false,items:[{t:'Oil Pressure',a:'CHECK'},{t:'If low - Land',a:'AS SOON AS PRACTICAL'},{t:'If continuously decreasing',a:'SECURE ENGINE'},{t:'OEI Landing procedure',a:'SEE PARA. 6.6'}]},
+  {id:'icing',name:'Inadvertent Icing',icon:'alert',type:'proc',memory:false,items:[{t:'Carburettor Heat',a:'BOTH ON'},{t:'Pitot Heat',a:'ON'},{t:'Exit icing area',a:'CHANGE ALT / DIRECTION'},{t:'Control Surfaces',a:'MOVE CONTINUOUSLY'},{t:'Propeller RPM',a:'INCREASE'}]},
+  {id:'flaps-fail',name:'Flaps Control Failure',icon:'alert',type:'proc',memory:false,items:[{t:'Airspeed',a:'KEEP BELOW 93 KIAS'},{t:'Land',a:'AS SOON AS PRACTICAL'},{t:'Approach speed',a:'KEEP OVER 75 KIAS'},{t:'Landing distance',a:'INCREASED ~25%'}]},
+  {id:'ditching',name:'Ditching',icon:'alert',type:'proc',memory:false,items:[{t:'Transponder',a:'7700'},{t:'ATC',a:'MAYDAY CALL'},{t:'Seat belts',a:'TIGHTEN'},{t:'Loose objects',a:'SECURE'},{t:'Flaps',a:'T/O'},{t:'Landing gear',a:'UP'},{t:'Ditch parallel to swells at min speed',a:''},{t:'After ditching - Evacuate immediately',a:''}]},
+];
+
+// ── STATE ──────────────────────────────────────────
+var currentCL = null;
+var checkedItems = {};
+
+// ── BUILD NORMAL GRID ──────────────────────────────
 function buildClGrid() {
-  const grid = document.getElementById('cl-grid');
+  var grid = document.getElementById('cl-grid');
   grid.innerHTML = '';
-  // Skip IFR briefing — shown separately
-  CHECKLISTS.filter(cl => cl.id !== 'ifr-briefing').forEach(cl => {
-    const div = document.createElement('div');
+  CHECKLISTS.filter(function(cl){return cl.id!=='ifr-briefing';}).forEach(function(cl) {
+    var div = document.createElement('div');
     div.className = 'cl-card' + (cl.memory ? ' memory' : '');
-    div.onclick = () => openChecklist(cl.id);
-    const done = (checkedItems[cl.id] || []).filter(Boolean).length;
-    const total = cl.items.length;
-    const pct = total > 0 ? Math.round(done/total*100) : 0;
-    div.innerHTML = `
-      ${cl.memory ? '<div class="memory-badge">MEMORY ITEM</div>' : ''}
-      <div class="cl-card-name">${cl.name}</div>
-      ${done > 0 ? `<div style="font-family:var(--mono);font-size:9px;color:${done===total?'var(--green)':'var(--amber)'}">${pct}%</div>` : ''}
-    `;
+    div.onclick = function(){ openChecklist(cl.id); };
+    var done = (checkedItems[cl.id]||[]).filter(Boolean).length;
+    var total = cl.items.length;
+    var pct = total>0 ? Math.round(done/total*100) : 0;
+    div.innerHTML = (cl.memory?'<div class="memory-badge">MEMORY ITEM</div>':'')+
+      '<div class="cl-card-name">'+cl.name+'</div>'+
+      (done>0?'<div style="font-family:var(--mono);font-size:9px;color:'+(done===total?'var(--green)':'var(--amber)')+'">'+pct+'%</div>':'');
     grid.appendChild(div);
   });
 }
 
+// ── BUILD EMERGENCY GRID ───────────────────────────
+function buildEmergGrid() {
+  var grid = document.getElementById('cl-emerg-grid');
+  grid.innerHTML = '';
+  EMERGENCY_CHECKLISTS.forEach(function(cl) {
+    var div = document.createElement('div');
+    div.className = 'cl-card emergency-card';
+    div.onclick = function(){ openChecklist(cl.id); };
+    var done = (checkedItems[cl.id]||[]).filter(Boolean).length;
+    var total = cl.items.length;
+    var pct = total>0 ? Math.round(done/total*100) : 0;
+    div.innerHTML = '<div class="cl-card-name" style="color:#fff;">'+cl.name+'</div>'+
+      (done>0?'<div style="font-family:var(--mono);font-size:9px;color:#FCA5A5;">'+pct+'%</div>':'');
+    grid.appendChild(div);
+  });
+}
+
+// ── OPEN CHECKLIST ─────────────────────────────────
 function openChecklist(id) {
-  const cl = CHECKLISTS.find(c => c.id === id);
+  var cl = CHECKLISTS.find(function(c){return c.id===id;}) ||
+           EMERGENCY_CHECKLISTS.find(function(c){return c.id===id;}) ||
+           (id==='ifr-briefing' ? CHECKLISTS[0] : null);
   if (!cl) return;
   currentCL = cl;
   if (!checkedItems[id]) checkedItems[id] = new Array(cl.items.length).fill(false);
-
   document.getElementById('cl-items-title').textContent = cl.name.toUpperCase();
   document.getElementById('cl-menu-view').style.display = 'none';
-  const iv = document.getElementById('cl-items-view');
+  var iv = document.getElementById('cl-items-view');
   iv.style.display = 'flex';
-
   renderItems();
 }
 
 function renderItems() {
-  const cl = currentCL;
-  const list = document.getElementById('cl-items-list');
-  const checked = checkedItems[cl.id];
+  var cl = currentCL;
+  var list = document.getElementById('cl-items-list');
+  var checked = checkedItems[cl.id];
   list.innerHTML = '';
-
-  cl.items.forEach((item, i) => {
-    const div = document.createElement('div');
-    const isDone = checked[i];
-    const isSep = !item.a && item.t.startsWith('—');
-
+  cl.items.forEach(function(item, i) {
+    var div = document.createElement('div');
+    var isDone = checked[i];
+    var isSep = item.t.startsWith('—') && !item.a;
     if (isSep) {
       div.style.cssText = 'background:var(--panel);padding:8px 20px;font-family:var(--head);font-size:11px;letter-spacing:1.5px;color:var(--amber);border-bottom:1px solid var(--border);';
       div.textContent = item.t;
       list.appendChild(div);
       return;
     }
-
     if (cl.type === 'seq') {
-      div.className = 'cl-seq-item' + (isDone ? ' checked' : '');
-      div.innerHTML = `
-        <div class="cl-seq-num">${i+1}</div>
-        <div class="cl-seq-text">${item.t}</div>
-        <div class="cl-seq-check">
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-        </div>`;
+      div.className = 'cl-seq-item' + (isDone?' checked':'');
+      div.innerHTML = '<div class="cl-seq-num">'+(i+1)+'</div><div class="cl-seq-text">'+item.t+'</div>'+
+        '<div class="cl-seq-check"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>';
     } else {
-      div.className = 'cl-item' + (isDone ? ' checked' : '');
-      div.innerHTML = `
-        <div class="cl-item-left">
-          <div class="cl-item-num">${i+1}</div>
-          <div class="cl-item-text">${item.t}</div>
-        </div>
-        ${item.a ? `<div class="cl-item-action">${item.a}</div>` : ''}
-        <div class="cl-item-check" style="margin-left:10px;">
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-        </div>`;
+      div.className = 'cl-item' + (isDone?' checked':'');
+      div.innerHTML = '<div class="cl-item-left"><div class="cl-item-num">'+(i+1)+'</div><div class="cl-item-text">'+item.t+'</div></div>'+
+        (item.a?'<div class="cl-item-action">'+item.a+'</div>':'')+
+        '<div class="cl-item-check" style="margin-left:10px;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>';
     }
-
-    div.onclick = () => toggleItem(i);
+    div.onclick = function(){ toggleItem(i); };
     list.appendChild(div);
   });
-
   updateProgress();
 }
 
@@ -1081,18 +1095,17 @@ function toggleItem(i) {
   checkedItems[currentCL.id][i] = !checkedItems[currentCL.id][i];
   renderItems();
   buildClGrid();
+  buildEmergGrid();
 }
 
 function updateProgress() {
-  const cl = currentCL;
-  const checked = checkedItems[cl.id];
-  // exclude separator items
-  const items = cl.items.filter(it => !(it.t.startsWith('—') && !it.a));
-  const total = items.length;
-  const done = checked.filter(Boolean).length;
-  const pct = total > 0 ? Math.round(done/total*100) : 0;
-  document.getElementById('cl-progress-fill').style.width = pct + '%';
-  document.getElementById('cl-progress-text').textContent = done + ' / ' + total;
+  var cl = currentCL;
+  var checked = checkedItems[cl.id];
+  var total = cl.items.length;
+  var done = checked.filter(Boolean).length;
+  var pct = total>0 ? Math.round(done/total*100) : 0;
+  document.getElementById('cl-progress-fill').style.width = pct+'%';
+  document.getElementById('cl-progress-text').textContent = done+' / '+total;
 }
 
 function resetChecklist() {
@@ -1100,6 +1113,7 @@ function resetChecklist() {
   checkedItems[currentCL.id] = new Array(currentCL.items.length).fill(false);
   renderItems();
   buildClGrid();
+  buildEmergGrid();
 }
 
 function showClMenu() {
@@ -1107,462 +1121,190 @@ function showClMenu() {
   document.getElementById('cl-items-view').style.display = 'none';
   currentCL = null;
   buildClGrid();
+  buildEmergGrid();
 }
 
-// ── SCREEN NAVIGATION ─────────────────────────────
-const screens = ['screen-home','screen-checklist','screen-perf'];
-const navBtns = { 'screen-checklist':'nav-checklist', 'screen-perf':'nav-perf' };
+function switchClTab(tab) {
+  var isEmerg = tab==='emergency';
+  document.getElementById('cl-normal-view').style.display = isEmerg?'none':'';
+  document.getElementById('cl-emergency-view').style.display = isEmerg?'':'none';
+  document.getElementById('tab-normal').classList.toggle('active',!isEmerg);
+  document.getElementById('tab-emergency').classList.toggle('active',isEmerg);
+}
+
+// ── SCREEN NAVIGATION ──────────────────────────────
+var screens = ['screen-home','screen-checklist','screen-perf'];
+var navBtns = {'screen-checklist':'nav-checklist','screen-perf':'nav-perf'};
 
 function showScreen(id) {
-  screens.forEach(s => {
-    const el = document.getElementById(s);
-    el.classList.toggle('active', s === id);
+  screens.forEach(function(s){
+    var el = document.getElementById(s);
+    el.classList.toggle('active', s===id);
   });
-  document.body.classList.toggle('on-home', id === 'screen-home');
-  // Bottom nav only visible outside home
-  Object.entries(navBtns).forEach(([s,b]) => {
-    document.getElementById(b).classList.toggle('active', s === id);
+  document.body.classList.toggle('on-home', id==='screen-home');
+  Object.keys(navBtns).forEach(function(s){
+    var b = document.getElementById(navBtns[s]);
+    if(b) b.classList.toggle('active', s===id);
   });
 }
 
-function enterAircraft() {
-  showScreen('screen-checklist');
-}
+function enterAircraft() { showScreen('screen-checklist'); }
 
-// ── PERFORMANCE ───────────────────────────────────
-const toData = {
-  1180: {0:[208,258,313,374,290,266,331,404,485,373],1000:[230,284,346,413,315,294,366,447,537,407],2000:[254,315,382,457,343,326,406,495,595,444],3000:[281,348,423,505,374,401,499,610,733,529],4000:[311,385,468,560,408,401,499,610,733,529],5000:[345,427,519,620,445,445,555,677,814,579],6000:[383,474,575,688,486,495,617,753,906,633],7000:[425,526,639,764,531,551,686,839,1008,693],8000:[472,585,710,849,581,614,765,934,1123,759],9000:[525,650,790,945,635,685,853,1042,1253,833],10000:[585,724,879,1052,696,764,952,1163,1399,914]},
-  1080: {0:[148,188,234,286,215,193,246,306,374,281],1000:[165,210,261,319,235,216,274,341,418,308],2000:[184,234,291,356,258,241,306,381,466,338],3000:[206,262,326,398,284,301,383,477,583,409],4000:[230,293,364,446,312,301,383,477,583,409],5000:[258,328,408,499,343,338,429,534,653,449],6000:[289,368,457,559,378,378,481,599,732,495],7000:[324,412,513,628,417,425,540,672,822,545],8000:[364,463,577,705,460,477,606,755,923,602],9000:[410,521,648,793,508,536,682,849,1038,664],10000:[461,586,730,893,561,604,767,955,1168,734]},
-  930:  {0:[100,127,158,194,146,131,167,207,254,190],1000:[112,142,177,216,160,146,186,231,283,209],2000:[125,159,197,242,175,163,208,258,316,229],3000:[140,177,221,270,192,204,260,323,395,277],4000:[156,198,247,302,212,204,260,323,395,277],5000:[175,222,277,338,233,229,291,362,443,305],6000:[196,249,310,379,256,257,326,406,496,335],7000:[220,280,348,426,282,288,366,455,557,370],8000:[247,314,391,478,312,323,411,512,626,408],9000:[278,353,440,538,344,364,462,575,704,450],10000:[313,397,495,605,380,409,520,648,792,498]}
+// ── PERFORMANCE DATA ───────────────────────────────
+var toData = {
+  1180:{0:[208,258,313,374,290,266,331,404,485,373],1000:[230,284,346,413,315,294,366,447,537,407],2000:[254,315,382,457,343,326,406,495,595,444],3000:[281,348,423,505,374,401,499,610,733,529],4000:[311,385,468,560,408,401,499,610,733,529],5000:[345,427,519,620,445,445,555,677,814,579],6000:[383,474,575,688,486,495,617,753,906,633],7000:[425,526,639,764,531,551,686,839,1008,693],8000:[472,585,710,849,581,614,765,934,1123,759],9000:[525,650,790,945,635,685,853,1042,1253,833],10000:[585,724,879,1052,696,764,952,1163,1399,914]},
+  1080:{0:[148,188,234,286,215,193,246,306,374,281],1000:[165,210,261,319,235,216,274,341,418,308],2000:[184,234,291,356,258,241,306,381,466,338],3000:[206,262,326,398,284,301,383,477,583,409],4000:[230,293,364,446,312,301,383,477,583,409],5000:[258,328,408,499,343,338,429,534,653,449],6000:[289,368,457,559,378,378,481,599,732,495],7000:[324,412,513,628,417,425,540,672,822,545],8000:[364,463,577,705,460,477,606,755,923,602],9000:[410,521,648,793,508,536,682,849,1038,664],10000:[461,586,730,893,561,604,767,955,1168,734]},
+  930:{0:[100,127,158,194,146,131,167,207,254,190],1000:[112,142,177,216,160,146,186,231,283,209],2000:[125,159,197,242,175,163,208,258,316,229],3000:[140,177,221,270,192,204,260,323,395,277],4000:[156,198,247,302,212,204,260,323,395,277],5000:[175,222,277,338,233,229,291,362,443,305],6000:[196,249,310,379,256,257,326,406,496,335],7000:[220,280,348,426,282,288,366,455,557,370],8000:[247,314,391,478,312,323,411,512,626,408],9000:[278,353,440,538,344,364,462,575,704,450],10000:[313,397,495,605,380,409,520,648,792,498]}
 };
-const ldData = {
-  1180: {0:[183,202,220,238,213,288,312,335,358,326],1000:[190,209,228,247,219,297,321,345,369,334],2000:[197,217,237,256,226,306,331,356,381,342],3000:[204,225,245,266,232,325,352,379,405,360],4000:[212,233,255,276,239,325,352,379,405,360],5000:[220,242,264,287,247,335,363,391,418,369],6000:[228,251,275,298,254,346,375,403,431,378],7000:[237,261,285,309,262,357,387,416,445,388],8000:[246,271,296,321,270,368,399,430,460,398],9000:[256,282,308,334,279,380,412,444,475,409],10000:[266,293,320,347,288,393,426,459,491,420]},
-  1080: {0:[175,192,210,227,203,271,293,315,337,306],1000:[181,199,218,236,209,279,302,325,348,314],2000:[188,207,226,245,215,288,311,335,358,322],3000:[195,215,234,254,222,306,331,356,381,338],4000:[202,223,243,263,228,306,331,356,381,338],5000:[210,231,252,273,235,315,342,368,394,347],6000:[218,240,262,284,243,325,353,380,406,356],7000:[226,249,272,295,250,336,364,392,420,365],8000:[235,259,283,306,258,347,376,405,434,375],9000:[244,269,294,318,266,358,388,418,448,385],10000:[254,280,305,331,275,370,401,432,463,395]},
-  930:  {0:[150,166,181,196,175,233,252,271,290,264],1000:[156,172,187,203,180,240,260,280,299,270],2000:[162,178,194,211,185,248,268,288,309,277],3000:[168,185,202,219,191,263,285,307,328,291],4000:[174,192,209,227,197,263,285,307,328,291],5000:[181,199,217,235,203,272,294,317,339,299],6000:[188,207,226,244,209,280,304,327,350,307],7000:[195,215,234,254,215,289,313,338,361,315],8000:[203,223,243,264,222,299,324,349,373,323],9000:[210,232,253,274,229,308,334,360,386,331],10000:[219,241,263,285,237,319,346,372,399,340]}
+var ldData = {
+  1180:{0:[183,202,220,238,213,288,312,335,358,326],1000:[190,209,228,247,219,297,321,345,369,334],2000:[197,217,237,256,226,306,331,356,381,342],3000:[204,225,245,266,232,325,352,379,405,360],4000:[212,233,255,276,239,325,352,379,405,360],5000:[220,242,264,287,247,335,363,391,418,369],6000:[228,251,275,298,254,346,375,403,431,378],7000:[237,261,285,309,262,357,387,416,445,388],8000:[246,271,296,321,270,368,399,430,460,398],9000:[256,282,308,334,279,380,412,444,475,409],10000:[266,293,320,347,288,393,426,459,491,420]},
+  1080:{0:[175,192,210,227,203,271,293,315,337,306],1000:[181,199,218,236,209,279,302,325,348,314],2000:[188,207,226,245,215,288,311,335,358,322],3000:[195,215,234,254,222,306,331,356,381,338],4000:[202,223,243,263,228,306,331,356,381,338],5000:[210,231,252,273,235,315,342,368,394,347],6000:[218,240,262,284,243,325,353,380,406,356],7000:[226,249,272,295,250,336,364,392,420,365],8000:[235,259,283,306,258,347,376,405,434,375],9000:[244,269,294,318,266,358,388,418,448,385],10000:[254,280,305,331,275,370,401,432,463,395]},
+  930:{0:[150,166,181,196,175,233,252,271,290,264],1000:[156,172,187,203,180,240,260,280,299,270],2000:[162,178,194,211,185,248,268,288,309,277],3000:[168,185,202,219,191,263,285,307,328,291],4000:[174,192,209,227,197,263,285,307,328,291],5000:[181,199,217,235,203,272,294,317,339,299],6000:[188,207,226,244,209,280,304,327,350,307],7000:[195,215,234,254,215,289,313,338,361,315],8000:[203,223,243,264,222,299,324,349,373,323],9000:[210,232,253,274,229,308,334,360,386,331],10000:[219,241,263,285,237,319,346,372,399,340]}
 };
 
-function isaTemp(ft){ return 15-(ft/1000)*1.9812; }
-function mToFt(m){ return Math.round(m*3.28084); }
+function isaTemp(ft){return 15-(ft/1000)*1.9812;}
+function mToFt(m){return Math.round(m*3.28084);}
 function interp(row,oat){
-  const t=[-25,0,25,50],v=[row[0],row[1],row[2],row[3]];
+  var t=[-25,0,25,50],v=[row[0],row[1],row[2],row[3]];
   if(oat<=-25)return v[0]; if(oat>=50)return v[3];
-  for(let i=0;i<3;i++) if(oat>=t[i]&&oat<=t[i+1]) return v[i]+(oat-t[i])/(t[i+1]-t[i])*(v[i+1]-v[i]);
+  for(var i=0;i<3;i++) if(oat>=t[i]&&oat<=t[i+1]) return v[i]+(oat-t[i])/(t[i+1]-t[i])*(v[i+1]-v[i]);
   return v[1];
 }
 function getBase(data,weight,alt,oat){
-  const row=data[+weight][+alt];
-  return{gr:Math.round(interp(row,oat)),d50:Math.round(interp(row.slice(5),oat))};
+  var w = +weight;
+  var a = +alt;
+  var brackets = [0,1000,2000,3000,4000,5000,6000,7000,8000,9000,10000];
+  // Find surrounding brackets
+  var lo = brackets.filter(function(b){return b<=a;}).pop() || 0;
+  var hi = brackets.filter(function(b){return b>=a;})[0] || 10000;
+  if (lo === hi) {
+    var row = data[w][lo];
+    return {gr:Math.round(interp(row,oat)), d50:Math.round(interp(row.slice(5),oat))};
+  }
+  var rowLo = data[w][lo];
+  var rowHi = data[w][hi];
+  var f = (a - lo) / (hi - lo);
+  var gr  = Math.round(interp(rowLo,oat) + f*(interp(rowHi,oat)-interp(rowLo,oat)));
+  var d50 = Math.round(interp(rowLo.slice(5),oat) + f*(interp(rowHi.slice(5),oat)-interp(rowLo.slice(5),oat)));
+  return {gr:gr, d50:d50};
 }
-function setVal(mId,ftId,val){ document.getElementById(mId).textContent=val; document.getElementById(ftId).textContent=mToFt(val)+' ft'; }
+function setVal(mId,ftId,val){document.getElementById(mId).textContent=val;document.getElementById(ftId).textContent=mToFt(val)+' ft';}
 function setDelta(id,base,corr){
-  const el=document.getElementById(id),d=corr-base;
+  var el=document.getElementById(id),d=corr-base;
   if(d>0){el.textContent='+'+d+' m';el.className='delta-badge pos';}
   else if(d<0){el.textContent=d+' m';el.className='delta-badge neg';}
   else{el.textContent='±0';el.className='delta-badge zero';}
 }
 function calcTakeoff(){
-  const weight=document.getElementById('to-weight').value,alt=document.getElementById('to-alt').value;
-  const oat=parseFloat(document.getElementById('to-oat').value)||0;
-  const wind=parseFloat(document.getElementById('to-wind').value)||0;
-  const runway=+document.getElementById('to-runway').value;
-  const slope=parseFloat(document.getElementById('to-slope').value)||0;
-  document.getElementById('to-isa').textContent=isaTemp(+alt).toFixed(1)+' °C';
-  const b=getBase(toData,weight,alt,oat);
-  let gr=b.gr;
-  if(wind>=0)gr-=wind*2.5; else gr+=Math.abs(wind)*10;
-  if(runway===1)gr*=0.94;
+  var weight=document.getElementById('to-weight').value;
+  var alt=document.getElementById('to-alt').value;
+  var oat=parseFloat(document.getElementById('to-oat').value)||0;
+  var wind=parseFloat(document.getElementById('to-wind').value)||0;
+  var runway=+document.getElementById('to-runway').value;
+  var slope=parseFloat(document.getElementById('to-slope').value)||0;
+  var isaEl=document.getElementById('to-isa');
+  if(isaEl) isaEl.textContent=isaTemp(+alt).toFixed(1)+' C';
+  var b=getBase(toData,weight,alt,oat);
+  var gr=b.gr;
+  if(wind>=0) gr-=wind*2.5; else gr+=Math.abs(wind)*10;
+  if(runway===1) gr*=0.94;
   gr+=gr*(slope*0.05); gr=Math.round(gr);
-  const d50=Math.round(b.d50*(b.gr>0?gr/b.gr:1));
+  var d50=Math.round(b.d50*(b.gr>0?gr/b.gr:1));
   setVal('to-base-gr-m','to-base-gr-ft',b.gr); setVal('to-base-50-m','to-base-50-ft',b.d50);
   setVal('to-corr-gr-m','to-corr-gr-ft',gr); setVal('to-corr-50-m','to-corr-50-ft',d50);
   setDelta('to-delta-gr',b.gr,gr); setDelta('to-delta-50',b.d50,d50);
+  checkRunwayLimit('to', d50);
 }
 function calcLanding(){
-  const weight=document.getElementById('ld-weight').value,alt=document.getElementById('ld-alt').value;
-  const oat=parseFloat(document.getElementById('ld-oat').value)||0;
-  const wind=parseFloat(document.getElementById('ld-wind').value)||0;
-  const runway=+document.getElementById('ld-runway').value;
-  const slope=parseFloat(document.getElementById('ld-slope').value)||0;
-  document.getElementById('ld-isa').textContent=isaTemp(+alt).toFixed(1)+' °C';
-  const b=getBase(ldData,weight,alt,oat);
-  let gr=b.gr;
-  if(wind>=0)gr-=wind*5; else gr+=Math.abs(wind)*11;
-  if(runway===1)gr*=0.98;
+  var weight=document.getElementById('ld-weight').value;
+  var alt=document.getElementById('ld-alt').value;
+  var oat=parseFloat(document.getElementById('ld-oat').value)||0;
+  var wind=parseFloat(document.getElementById('ld-wind').value)||0;
+  var runway=+document.getElementById('ld-runway').value;
+  var slope=parseFloat(document.getElementById('ld-slope').value)||0;
+  var isaEl=document.getElementById('ld-isa');
+  if(isaEl) isaEl.textContent=isaTemp(+alt).toFixed(1)+' C';
+  var b=getBase(ldData,weight,alt,oat);
+  var gr=b.gr;
+  if(wind>=0) gr-=wind*5; else gr+=Math.abs(wind)*11;
+  if(runway===1) gr*=0.98;
   gr-=gr*(slope*0.025); gr=Math.round(gr);
-  const d50=Math.round(b.d50*(b.gr>0?gr/b.gr:1));
+  var d50=Math.round(b.d50*(b.gr>0?gr/b.gr:1));
   setVal('ld-base-gr-m','ld-base-gr-ft',b.gr); setVal('ld-base-50-m','ld-base-50-ft',b.d50);
   setVal('ld-corr-gr-m','ld-corr-gr-ft',gr); setVal('ld-corr-50-m','ld-corr-50-ft',d50);
   setDelta('ld-delta-gr',b.gr,gr); setDelta('ld-delta-50',b.d50,d50);
+  checkRunwayLimit('ld', d50);
 }
 function showPerfTab(name,btn){
-  document.querySelectorAll('.perf-page').forEach(p=>p.classList.remove('active'));
-  document.querySelectorAll('.perf-tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.perf-page').forEach(function(p){p.classList.remove('active');});
+  document.querySelectorAll('.perf-tab').forEach(function(t){t.classList.remove('active');});
   document.getElementById('perf-'+name).classList.add('active');
   btn.classList.add('active');
 }
 
-// ── CLOCKS & DATE ─────────────────────────────────
-const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-function pad(n){ return String(n).padStart(2,'0'); }
-function updateClock(){
-  const n = new Date();
-  // Date: DD Mon YYYY
-  document.getElementById('topbar-date').textContent =
-    pad(n.getUTCDate()) + ' ' + MONTHS[n.getUTCMonth()] + ' ' + n.getUTCFullYear();
-  // UTC time HH:MM
-  document.getElementById('clock-utc').textContent =
-    pad(n.getUTCHours()) + ':' + pad(n.getUTCMinutes());
-  // Local time HH:MM
-  document.getElementById('clock-lcl').textContent =
-    pad(n.getHours()) + ':' + pad(n.getMinutes());
-}
-setInterval(updateClock, 1000); updateClock();
 
-// ── WIFI INDICATOR ────────────────────────────────
+function checkRunwayLimit(prefix, dist50) {
+  var avail = getRwyAvailable(prefix);
+  var corrSection = document.querySelector('#perf-'+prefix+' .results-section.corrected');
+  var vals = document.querySelectorAll('#perf-'+prefix+' .results-section.corrected .results-metric-val');
+  if (!corrSection) return;
+  if (avail === null) {
+    // No runway selected — keep green
+    corrSection.style.setProperty('--corrected-color', 'var(--green)');
+    vals.forEach(function(v){ v.style.color=''; });
+    return;
+  }
+  var overLimit = dist50 > avail;
+  var color = overLimit ? 'var(--red)' : 'var(--green)';
+  vals.forEach(function(v){ v.style.color = color; });
+  // Also update header dot and text
+  var dot = corrSection.querySelector('.results-header-dot');
+  var txt = corrSection.querySelector('.results-header-text');
+  if(dot) dot.style.background = color;
+  if(txt) txt.style.color = color;
+  // Show warning if over limit
+  var warn = corrSection.querySelector('.rwy-warning');
+  if (overLimit) {
+    if (!warn) {
+      warn = document.createElement('div');
+      warn.className = 'rwy-warning';
+      warn.style.cssText = 'background:rgba(239,68,68,0.15);color:var(--red);font-family:var(--head);font-size:11px;font-weight:700;letter-spacing:1px;text-align:center;padding:8px;border-top:1px solid var(--border);';
+      warn.textContent = '⚠ DISTANCE EXCEEDS RUNWAY AVAILABLE (' + avail + ' m)';
+      corrSection.appendChild(warn);
+    } else {
+      warn.textContent = '⚠ DISTANCE EXCEEDS RUNWAY AVAILABLE (' + avail + ' m)';
+    }
+  } else {
+    if (warn) warn.remove();
+  }
+}
+
+// ── CLOCKS ─────────────────────────────────────────
+var MONTHS=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+function pad(n){return String(n).padStart(2,'0');}
+function updateClock(){
+  var n=new Date();
+  document.getElementById('topbar-date').textContent=pad(n.getUTCDate())+' '+MONTHS[n.getUTCMonth()]+' '+n.getUTCFullYear();
+  document.getElementById('clock-utc').textContent=pad(n.getUTCHours())+':'+pad(n.getUTCMinutes());
+  document.getElementById('clock-lcl').textContent=pad(n.getHours())+':'+pad(n.getMinutes());
+}
+setInterval(updateClock,1000); updateClock();
+
+// ── WIFI ────────────────────────────────────────────
 function updateOnline(){
-  const dot=document.getElementById('wifi-dot');
-  if(navigator.onLine){ dot.className='wifi-dot online'; dot.title='Online'; }
-  else { dot.className='wifi-dot offline'; dot.title='Offline'; }
+  var dot=document.getElementById('wifi-dot');
+  dot.className=navigator.onLine?'wifi-dot online':'wifi-dot offline';
 }
 window.addEventListener('online',updateOnline);
 window.addEventListener('offline',updateOnline);
 updateOnline();
 
-// ── SERVICE WORKER (offline) ──────────────────────
-const SW=`const C='p2006t-efb-v1';self.addEventListener('install',e=>{self.skipWaiting();e.waitUntil(caches.open(C).then(c=>c.addAll(['https://fonts.googleapis.com/css2?family=Oswald:wght@300;400;500;600;700&family=Share+Tech+Mono&family=Roboto:wght@300;400;500&display=swap']).catch(()=>{})));});self.addEventListener('activate',e=>{e.waitUntil(caches.keys().then(k=>Promise.all(k.filter(x=>x!==C).map(x=>caches.delete(x)))));self.clients.claim();});self.addEventListener('fetch',e=>{e.respondWith(caches.match(e.request).then(cached=>{if(cached)return cached;return fetch(e.request).then(r=>{if(r&&r.status===200){const cl=r.clone();caches.open(C).then(c=>c.put(e.request,cl));}return r;}).catch(()=>cached);}));});`;
-if('serviceWorker' in navigator){
-  const blob=new Blob([SW],{type:'application/javascript'});
-  navigator.serviceWorker.register(URL.createObjectURL(blob)).catch(()=>{});
-}
-
-// ── CHECKLIST TAB SWITCHER ────────────────────────
-function switchClTab(tab) {
-  const isEmerg = tab === 'emergency';
-  document.getElementById('cl-normal-view').style.display = isEmerg ? 'none' : '';
-  document.getElementById('cl-emergency-view').style.display = isEmerg ? '' : 'none';
-  document.getElementById('tab-normal').classList.toggle('active', !isEmerg);
-  document.getElementById('tab-emergency').classList.toggle('active', isEmerg);
-}
-
-// ── IFR BRIEFING + EMERGENCY DATA ─────────────────
-const IFR_BRIEFING = {
-  id:'ifr-briefing', name:'Engine Start Sequence / IFR Briefing', type:'seq',
-  items:[
-    {t:'Perform "Before Start Checklist"'},
-    {t:'Copy ATIS'},
-    {t:'Request Engine Start and ATC Clearance'},
-    {t:'Prepare and "SID Briefing"'},
-    {t:'WANT (Weather · Airspace · NOTAMs · TFRs)'},
-    {t:'Normal Briefing'},
-    {t:'Emergency Briefing'},
-    {t:'Engine Start'},
-    {t:'Ready to Taxi Call'},
-    {t:'Taxi Briefing'},
-  ]
-};
-
-const EMERGENCY_CHECKLISTS = [
-  {
-    id:'eng-fail-to-run', name:'Engine Failure During T/O Run', icon:'alert',
-    type:'proc', memory:false,
-    items:[
-      {t:'Throttle Levers',   a:'BOTH IDLE'},
-      {t:'Rudder',            a:'KEEP HEADING CONTROL'},
-      {t:'Brakes',            a:'AS REQUIRED'},
-      {t:'Failed Engine Ignition',        a:'BOTH OFF'},
-      {t:'Failed Engine Field',           a:'OFF'},
-      {t:'Failed Engine Elec Fuel Pump',  a:'OFF'},
-    ]
-  },
-  {
-    id:'eng-fail-after-to', name:'Engine Failure After T/O', icon:'alert',
-    type:'proc', memory:false,
-    items:[
-      {t:'Operating Engine Throttle Lever',  a:'FULL POWER'},
-      {t:'Operating Engine Propeller Lever', a:'FULL FORWARD'},
-      {t:'Heading',                          a:'KEEP CONTROL'},
-      {t:'Attitude',                         a:'REDUCE — keep above 62 KIAS'},
-      {t:'Inoperative Engine Prop Lever',    a:'FEATHER'},
-      {t:'Landing Gear',                     a:'UP'},
-      {t:'Airspeed',                         a:'VXSE / VYSE'},
-      {t:'Flaps',                            a:'0°'},
-      {t:'Inoperative Engine',               a:'CONFIRM & SECURE'},
-      {t:'Operating Engine Fuel Selector',   a:'CHECK — crossfeed if needed'},
-    ]
-  },
-  {
-    id:'eng-fail-flight', name:'Engine Failure in Flight', icon:'alert',
-    type:'proc', memory:false,
-    items:[
-      {t:'Autopilot',                        a:'OFF'},
-      {t:'Heading',                          a:'KEEP CONTROL'},
-      {t:'Attitude',                         a:'ADJUST — keep above 62 KIAS'},
-      {t:'Operating Engine',                 a:'MONITOR instruments'},
-      {t:'Operative Engine Elec Fuel Pump',  a:'CHECK ON'},
-      {t:'Operating Engine Fuel Selector',   a:'CHECK — crossfeed if needed'},
-      {t:'Inflight Engine Restart',          a:'ATTEMPT if possible'},
-      {t:'If restart unsuccessful',          a:'LAND AS SOON AS POSSIBLE'},
-    ]
-  },
-  {
-    id:'eng-securing', name:'Engine Securing', icon:'alert',
-    type:'proc', memory:false,
-    items:[
-      {t:'Throttle Lever',        a:'IDLE'},
-      {t:'Ignition',              a:'BOTH OFF'},
-      {t:'Propeller Lever',       a:'FEATHER'},
-      {t:'Fuel Selector',         a:'OFF'},
-      {t:'Electrical Fuel Pump',  a:'OFF'},
-    ]
-  },
-  {
-    id:'eng-restart', name:'Inflight Engine Restart', icon:'alert',
-    type:'proc', memory:false,
-    items:[
-      {t:'Carburettor Heat',                    a:'ON IF REQUIRED'},
-      {t:'Electrical Fuel Pump',                a:'ON'},
-      {t:'Fuel Quantity',                       a:'CHECK'},
-      {t:'Fuel Selector',                       a:'CHECK — crossfeed if needed'},
-      {t:'Field',                               a:'OFF'},
-      {t:'Ignition',                            a:'BOTH ON'},
-      {t:'Operating Engine Throttle',           a:'SET AS PRACTICAL'},
-      {t:'Stopped Engine Throttle',             a:'IDLE'},
-      {t:'Stopped Engine Propeller Lever',      a:'FULL FORWARD'},
-      {t:'Start Pushbutton Inoperative Engine', a:'PUSH'},
-      {t:'Propeller Lever Inoperative Engine',  a:'SET desired RPM'},
-      {t:'Field',                               a:'ON — check positive ammeter'},
-      {t:'Engine Throttle Levers',              a:'SET AS REQUIRED'},
-    ]
-  },
-  {
-    id:'oei-landing', name:'OEI Landing', icon:'alert',
-    type:'proc', memory:false,
-    items:[
-      {t:'Seat Belts',                        a:'TIGHTLY FASTENED'},
-      {t:'Landing Lights',                    a:'AS REQUIRED'},
-      {t:'Operating Engine Fuel Selector',    a:'CHECK — crossfeed if needed'},
-      {t:'Inoperative Engine Prop Lever',     a:'CHECK FEATHERED'},
-      {t:'Inoperative Engine',               a:'CHECK SECURED'},
-      {t:'Operative Engine Elec Fuel Pump',  a:'ON'},
-      {t:'Flaps (final)',                     a:'T/O'},
-      {t:'Landing Gear',                     a:'DOWN — 3 greens'},
-      {t:'Approach Speed',                   a:'VYSE — 80 KIAS'},
-      {t:'Touchdown Speed',                  a:'70 KIAS'},
-    ]
-  },
-  {
-    id:'eng-fire-ground', name:'Engine Fire on Ground', icon:'alert',
-    type:'proc', memory:false,
-    items:[
-      {t:'Throttle Lever affected engine',   a:'IDLE'},
-      {t:'Ignition affected engine',         a:'BOTH OFF'},
-      {t:'Electrical Fuel Pump',             a:'OFF'},
-      {t:'Fuel Selector affected engine',    a:'OFF'},
-      {t:'Field affected engine',            a:'OFF'},
-      {t:'Master Switch',                    a:'OFF'},
-      {t:'Evacuate aircraft',                a:'IMMEDIATELY'},
-    ]
-  },
-  {
-    id:'eng-fire-flight', name:'Engine Fire in Flight', icon:'alert',
-    type:'proc', memory:false,
-    items:[
-      {t:'Throttle Lever affected engine',   a:'IDLE'},
-      {t:'Airspeed',                         a:'INCREASE to extinguish fire'},
-      {t:'If fire persists — Engine',        a:'SECURE (Para. 3)'},
-      {t:'Land',                             a:'AS SOON AS POSSIBLE'},
-    ]
-  },
-  {
-    id:'elec-fire', name:'Electrical Fire / Smoke', icon:'alert',
-    type:'proc', memory:false,
-    items:[
-      {t:'Master Switch',          a:'OFF'},
-      {t:'Field LH & RH',          a:'BOTH OFF'},
-      {t:'All avionics switches',  a:'OFF'},
-      {t:'Master Switch',          a:'ON'},
-      {t:'Field LH & RH',          a:'BOTH ON — restore one at a time'},
-      {t:'Land',                   a:'AS SOON AS POSSIBLE'},
-    ]
-  },
-  {
-    id:'single-gen-fail', name:'Single Generator Failure', icon:'alert',
-    type:'proc', memory:false,
-    items:[
-      {t:'Affected Field (LH or RH)', a:'OFF'},
-      {t:'Affected Field (LH or RH)', a:'ON'},
-      {t:'If caution stays — Field',  a:'OFF'},
-      {t:'Avionics LH',               a:'OFF'},
-      {t:'ADF',                       a:'OFF'},
-      {t:'Cross Bus (if needed)',      a:'OFF'},
-      {t:'Land',                      a:'AS SOON AS PRACTICABLE'},
-    ]
-  },
-  {
-    id:'both-gen-fail', name:'Both Generators Failure', icon:'alert',
-    type:'proc', memory:false,
-    items:[
-      {t:'Field LH & RH',           a:'BOTH OFF'},
-      {t:'Field LH & RH',           a:'BOTH ON'},
-      {t:'If both fail — Field LH & RH',  a:'BOTH OFF'},
-      {t:'Cross Bus LH & RH',       a:'BOTH OFF'},
-      {t:'EMERG BATT (if installed)',a:'ON'},
-      {t:'Land',                    a:'AS SOON AS POSSIBLE'},
-    ]
-  },
-  {
-    id:'emerg-descent', name:'Emergency Descent', icon:'alert',
-    type:'proc', memory:false,
-    items:[
-      {t:'Power Levers',   a:'IDLE'},
-      {t:'Flaps',          a:'UP'},
-      {t:'IAS',            a:'BELOW VLO/VLE'},
-      {t:'Landing Gear',   a:'DOWN'},
-      {t:'Airspeed',       a:'UP TO VLO/VLE'},
-    ]
-  },
-  {
-    id:'total-elec-fail', name:'Total Electrical Failure', icon:'alert',
-    type:'proc', memory:false,
-    items:[
-      {t:'Emergency Light',      a:'ON IF NEEDED'},
-      {t:'Standby ADI switch',   a:'ON'},
-      {t:'Master Switch',        a:'OFF'},
-      {t:'Field LH & RH',        a:'BOTH OFF'},
-      {t:'Master Switch',        a:'ON'},
-      {t:'Field LH & RH',        a:'BOTH ON'},
-      {t:'If fails — EMERG BATT',a:'ON (if installed)'},
-      {t:'Land',                 a:'AS SOON AS POSSIBLE — Emerg LG ext.'},
-    ]
-  },
-  {
-    id:'emerg-lg-ext', name:'Emergency LG Extension', icon:'alert',
-    type:'proc', memory:false,
-    items:[
-      {t:'Airspeed',            a:'REDUCE BELOW VLO'},
-      {t:'LG Control Knob',     a:'DOWN'},
-      {t:'LG Green Lights',     a:'CHECK 3 GREEN'},
-      {t:'If not 3 green — Hydraulic Emergency Lever', a:'PULL'},
-      {t:'LG Green Lights',     a:'VERIFY 3 GREEN'},
-      {t:'Land normally',       a:''},
-    ]
-  },
-  {
-    id:'high-oil-temp', name:'High Oil Temperature', icon:'alert',
-    type:'proc', memory:false,
-    items:[
-      {t:'Oil Pressure',              a:'CHECK'},
-      {t:'Affected Engine Power',     a:'REDUCE TO MINIMUM'},
-      {t:'Prop Speed',                a:'KEEP ABOVE 2000 RPM'},
-      {t:'If no improvement — Engine',a:'SECURE'},
-      {t:'Land',                      a:'AS SOON AS POSSIBLE'},
-    ]
-  },
-  {
-    id:'low-oil-press', name:'Low Oil Pressure', icon:'alert',
-    type:'proc', memory:false,
-    items:[
-      {t:'Oil Pressure',               a:'CHECK'},
-      {t:'If low — Land',              a:'AS SOON AS PRACTICAL'},
-      {t:'If continuously decreasing', a:'SECURE ENGINE'},
-      {t:'OEI Landing procedure',      a:'SEE PARA. 6.6'},
-    ]
-  },
-  {
-    id:'icing', name:'Inadvertent Icing', icon:'alert',
-    type:'proc', memory:false,
-    items:[
-      {t:'Carburettor Heat',    a:'BOTH ON'},
-      {t:'Pitot Heat',          a:'ON'},
-      {t:'Exit icing area',     a:'CHANGE ALT / DIRECTION'},
-      {t:'Control Surfaces',    a:'MOVE CONTINUOUSLY'},
-      {t:'Propeller RPM',       a:'INCREASE'},
-    ]
-  },
-  {
-    id:'flaps-fail', name:'Flaps Control Failure', icon:'alert',
-    type:'proc', memory:false,
-    items:[
-      {t:'Airspeed',            a:'KEEP BELOW 93 KIAS'},
-      {t:'Land',                a:'AS SOON AS PRACTICAL'},
-      {t:'Approach speed',      a:'KEEP OVER 75 KIAS'},
-      {t:'Landing distance',    a:'INCREASED ~25%'},
-    ]
-  },
-  {
-    id:'ditching', name:'Ditching', icon:'alert',
-    type:'proc', memory:false,
-    items:[
-      {t:'Transponder',         a:'7700'},
-      {t:'ATC',                 a:'MAYDAY CALL'},
-      {t:'Seat belts',          a:'TIGHTEN'},
-      {t:'Loose objects',       a:'SECURE'},
-      {t:'Flaps',               a:'T/O'},
-      {t:'Landing gear',        a:'UP'},
-      {t:'Ditch parallel to swells at min speed', a:''},
-      {t:'After ditching — Evacuate immediately', a:''},
-    ]
-  },
-];
-
-// Build emergency grid
-function buildEmergGrid() {
-  const grid = document.getElementById('cl-emerg-grid');
-  grid.innerHTML = '';
-  EMERGENCY_CHECKLISTS.forEach(cl => {
-    const div = document.createElement('div');
-    div.className = 'cl-card emergency-card';
-    div.onclick = () => openChecklist(cl.id);
-    const done = (checkedItems[cl.id] || []).filter(Boolean).length;
-    const total = cl.items.length;
-    const pct = total > 0 ? Math.round(done/total*100) : 0;
-    div.innerHTML = `
-      <div class="cl-card-name" style="color:#FECACA;">${cl.name}</div>
-      ${done > 0 ? `<div style="font-family:var(--mono);font-size:9px;color:#FCA5A5;">${pct}%</div>` : ''}
-    `;
-    grid.appendChild(div);
-  });
-}
-
-// ── INIT ──────────────────────────────────────────
+// ── INIT ────────────────────────────────────────────
 document.body.classList.add('on-home');
 buildClGrid();
 buildEmergGrid();
-
-// Register IFR briefing
-if (!checkedItems['ifr-briefing']) checkedItems['ifr-briefing'] = new Array(IFR_BRIEFING.items.length).fill(false);
-
-// Patch openChecklist to handle IFR + emergency
-const _origOpenChecklist = openChecklist;
-openChecklist = function(id) {
-  if (id === 'ifr-briefing') {
-    currentCL = IFR_BRIEFING;
-    if (!checkedItems[id]) checkedItems[id] = new Array(IFR_BRIEFING.items.length).fill(false);
-    document.getElementById('cl-items-title').textContent = IFR_BRIEFING.name.toUpperCase();
-    document.getElementById('cl-menu-view').style.display = 'none';
-    const iv = document.getElementById('cl-items-view');
-    iv.style.display = 'flex';
-    renderItems();
-    return;
-  }
-  const emerg = EMERGENCY_CHECKLISTS.find(c => c.id === id);
-  if (emerg) {
-    currentCL = emerg;
-    if (!checkedItems[id]) checkedItems[id] = new Array(emerg.items.length).fill(false);
-    document.getElementById('cl-items-title').textContent = emerg.name.toUpperCase();
-    document.getElementById('cl-menu-view').style.display = 'none';
-    const iv = document.getElementById('cl-items-view');
-    iv.style.display = 'flex';
-    renderItems();
-    return;
-  }
-  _origOpenChecklist(id);
-};
-
 calcTakeoff();
 calcLanding();
-// Start on home — hide bottom nav
-
 </script>
 </body>
 </html>
