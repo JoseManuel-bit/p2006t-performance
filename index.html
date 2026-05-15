@@ -73,6 +73,7 @@ body { font-family: var(--body); background: var(--bg); color: var(--text); min-
   display: flex; background: var(--bg2);
   border-top: 2px solid var(--amber); flex-shrink: 0;
 }
+body.on-home .bottom-nav { display: none; }
 
 .nav-btn {
   flex: 1; padding: 10px 4px 8px;
@@ -1115,9 +1116,8 @@ function showScreen(id) {
     const el = document.getElementById(s);
     el.classList.toggle('active', s === id);
   });
+  document.body.classList.toggle('on-home', id === 'screen-home');
   // Bottom nav only visible outside home
-  const bnav = document.getElementById('bottom-nav');
-  bnav.style.setProperty('display', id === 'screen-home' ? 'none' : 'flex', 'important');
   Object.entries(navBtns).forEach(([s,b]) => {
     document.getElementById(b).classList.toggle('active', s === id);
   });
@@ -1523,6 +1523,7 @@ function buildEmergGrid() {
 }
 
 // ── INIT ──────────────────────────────────────────
+document.body.classList.add('on-home');
 buildClGrid();
 buildEmergGrid();
 
@@ -1559,7 +1560,7 @@ openChecklist = function(id) {
 calcTakeoff();
 calcLanding();
 // Start on home — hide bottom nav
-document.getElementById('bottom-nav').style.setProperty('display','none','important');
+
 </script>
 </body>
 </html>
