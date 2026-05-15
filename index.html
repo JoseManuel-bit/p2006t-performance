@@ -536,6 +536,10 @@ input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer
 
 <!-- PERFORMANCE SCREEN -->
 <div class="screen" id="screen-perf">
+  <div class="cl-header">
+    <button class="cl-back-btn" onclick="showScreen('screen-home')" style="width:80px;text-align:center;justify-content:center;">HOME</button>
+    <div class="cl-header-title" style="text-align:right;flex:1;">P2006T · PERFORMANCE</div>
+  </div>
   <div class="perf-tabs">
     <button class="perf-tab active" id="ptab-to" onclick="showPerfTab('to',this)">
 TAKE-OFF
@@ -566,7 +570,7 @@ LANDING
         </div>
       </div>
       <div class="input-grid">
-        <div class="input-card"><div class="input-card-label">Weight · kg</div><div class="input-card-val"><select id="to-weight" onchange="calcTakeoff()"><option value="1180">1180</option><option value="1080">1080</option><option value="930">930</option></select></div></div>
+        <div class="input-card"><div class="input-card-label">Weight · kg</div><div class="input-card-val"><input type="number" id="to-weight" value="1180" step="1" min="930" max="1180" oninput="calcTakeoff()"></div></div>
         <div class="input-card"><div class="input-card-label">Press. Alt · ft</div><div class="input-card-val"><input type="number" id="to-alt" value="0" step="100" min="0" max="10000" oninput="calcTakeoff()"></div></div>
         <div class="input-card"><div class="input-card-label">OAT · °C</div><div class="input-card-val"><input type="number" id="to-oat" value="15" step="1" min="-40" max="60" oninput="calcTakeoff()"></div></div>
       </div>
@@ -622,7 +626,7 @@ LANDING
         </div>
       </div>
       <div class="input-grid">
-        <div class="input-card"><div class="input-card-label">Weight · kg</div><div class="input-card-val"><select id="ld-weight" onchange="calcLanding()"><option value="1180">1180</option><option value="1080">1080</option><option value="930">930</option></select></div></div>
+        <div class="input-card"><div class="input-card-label">Weight · kg</div><div class="input-card-val"><input type="number" id="ld-weight" value="1180" step="1" min="930" max="1180" oninput="calcLanding()"></div></div>
         <div class="input-card"><div class="input-card-label">Press. Alt · ft</div><div class="input-card-val"><input type="number" id="ld-alt" value="0" step="100" min="0" max="10000" oninput="calcLanding()"></div></div>
         <div class="input-card"><div class="input-card-label">OAT · °C</div><div class="input-card-val"><input type="number" id="ld-oat" value="15" step="1" min="-40" max="60" oninput="calcLanding()"></div></div>
       </div>
@@ -667,22 +671,13 @@ LANDING
   <div class="docs-header">
     <div class="cl-header">
       <button class="cl-back-btn" onclick="showScreen('screen-home')" style="width:80px;text-align:center;justify-content:center;">HOME</button>
-      <div style="flex:1;text-align:center;font-family:var(--head);font-size:15px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--text);">P2006T · DOCUMENTS</div>
-      <div style="width:80px;"></div>
+      <div class="cl-header-title" style="text-align:right;flex:1;">P2006T · DOCUMENTS</div>
     </div>
   </div>
   <div class="docs-content">
-    <div class="docs-info">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-      Upload documents to your GitHub repository alongside index.html. They will be available offline once cached.
-    </div>
+
     <div class="docs-grid" id="docs-grid"></div>
-    <div class="docs-add-info">
-      <div class="docs-add-title">HOW TO ADD DOCUMENTS</div>
-      <div class="docs-add-step"><span class="docs-step-num">1</span>Upload your PDF to the GitHub repository (same folder as index.html)</div>
-      <div class="docs-add-step"><span class="docs-step-num">2</span>Edit the DOCUMENTS array in the code and add your file</div>
-      <div class="docs-add-step"><span class="docs-step-num">3</span>Open the app once with internet to cache the file offline</div>
-    </div>
+
   </div>
 </div>
 
@@ -1024,9 +1019,9 @@ function selectRunway(prefix) {
 
 function getRwyAvailable(prefix) {
   var icao = document.getElementById(prefix+'-icao').value.toUpperCase().trim();
-  var rwyWrap = document.getElementById(prefix+'-rwy-wrap');
-  if (!icao || rwyWrap.style.display==='none') return null;
+  if (!icao || icao.length < 4) return null;
   var rwySel = document.getElementById(prefix+'-rwy-sel');
+  if (!rwySel || !rwySel.value || rwySel.value === '') return null;
   var rwyData = RUNWAYS[icao] && RUNWAYS[icao][rwySel.value];
   return rwyData ? (prefix==='to' ? rwyData.tora : rwyData.lda) : null;
 }
@@ -1040,24 +1035,6 @@ const DOCUMENTS = [
     name: 'Aircraft Flight Manual',
     subtitle: 'AFM 4th Edition Rev. 22',
     file: 'poh.pdf',
-    type: 'PDF',
-  },
-  {
-    name: 'Minimum Equipment List',
-    subtitle: 'MEL P2006T',
-    file: 'mel.pdf',
-    type: 'PDF',
-  },
-  {
-    name: 'Weight & Balance',
-    subtitle: 'EC-NTJ',
-    file: 'wb.pdf',
-    type: 'PDF',
-  },
-  {
-    name: 'Insurance Certificate',
-    subtitle: 'Current year',
-    file: 'insurance.pdf',
     type: 'PDF',
   },
 ];
@@ -1297,23 +1274,51 @@ function interp(row,oat){
   for(var i=0;i<3;i++) if(oat>=t[i]&&oat<=t[i+1]) return v[i]+(oat-t[i])/(t[i+1]-t[i])*(v[i+1]-v[i]);
   return v[1];
 }
-function getBase(data,weight,alt,oat){
-  var w = +weight;
-  var a = +alt;
-  var brackets = [0,1000,2000,3000,4000,5000,6000,7000,8000,9000,10000];
-  // Find surrounding brackets
-  var lo = brackets.filter(function(b){return b<=a;}).pop() || 0;
-  var hi = brackets.filter(function(b){return b>=a;})[0] || 10000;
+function interpAlt(data, w, a, oat) {
+  var altBrackets = [0,1000,2000,3000,4000,5000,6000,7000,8000,9000,10000];
+  var lo = altBrackets.filter(function(b){return b<=a;}).pop() || 0;
+  var hi = altBrackets.filter(function(b){return b>=a;})[0];
+  if (hi === undefined) hi = 10000;
   if (lo === hi) {
     var row = data[w][lo];
-    return {gr:Math.round(interp(row,oat)), d50:Math.round(interp(row.slice(5),oat))};
+    return {gr: interp(row, oat), d50: interp(row.slice(5), oat)};
   }
   var rowLo = data[w][lo];
   var rowHi = data[w][hi];
   var f = (a - lo) / (hi - lo);
-  var gr  = Math.round(interp(rowLo,oat) + f*(interp(rowHi,oat)-interp(rowLo,oat)));
-  var d50 = Math.round(interp(rowLo.slice(5),oat) + f*(interp(rowHi.slice(5),oat)-interp(rowLo.slice(5),oat)));
-  return {gr:gr, d50:d50};
+  return {
+    gr:  interp(rowLo, oat) + f * (interp(rowHi, oat)  - interp(rowLo, oat)),
+    d50: interp(rowLo.slice(5), oat) + f * (interp(rowHi.slice(5), oat) - interp(rowLo.slice(5), oat))
+  };
+}
+
+function getBase(data, weight, alt, oat) {
+  var w = +weight;
+  var a = +alt;
+  // Clamp weight to valid range
+  if (w <= 930) {
+    var r = interpAlt(data, 930, a, oat);
+    return {gr: Math.round(r.gr), d50: Math.round(r.d50)};
+  }
+  if (w >= 1180) {
+    var r = interpAlt(data, 1180, a, oat);
+    return {gr: Math.round(r.gr), d50: Math.round(r.d50)};
+  }
+  // Interpolate between weight brackets
+  var wBrackets = [930, 1080, 1180];
+  var wLo = wBrackets.filter(function(b){return b<=w;}).pop();
+  var wHi = wBrackets.filter(function(b){return b>=w;})[0];
+  if (wLo === wHi) {
+    var r = interpAlt(data, wLo, a, oat);
+    return {gr: Math.round(r.gr), d50: Math.round(r.d50)};
+  }
+  var rLo = interpAlt(data, wLo, a, oat);
+  var rHi = interpAlt(data, wHi, a, oat);
+  var fw = (w - wLo) / (wHi - wLo);
+  return {
+    gr:  Math.round(rLo.gr  + fw * (rHi.gr  - rLo.gr)),
+    d50: Math.round(rLo.d50 + fw * (rHi.d50 - rLo.d50))
+  };
 }
 function setVal(mId,ftId,val){document.getElementById(mId).textContent=val;document.getElementById(ftId).textContent=mToFt(val)+' ft';}
 function setDelta(id,base,corr){
@@ -1376,9 +1381,14 @@ function checkRunwayLimit(prefix, dist50) {
   var vals = document.querySelectorAll('#perf-'+prefix+' .results-section.corrected .results-metric-val');
   if (!corrSection) return;
   if (avail === null) {
-    // No runway selected — keep green
-    corrSection.style.setProperty('--corrected-color', 'var(--green)');
+    // No runway selected — reset to default green
     vals.forEach(function(v){ v.style.color=''; });
+    var dot = corrSection.querySelector('.results-header-dot');
+    var txt = corrSection.querySelector('.results-header-text');
+    if(dot) dot.style.background='';
+    if(txt) txt.style.color='';
+    var warn = corrSection.querySelector('.rwy-warning');
+    if(warn) warn.remove();
     return;
   }
   var overLimit = dist50 > avail;
