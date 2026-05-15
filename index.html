@@ -1116,7 +1116,13 @@ function showScreen(id) {
   });
   // Bottom nav only visible outside home
   const bnav = document.getElementById('bottom-nav');
-  bnav.classList.toggle('hidden', id === 'screen-home');
+  if (id === 'screen-home') {
+    bnav.classList.add('hidden');
+    bnav.style.display = 'none';
+  } else {
+    bnav.classList.remove('hidden');
+    bnav.style.display = 'flex';
+  }
   Object.entries(navBtns).forEach(([s,b]) => {
     document.getElementById(b).classList.toggle('active', s === id);
   });
@@ -1124,6 +1130,9 @@ function showScreen(id) {
 
 function enterAircraft() {
   showScreen('screen-checklist');
+  var bnav = document.getElementById('bottom-nav');
+  bnav.classList.remove('hidden');
+  bnav.style.display = 'flex';
 }
 
 // ── PERFORMANCE ───────────────────────────────────
