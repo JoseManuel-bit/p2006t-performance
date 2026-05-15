@@ -1,0 +1,702 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>P2006T · Performance</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Oswald:wght@300;400;500;600;700&family=Share+Tech+Mono&family=Roboto:wght@300;400;500&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:        #0E1117;
+  --bg2:       #161B24;
+  --bg3:       #1E2533;
+  --panel:     #252D3D;
+  --border:    #2E3A50;
+  --amber:     #F5A800;
+  --amber2:    #FFB800;
+  --amber-dim: #7A5400;
+  --green:     #2ECC71;
+  --red:       #E74C3C;
+  --text:      #E8EDF5;
+  --text-dim:  #8A97B0;
+  --text-label:#C5CDD9;
+  --mono:      'Share Tech Mono', monospace;
+  --head:      'Oswald', sans-serif;
+  --body:      'Roboto', sans-serif;
+  --radius:    4px;
+}
+
+body {
+  font-family: var(--body);
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* TOPBAR */
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--bg2);
+  border-bottom: 2px solid var(--amber);
+  padding: 0 16px;
+  height: 52px;
+  flex-shrink: 0;
+}
+.topbar-left { display: flex; align-items: center; gap: 12px; }
+.aircraft-badge { font-family: var(--head); font-size: 22px; font-weight: 700; letter-spacing: 3px; color: var(--amber); }
+.aircraft-sub { font-family: var(--body); font-size: 10px; color: var(--text-dim); letter-spacing: 1px; text-transform: uppercase; line-height: 1; }
+.divider-v { width: 1px; height: 28px; background: var(--border); }
+.topbar-meta { font-family: var(--body); font-size: 11px; color: var(--text-dim); line-height: 1.5; }
+.topbar-right { font-family: var(--mono); font-size: 11px; color: var(--text-dim); text-align: right; line-height: 1.6; }
+
+/* TABS */
+.tab-bar { display: flex; background: var(--bg2); border-bottom: 1px solid var(--border); }
+.tab-btn {
+  flex: 1; padding: 11px 8px;
+  font-family: var(--head); font-size: 13px; font-weight: 600;
+  letter-spacing: 2px; text-transform: uppercase;
+  color: var(--text-dim); background: none; border: none; cursor: pointer;
+  border-bottom: 3px solid transparent; transition: all 0.18s;
+  display: flex; align-items: center; justify-content: center; gap: 7px;
+}
+.tab-btn svg { opacity: 0.5; transition: opacity 0.18s; }
+.tab-btn.active { color: var(--amber); border-bottom-color: var(--amber); background: rgba(245,168,0,0.06); }
+.tab-btn.active svg { opacity: 1; }
+.tab-btn:hover:not(.active) { color: var(--text-label); }
+
+/* CONTENT */
+.content { flex: 1; padding: 12px; max-width: 860px; margin: 0 auto; width: 100%; }
+.page { display: none; }
+.page.active { display: block; }
+
+/* INPUT GRID */
+.input-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 10px; }
+.input-card { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
+.input-card-label {
+  background: var(--panel); font-family: var(--head); font-size: 11px; font-weight: 600;
+  letter-spacing: 1.5px; text-transform: uppercase; color: var(--text-dim);
+  text-align: center; padding: 6px 4px 5px; border-bottom: 1px solid var(--border);
+}
+.input-card-val { display: flex; align-items: center; justify-content: center; background: var(--bg3); }
+.input-card-val select, .input-card-val input[type="number"] {
+  width: 100%; background: transparent; border: none;
+  font-family: var(--mono); font-size: 28px; color: var(--amber);
+  text-align: center; padding: 10px 4px; outline: none; cursor: pointer;
+  -webkit-appearance: none; appearance: none;
+}
+.input-card-val select option { background: #1a2030; color: var(--text); font-size: 14px; }
+input[type=number]::-webkit-inner-spin-button,
+input[type=number]::-webkit-outer-spin-button { opacity: 0; }
+
+/* INFO PANEL */
+.info-panel {
+  background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius);
+  padding: 12px 14px; margin-bottom: 10px;
+  display: grid; grid-template-columns: 1fr 1fr; gap: 4px 24px; font-size: 12px;
+}
+.info-row { display: flex; gap: 6px; align-items: baseline; }
+.info-key {
+  font-family: var(--head); font-weight: 600; font-size: 10px;
+  letter-spacing: 1px; text-transform: uppercase; color: var(--text-dim);
+  white-space: nowrap; flex-shrink: 0;
+}
+.info-val { font-family: var(--mono); font-size: 12px; color: var(--text-label); }
+.info-divider { grid-column: 1/-1; height: 1px; background: var(--border); margin: 6px 0; }
+.info-section-title {
+  grid-column: 1/-1; font-family: var(--head); font-size: 10px; font-weight: 600;
+  letter-spacing: 2px; text-transform: uppercase; color: var(--amber-dim); margin-bottom: 2px;
+}
+
+/* CORRECTIONS PANEL */
+.corr-panel { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); margin-bottom: 10px; overflow: hidden; }
+.corr-panel-title {
+  background: var(--panel); font-family: var(--head); font-size: 11px; font-weight: 600;
+  letter-spacing: 2px; text-transform: uppercase; color: var(--text-dim);
+  padding: 7px 14px; border-bottom: 1px solid var(--border);
+}
+.corr-row { display: flex; align-items: stretch; border-bottom: 1px solid var(--border); }
+.corr-row:last-child { border-bottom: none; }
+.corr-icon { width: 40px; display: flex; align-items: center; justify-content: center; background: var(--bg3); border-right: 1px solid var(--border); flex-shrink: 0; color: var(--text-dim); }
+.corr-label { flex: 1; font-family: var(--head); font-size: 12px; font-weight: 500; letter-spacing: 1px; text-transform: uppercase; color: var(--text-label); display: flex; flex-direction: column; justify-content: center; padding: 8px 12px; }
+.corr-hint { font-family: var(--body); font-size: 10px; font-weight: 300; letter-spacing: 0; text-transform: none; color: var(--text-dim); margin-top: 1px; }
+.corr-input { width: 90px; border-left: 1px solid var(--border); background: var(--bg3); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.corr-input input, .corr-input select {
+  width: 100%; background: transparent; border: none;
+  font-family: var(--mono); font-size: 20px; color: var(--amber);
+  text-align: center; padding: 8px 4px; outline: none;
+  -webkit-appearance: none; appearance: none;
+}
+.corr-input select option { background: #1a2030; color: var(--text); font-size: 13px; }
+
+/* RESULTS */
+.results-section { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); margin-bottom: 10px; overflow: hidden; }
+.results-header { background: var(--panel); display: flex; align-items: center; gap: 8px; padding: 8px 14px; border-bottom: 1px solid var(--border); }
+.results-header-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--text-dim); flex-shrink: 0; }
+.results-section.corrected .results-header-dot { background: var(--amber); }
+.results-header-text { font-family: var(--head); font-size: 12px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; color: var(--text-dim); }
+.results-section.corrected .results-header-text { color: var(--amber); }
+.results-row { display: flex; align-items: stretch; border-bottom: 1px solid var(--border); }
+.results-row:last-child { border-bottom: none; }
+.results-label { flex: 1; padding: 0 14px; font-family: var(--head); font-size: 13px; font-weight: 500; letter-spacing: 1.5px; text-transform: uppercase; color: var(--text-label); display: flex; align-items: center; flex-wrap: wrap; gap: 4px; }
+.results-block { display: flex; border-left: 1px solid var(--border); }
+.results-metric { width: 130px; padding: 14px 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; border-left: 1px solid var(--border); background: var(--bg3); }
+.results-metric:first-child { border-left: none; }
+.results-metric-unit { font-family: var(--head); font-size: 9px; font-weight: 500; letter-spacing: 1.5px; text-transform: uppercase; color: var(--text-dim); margin-bottom: 3px; }
+.results-metric-val { font-family: var(--mono); font-size: 28px; color: var(--text); line-height: 1; }
+.results-section.corrected .results-metric-val { color: var(--amber2); }
+.results-metric-ft { font-family: var(--mono); font-size: 11px; color: var(--text-dim); margin-top: 3px; }
+
+/* DELTA BADGE */
+.delta-badge { display: inline-flex; align-items: center; font-family: var(--mono); font-size: 10px; padding: 2px 6px; border-radius: 3px; opacity: 0.9; }
+.delta-badge.neg { background: rgba(46,204,113,0.15); color: var(--green); }
+.delta-badge.pos { background: rgba(231,76,60,0.15); color: var(--red); }
+.delta-badge.zero { background: rgba(138,151,176,0.12); color: var(--text-dim); }
+
+/* FOOTER */
+.footer { background: var(--bg2); border-top: 1px solid var(--border); padding: 8px 16px; display: flex; justify-content: space-between; align-items: center; }
+.footer-left { font-family: var(--mono); font-size: 9px; color: var(--text-dim); letter-spacing: 0.5px; line-height: 1.6; }
+.footer-warn { font-family: var(--head); font-size: 9px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; color: var(--red); opacity: 0.7; }
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+@media (max-width: 500px) {
+  .info-panel { grid-template-columns: 1fr; }
+  .results-metric { width: 100px; }
+  .results-metric-val { font-size: 22px; }
+  .input-card-val select, .input-card-val input[type="number"] { font-size: 22px; }
+}
+</style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<div class="topbar">
+  <div class="topbar-left">
+    <div>
+      <div class="aircraft-badge">P2006T</div>
+      <div class="aircraft-sub">Performance Calculator</div>
+    </div>
+    <div class="divider-v"></div>
+    <div class="topbar-meta">
+      <div>AFM 4th Ed. Rev. 22</div>
+      <div>EASA CS-23 · MTOW 1180 kg</div>
+    </div>
+  </div>
+  <div class="topbar-right">
+    <div id="clock">--:-- UTC</div>
+    <div style="font-size:9px;color:var(--amber-dim);">FOR PLANNING ONLY</div>
+  </div>
+</div>
+
+<!-- TABS -->
+<div class="tab-bar">
+  <button class="tab-btn active" id="tab-to" onclick="showPage('takeoff',this)">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12l5-3 4 6 5-8 6 10"/><line x1="2" y1="20" x2="22" y2="20"/></svg>
+    TAKE-OFF
+  </button>
+  <button class="tab-btn" id="tab-ld" onclick="showPage('landing',this)">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12l-5 3-4-6-5 8-6-10"/><line x1="2" y1="20" x2="22" y2="20"/></svg>
+    LANDING
+  </button>
+</div>
+
+<div class="content">
+
+<!-- ═══ TAKE-OFF PAGE ═══ -->
+<div class="page active" id="page-takeoff">
+
+  <div class="input-grid">
+    <div class="input-card">
+      <div class="input-card-label">Weight · kg</div>
+      <div class="input-card-val">
+        <select id="to-weight" onchange="calcTakeoff()">
+          <option value="1180">1180</option>
+          <option value="1080">1080</option>
+          <option value="930">930</option>
+        </select>
+      </div>
+    </div>
+    <div class="input-card">
+      <div class="input-card-label">Press. Alt · ft</div>
+      <div class="input-card-val">
+        <select id="to-alt" onchange="calcTakeoff()">
+          <option value="0">0</option>
+          <option value="1000">1000</option>
+          <option value="2000">2000</option>
+          <option value="3000">3000</option>
+          <option value="4000">4000</option>
+          <option value="5000">5000</option>
+          <option value="6000">6000</option>
+          <option value="7000">7000</option>
+          <option value="8000">8000</option>
+          <option value="9000">9000</option>
+          <option value="10000">10000</option>
+        </select>
+      </div>
+    </div>
+    <div class="input-card">
+      <div class="input-card-label">OAT · °C</div>
+      <div class="input-card-val">
+        <input type="number" id="to-oat" value="15" step="1" min="-40" max="60" oninput="calcTakeoff()">
+      </div>
+    </div>
+  </div>
+
+  <div class="info-panel">
+    <div class="info-row"><span class="info-key">Flaps</span><span class="info-val">T/O</span></div>
+    <div class="info-row"><span class="info-key">Throttle</span><span class="info-val">Full Forward</span></div>
+    <div class="info-row"><span class="info-key">Lift-off speed</span><span class="info-val">65 KIAS</span></div>
+    <div class="info-row"><span class="info-key">Over 50 ft</span><span class="info-val">70 KIAS</span></div>
+    <div class="info-row"><span class="info-key">Runway (base)</span><span class="info-val">Grass</span></div>
+    <div class="info-row"><span class="info-key">ISA temp @ alt</span><span class="info-val" id="to-isa-display">15.0 °C</span></div>
+    <div class="info-divider"></div>
+    <div class="info-section-title">Corrections applied</div>
+    <div class="info-row"><span class="info-key">Headwind</span><span class="info-val">−2.5 m / kt</span></div>
+    <div class="info-row"><span class="info-key">Tailwind</span><span class="info-val">+10.0 m / kt</span></div>
+    <div class="info-row"><span class="info-key">Paved rwy</span><span class="info-val">−6% GR</span></div>
+    <div class="info-row"><span class="info-key">Slope</span><span class="info-val">+5% GR per +1%</span></div>
+  </div>
+
+  <div class="corr-panel">
+    <div class="corr-panel-title">Runway Conditions &amp; Corrections</div>
+    <div class="corr-row">
+      <div class="corr-icon">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
+      </div>
+      <div class="corr-label">Wind (kt)<span class="corr-hint">+ = headwind &nbsp;·&nbsp; − = tailwind</span></div>
+      <div class="corr-input"><input type="number" id="to-wind" value="0" step="1" min="-30" max="30" oninput="calcTakeoff()"></div>
+    </div>
+    <div class="corr-row">
+      <div class="corr-icon">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="11" width="18" height="2" rx="1"/><path d="M3 17h18M3 7h18"/></svg>
+      </div>
+      <div class="corr-label">Runway surface<span class="corr-hint">0 = Grass &nbsp;·&nbsp; 1 = Paved</span></div>
+      <div class="corr-input">
+        <select id="to-runway" onchange="calcTakeoff()">
+          <option value="0">0</option>
+          <option value="1">1</option>
+        </select>
+      </div>
+    </div>
+    <div class="corr-row">
+      <div class="corr-icon">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+      </div>
+      <div class="corr-label">Slope (%)<span class="corr-hint">+ = upslope &nbsp;·&nbsp; affects ground roll only</span></div>
+      <div class="corr-input"><input type="number" id="to-slope" value="0" step="0.1" min="-5" max="5" oninput="calcTakeoff()"></div>
+    </div>
+  </div>
+
+  <div class="results-section">
+    <div class="results-header">
+      <div class="results-header-dot"></div>
+      <div class="results-header-text">Take-Off · Base values (no corrections)</div>
+    </div>
+    <div class="results-row">
+      <div class="results-label">Ground Roll</div>
+      <div class="results-block">
+        <div class="results-metric">
+          <div class="results-metric-unit">metres</div>
+          <div class="results-metric-val" id="to-base-gr-m">–</div>
+          <div class="results-metric-ft" id="to-base-gr-ft">– ft</div>
+        </div>
+      </div>
+    </div>
+    <div class="results-row">
+      <div class="results-label">Distance to 50 ft</div>
+      <div class="results-block">
+        <div class="results-metric">
+          <div class="results-metric-unit">metres</div>
+          <div class="results-metric-val" id="to-base-50-m">–</div>
+          <div class="results-metric-ft" id="to-base-50-ft">– ft</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="results-section corrected">
+    <div class="results-header">
+      <div class="results-header-dot"></div>
+      <div class="results-header-text">Take-Off · With all corrections applied</div>
+    </div>
+    <div class="results-row">
+      <div class="results-label">Ground Roll <span class="delta-badge zero" id="to-delta-gr">±0</span></div>
+      <div class="results-block">
+        <div class="results-metric">
+          <div class="results-metric-unit">metres</div>
+          <div class="results-metric-val" id="to-corr-gr-m">–</div>
+          <div class="results-metric-ft" id="to-corr-gr-ft">– ft</div>
+        </div>
+      </div>
+    </div>
+    <div class="results-row">
+      <div class="results-label">Distance to 50 ft <span class="delta-badge zero" id="to-delta-50">±0</span></div>
+      <div class="results-block">
+        <div class="results-metric">
+          <div class="results-metric-unit">metres</div>
+          <div class="results-metric-val" id="to-corr-50-m">–</div>
+          <div class="results-metric-ft" id="to-corr-50-ft">– ft</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /takeoff -->
+
+<!-- ═══ LANDING PAGE ═══ -->
+<div class="page" id="page-landing">
+
+  <div class="input-grid">
+    <div class="input-card">
+      <div class="input-card-label">Weight · kg</div>
+      <div class="input-card-val">
+        <select id="ld-weight" onchange="calcLanding()">
+          <option value="1180">1180</option>
+          <option value="1080">1080</option>
+          <option value="930">930</option>
+        </select>
+      </div>
+    </div>
+    <div class="input-card">
+      <div class="input-card-label">Press. Alt · ft</div>
+      <div class="input-card-val">
+        <select id="ld-alt" onchange="calcLanding()">
+          <option value="0">0</option>
+          <option value="1000">1000</option>
+          <option value="2000">2000</option>
+          <option value="3000">3000</option>
+          <option value="4000">4000</option>
+          <option value="5000">5000</option>
+          <option value="6000">6000</option>
+          <option value="7000">7000</option>
+          <option value="8000">8000</option>
+          <option value="9000">9000</option>
+          <option value="10000">10000</option>
+        </select>
+      </div>
+    </div>
+    <div class="input-card">
+      <div class="input-card-label">OAT · °C</div>
+      <div class="input-card-val">
+        <input type="number" id="ld-oat" value="15" step="1" min="-40" max="60" oninput="calcLanding()">
+      </div>
+    </div>
+  </div>
+
+  <div class="info-panel">
+    <div class="info-row"><span class="info-key">Flaps</span><span class="info-val">LAND</span></div>
+    <div class="info-row"><span class="info-key">Throttle</span><span class="info-val">Idle</span></div>
+    <div class="info-row"><span class="info-key">Approach speed</span><span class="info-val">70 KIAS</span></div>
+    <div class="info-row"><span class="info-key">Runway (base)</span><span class="info-val">Grass</span></div>
+    <div class="info-row"><span class="info-key">ISA temp @ alt</span><span class="info-val" id="ld-isa-display">15.0 °C</span></div>
+    <div class="info-row"></div>
+    <div class="info-divider"></div>
+    <div class="info-section-title">Corrections applied</div>
+    <div class="info-row"><span class="info-key">Headwind</span><span class="info-val">−5.0 m / kt</span></div>
+    <div class="info-row"><span class="info-key">Tailwind</span><span class="info-val">+11.0 m / kt</span></div>
+    <div class="info-row"><span class="info-key">Paved rwy</span><span class="info-val">−2% GR</span></div>
+    <div class="info-row"><span class="info-key">Slope</span><span class="info-val">−2.5% GR per +1%</span></div>
+  </div>
+
+  <div class="corr-panel">
+    <div class="corr-panel-title">Runway Conditions &amp; Corrections</div>
+    <div class="corr-row">
+      <div class="corr-icon">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
+      </div>
+      <div class="corr-label">Wind (kt)<span class="corr-hint">+ = headwind &nbsp;·&nbsp; − = tailwind</span></div>
+      <div class="corr-input"><input type="number" id="ld-wind" value="0" step="1" min="-30" max="30" oninput="calcLanding()"></div>
+    </div>
+    <div class="corr-row">
+      <div class="corr-icon">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="11" width="18" height="2" rx="1"/><path d="M3 17h18M3 7h18"/></svg>
+      </div>
+      <div class="corr-label">Runway surface<span class="corr-hint">0 = Grass &nbsp;·&nbsp; 1 = Paved</span></div>
+      <div class="corr-input">
+        <select id="ld-runway" onchange="calcLanding()">
+          <option value="0">0</option>
+          <option value="1">1</option>
+        </select>
+      </div>
+    </div>
+    <div class="corr-row">
+      <div class="corr-icon">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+      </div>
+      <div class="corr-label">Slope (%)<span class="corr-hint">+ = upslope &nbsp;·&nbsp; affects ground roll only</span></div>
+      <div class="corr-input"><input type="number" id="ld-slope" value="0" step="0.1" min="-5" max="5" oninput="calcLanding()"></div>
+    </div>
+  </div>
+
+  <div class="results-section">
+    <div class="results-header">
+      <div class="results-header-dot"></div>
+      <div class="results-header-text">Landing · Base values (no corrections)</div>
+    </div>
+    <div class="results-row">
+      <div class="results-label">Ground Roll</div>
+      <div class="results-block">
+        <div class="results-metric">
+          <div class="results-metric-unit">metres</div>
+          <div class="results-metric-val" id="ld-base-gr-m">–</div>
+          <div class="results-metric-ft" id="ld-base-gr-ft">– ft</div>
+        </div>
+      </div>
+    </div>
+    <div class="results-row">
+      <div class="results-label">Landing Distance</div>
+      <div class="results-block">
+        <div class="results-metric">
+          <div class="results-metric-unit">metres</div>
+          <div class="results-metric-val" id="ld-base-50-m">–</div>
+          <div class="results-metric-ft" id="ld-base-50-ft">– ft</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="results-section corrected">
+    <div class="results-header">
+      <div class="results-header-dot"></div>
+      <div class="results-header-text">Landing · With all corrections applied</div>
+    </div>
+    <div class="results-row">
+      <div class="results-label">Ground Roll <span class="delta-badge zero" id="ld-delta-gr">±0</span></div>
+      <div class="results-block">
+        <div class="results-metric">
+          <div class="results-metric-unit">metres</div>
+          <div class="results-metric-val" id="ld-corr-gr-m">–</div>
+          <div class="results-metric-ft" id="ld-corr-gr-ft">– ft</div>
+        </div>
+      </div>
+    </div>
+    <div class="results-row">
+      <div class="results-label">Landing Distance <span class="delta-badge zero" id="ld-delta-50">±0</span></div>
+      <div class="results-block">
+        <div class="results-metric">
+          <div class="results-metric-unit">metres</div>
+          <div class="results-metric-val" id="ld-corr-50-m">–</div>
+          <div class="results-metric-ft" id="ld-corr-50-ft">– ft</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /landing -->
+</div><!-- /content -->
+
+<!-- FOOTER -->
+<div class="footer">
+  <div class="footer-left">
+    TECNAM P2006T &nbsp;·&nbsp; AFM 4th Edition Rev. 22 &nbsp;·&nbsp; Section 5 – Performances &nbsp;·&nbsp; EASA CS-23
+  </div>
+  <div class="footer-warn">⚠ Not for operational use</div>
+</div>
+
+<script>
+// ══════════════════════════════════════════════════
+// TAKE-OFF DATA  (POH §8)
+// [GR-25, GR0, GR25, GR50, GR_ISA, D50-25, D500, D5025, D5050, D50_ISA]
+// ══════════════════════════════════════════════════
+const toData = {
+  1180: {
+       0:[208,258,313,374,290,266,331,404,485,373],
+    1000:[230,284,346,413,315,294,366,447,537,407],
+    2000:[254,315,382,457,343,326,406,495,595,444],
+    3000:[281,348,423,505,374,401,499,610,733,529],
+    4000:[311,385,468,560,408,401,499,610,733,529],
+    5000:[345,427,519,620,445,445,555,677,814,579],
+    6000:[383,474,575,688,486,495,617,753,906,633],
+    7000:[425,526,639,764,531,551,686,839,1008,693],
+    8000:[472,585,710,849,581,614,765,934,1123,759],
+    9000:[525,650,790,945,635,685,853,1042,1253,833],
+   10000:[585,724,879,1052,696,764,952,1163,1399,914]
+  },
+  1080: {
+       0:[148,188,234,286,215,193,246,306,374,281],
+    1000:[165,210,261,319,235,216,274,341,418,308],
+    2000:[184,234,291,356,258,241,306,381,466,338],
+    3000:[206,262,326,398,284,301,383,477,583,409],
+    4000:[230,293,364,446,312,301,383,477,583,409],
+    5000:[258,328,408,499,343,338,429,534,653,449],
+    6000:[289,368,457,559,378,378,481,599,732,495],
+    7000:[324,412,513,628,417,425,540,672,822,545],
+    8000:[364,463,577,705,460,477,606,755,923,602],
+    9000:[410,521,648,793,508,536,682,849,1038,664],
+   10000:[461,586,730,893,561,604,767,955,1168,734]
+  },
+  930: {
+       0:[100,127,158,194,146,131,167,207,254,190],
+    1000:[112,142,177,216,160,146,186,231,283,209],
+    2000:[125,159,197,242,175,163,208,258,316,229],
+    3000:[140,177,221,270,192,204,260,323,395,277],
+    4000:[156,198,247,302,212,204,260,323,395,277],
+    5000:[175,222,277,338,233,229,291,362,443,305],
+    6000:[196,249,310,379,256,257,326,406,496,335],
+    7000:[220,280,348,426,282,288,366,455,557,370],
+    8000:[247,314,391,478,312,323,411,512,626,408],
+    9000:[278,353,440,538,344,364,462,575,704,450],
+   10000:[313,397,495,605,380,409,520,648,792,498]
+  }
+};
+
+// ══════════════════════════════════════════════════
+// LANDING DATA  (POH §16)
+// ══════════════════════════════════════════════════
+const ldData = {
+  1180: {
+       0:[183,202,220,238,213,288,312,335,358,326],
+    1000:[190,209,228,247,219,297,321,345,369,334],
+    2000:[197,217,237,256,226,306,331,356,381,342],
+    3000:[204,225,245,266,232,325,352,379,405,360],
+    4000:[212,233,255,276,239,325,352,379,405,360],
+    5000:[220,242,264,287,247,335,363,391,418,369],
+    6000:[228,251,275,298,254,346,375,403,431,378],
+    7000:[237,261,285,309,262,357,387,416,445,388],
+    8000:[246,271,296,321,270,368,399,430,460,398],
+    9000:[256,282,308,334,279,380,412,444,475,409],
+   10000:[266,293,320,347,288,393,426,459,491,420]
+  },
+  1080: {
+       0:[175,192,210,227,203,271,293,315,337,306],
+    1000:[181,199,218,236,209,279,302,325,348,314],
+    2000:[188,207,226,245,215,288,311,335,358,322],
+    3000:[195,215,234,254,222,306,331,356,381,338],
+    4000:[202,223,243,263,228,306,331,356,381,338],
+    5000:[210,231,252,273,235,315,342,368,394,347],
+    6000:[218,240,262,284,243,325,353,380,406,356],
+    7000:[226,249,272,295,250,336,364,392,420,365],
+    8000:[235,259,283,306,258,347,376,405,434,375],
+    9000:[244,269,294,318,266,358,388,418,448,385],
+   10000:[254,280,305,331,275,370,401,432,463,395]
+  },
+  930: {
+       0:[150,166,181,196,175,233,252,271,290,264],
+    1000:[156,172,187,203,180,240,260,280,299,270],
+    2000:[162,178,194,211,185,248,268,288,309,277],
+    3000:[168,185,202,219,191,263,285,307,328,291],
+    4000:[174,192,209,227,197,263,285,307,328,291],
+    5000:[181,199,217,235,203,272,294,317,339,299],
+    6000:[188,207,226,244,209,280,304,327,350,307],
+    7000:[195,215,234,254,215,289,313,338,361,315],
+    8000:[203,223,243,264,222,299,324,349,373,323],
+    9000:[210,232,253,274,229,308,334,360,386,331],
+   10000:[219,241,263,285,237,319,346,372,399,340]
+  }
+};
+
+function isaTemp(ft) { return 15 - (ft/1000)*1.9812; }
+function mToFt(m)    { return Math.round(m*3.28084); }
+
+function interp(row, oat) {
+  const temps=[-25,0,25,50], vals=[row[0],row[1],row[2],row[3]];
+  if(oat<=-25) return vals[0];
+  if(oat>=50)  return vals[3];
+  for(let i=0;i<3;i++){
+    if(oat>=temps[i]&&oat<=temps[i+1]){
+      return vals[i]+(oat-temps[i])/(temps[i+1]-temps[i])*(vals[i+1]-vals[i]);
+    }
+  }
+  return vals[1];
+}
+
+function getBase(data, weight, alt, oat) {
+  const row = data[+weight][+alt];
+  return { gr: Math.round(interp(row,oat)), d50: Math.round(interp(row.slice(5),oat)) };
+}
+
+function setVal(mId,ftId,val){
+  document.getElementById(mId).textContent=val;
+  document.getElementById(ftId).textContent=mToFt(val)+' ft';
+}
+
+function setDelta(id,base,corr){
+  const el=document.getElementById(id), d=corr-base;
+  if(d>0){ el.textContent='+'+d+' m'; el.className='delta-badge pos'; }
+  else if(d<0){ el.textContent=d+' m'; el.className='delta-badge neg'; }
+  else{ el.textContent='±0'; el.className='delta-badge zero'; }
+}
+
+function calcTakeoff(){
+  const weight=document.getElementById('to-weight').value;
+  const alt=document.getElementById('to-alt').value;
+  const oat=parseFloat(document.getElementById('to-oat').value)||0;
+  const wind=parseFloat(document.getElementById('to-wind').value)||0;
+  const runway=+document.getElementById('to-runway').value;
+  const slope=parseFloat(document.getElementById('to-slope').value)||0;
+
+  document.getElementById('to-isa-display').textContent=isaTemp(+alt).toFixed(1)+' °C';
+  const b=getBase(toData,weight,alt,oat);
+
+  let gr=b.gr;
+  if(wind>=0) gr-=wind*2.5; else gr+=Math.abs(wind)*10;
+  if(runway===1) gr*=0.94;
+  gr+=gr*(slope*0.05);
+  gr=Math.round(gr);
+  const d50=Math.round(b.d50*(b.gr>0?gr/b.gr:1));
+
+  setVal('to-base-gr-m','to-base-gr-ft',b.gr);
+  setVal('to-base-50-m','to-base-50-ft',b.d50);
+  setVal('to-corr-gr-m','to-corr-gr-ft',gr);
+  setVal('to-corr-50-m','to-corr-50-ft',d50);
+  setDelta('to-delta-gr',b.gr,gr);
+  setDelta('to-delta-50',b.d50,d50);
+}
+
+function calcLanding(){
+  const weight=document.getElementById('ld-weight').value;
+  const alt=document.getElementById('ld-alt').value;
+  const oat=parseFloat(document.getElementById('ld-oat').value)||0;
+  const wind=parseFloat(document.getElementById('ld-wind').value)||0;
+  const runway=+document.getElementById('ld-runway').value;
+  const slope=parseFloat(document.getElementById('ld-slope').value)||0;
+
+  document.getElementById('ld-isa-display').textContent=isaTemp(+alt).toFixed(1)+' °C';
+  const b=getBase(ldData,weight,alt,oat);
+
+  let gr=b.gr;
+  if(wind>=0) gr-=wind*5; else gr+=Math.abs(wind)*11;
+  if(runway===1) gr*=0.98;
+  gr-=gr*(slope*0.025);
+  gr=Math.round(gr);
+  const d50=Math.round(b.d50*(b.gr>0?gr/b.gr:1));
+
+  setVal('ld-base-gr-m','ld-base-gr-ft',b.gr);
+  setVal('ld-base-50-m','ld-base-50-ft',b.d50);
+  setVal('ld-corr-gr-m','ld-corr-gr-ft',gr);
+  setVal('ld-corr-50-m','ld-corr-50-ft',d50);
+  setDelta('ld-delta-gr',b.gr,gr);
+  setDelta('ld-delta-50',b.d50,d50);
+}
+
+function showPage(name,btn){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(t=>t.classList.remove('active'));
+  document.getElementById('page-'+name).classList.add('active');
+  btn.classList.add('active');
+}
+
+function updateClock(){
+  const n=new Date();
+  document.getElementById('clock').textContent=
+    String(n.getUTCHours()).padStart(2,'0')+':'+
+    String(n.getUTCMinutes()).padStart(2,'0')+':'+
+    String(n.getUTCSeconds()).padStart(2,'0')+' UTC';
+}
+setInterval(updateClock,1000);
+updateClock();
+calcTakeoff();
+calcLanding();
+</script>
+</body>
+</html>
