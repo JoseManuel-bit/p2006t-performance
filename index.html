@@ -73,7 +73,7 @@ body { font-family: var(--body); background: var(--bg); color: var(--text); min-
   display: flex; background: var(--bg2);
   border-top: 2px solid var(--amber); flex-shrink: 0;
 }
-.bottom-nav.hidden { display: none !important; }
+
 .nav-btn {
   flex: 1; padding: 10px 4px 8px;
   font-family: var(--head); font-size: 10px; font-weight: 600;
@@ -545,6 +545,8 @@ LANDING
 </div>
 
 <!-- BOTTOM NAV -->
+
+
 <div class="bottom-nav" id="bottom-nav">
 
   <button class="nav-btn" id="nav-checklist" onclick="showScreen('screen-checklist')">
@@ -554,7 +556,6 @@ LANDING
     PERF
   </button>
 </div>
-
 <script>
 // ═══════════════════════════════════════════════════
 // CHECKLIST DATA — AFM Section 4
@@ -1116,13 +1117,7 @@ function showScreen(id) {
   });
   // Bottom nav only visible outside home
   const bnav = document.getElementById('bottom-nav');
-  if (id === 'screen-home') {
-    bnav.classList.add('hidden');
-    bnav.style.display = 'none';
-  } else {
-    bnav.classList.remove('hidden');
-    bnav.style.display = 'flex';
-  }
+  bnav.style.setProperty('display', id === 'screen-home' ? 'none' : 'flex', 'important');
   Object.entries(navBtns).forEach(([s,b]) => {
     document.getElementById(b).classList.toggle('active', s === id);
   });
@@ -1130,9 +1125,6 @@ function showScreen(id) {
 
 function enterAircraft() {
   showScreen('screen-checklist');
-  var bnav = document.getElementById('bottom-nav');
-  bnav.classList.remove('hidden');
-  bnav.style.display = 'flex';
 }
 
 // ── PERFORMANCE ───────────────────────────────────
@@ -1567,7 +1559,7 @@ openChecklist = function(id) {
 calcTakeoff();
 calcLanding();
 // Start on home — hide bottom nav
-document.getElementById('bottom-nav').classList.add('hidden');
+document.getElementById('bottom-nav').style.setProperty('display','none','important');
 </script>
 </body>
 </html>
