@@ -378,6 +378,53 @@ input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer
   text-align:center; font-weight:700;
 }
 
+
+/* ── DOCS SCREEN ─────────────────────────────── */
+.docs-content { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; padding: 12px; padding-bottom: 70px; }
+.docs-info {
+  display: flex; align-items: flex-start; gap: 8px;
+  background: rgba(37,99,235,0.1); border: 1px solid rgba(37,99,235,0.3);
+  border-radius: var(--radius); padding: 10px 12px; margin-bottom: 12px;
+  font-family: var(--body); font-size: 11px; color: var(--text-dim); line-height: 1.5;
+}
+.docs-info svg { flex-shrink:0; color: var(--blue2); margin-top:1px; }
+.docs-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 16px; }
+.doc-card {
+  background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius);
+  padding: 16px 12px; display: flex; flex-direction: column; gap: 8px;
+  cursor: pointer; transition: all 0.18s; text-decoration: none;
+}
+.doc-card:hover { border-color: var(--amber); background: var(--panel); }
+.doc-card-icon { color: var(--amber); }
+.doc-card-name { font-family: var(--head); font-size: 13px; font-weight: 700; letter-spacing: 0.5px; color: var(--text); line-height: 1.3; }
+.doc-card-type { font-family: var(--mono); font-size: 9px; color: var(--text-dim); letter-spacing: 1px; text-transform: uppercase; }
+.doc-card-size { font-family: var(--mono); font-size: 9px; color: var(--text-dim); }
+.doc-card.missing { opacity: 0.4; cursor: not-allowed; }
+.doc-card.missing:hover { border-color: var(--border); background: var(--bg2); }
+.doc-card-status { font-family: var(--mono); font-size: 9px; }
+.doc-card-status.ok { color: var(--green); }
+.doc-card-status.missing { color: var(--red); }
+
+.docs-add-info {
+  background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius);
+  padding: 12px;
+}
+.docs-add-title {
+  font-family: var(--head); font-size: 10px; font-weight: 700; letter-spacing: 2px;
+  text-transform: uppercase; color: var(--text-dim); margin-bottom: 10px;
+}
+.docs-add-step {
+  display: flex; align-items: flex-start; gap: 10px;
+  font-family: var(--body); font-size: 12px; color: var(--text-label);
+  line-height: 1.5; margin-bottom: 8px;
+}
+.docs-step-num {
+  background: var(--panel); border: 1px solid var(--border); border-radius: 50%;
+  width: 20px; height: 20px; display: flex; align-items: center; justify-content: center;
+  font-family: var(--mono); font-size: 10px; font-weight: 700; color: var(--amber);
+  flex-shrink: 0;
+}
+
 </style>
 </head>
 <body>
@@ -615,16 +662,42 @@ LANDING
 
 </div>
 
+<!-- DOCS SCREEN -->
+<div class="screen" id="screen-docs">
+  <div class="docs-header">
+    <div class="cl-header">
+      <button class="cl-back-btn" onclick="showScreen('screen-home')" style="width:80px;text-align:center;justify-content:center;">HOME</button>
+      <div style="flex:1;text-align:center;font-family:var(--head);font-size:15px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--text);">P2006T · DOCUMENTS</div>
+      <div style="width:80px;"></div>
+    </div>
+  </div>
+  <div class="docs-content">
+    <div class="docs-info">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+      Upload documents to your GitHub repository alongside index.html. They will be available offline once cached.
+    </div>
+    <div class="docs-grid" id="docs-grid"></div>
+    <div class="docs-add-info">
+      <div class="docs-add-title">HOW TO ADD DOCUMENTS</div>
+      <div class="docs-add-step"><span class="docs-step-num">1</span>Upload your PDF to the GitHub repository (same folder as index.html)</div>
+      <div class="docs-add-step"><span class="docs-step-num">2</span>Edit the DOCUMENTS array in the code and add your file</div>
+      <div class="docs-add-step"><span class="docs-step-num">3</span>Open the app once with internet to cache the file offline</div>
+    </div>
+  </div>
+</div>
+
 <!-- BOTTOM NAV -->
 
 
 <div class="bottom-nav" id="bottom-nav">
-
   <button class="nav-btn" id="nav-checklist" onclick="showScreen('screen-checklist')">
     CHECKLIST
   </button>
   <button class="nav-btn" id="nav-perf" onclick="showScreen('screen-perf')">
     PERF
+  </button>
+  <button class="nav-btn" id="nav-docs" onclick="showScreen('screen-docs')">
+    DOCS
   </button>
 </div>
 <script>
@@ -958,6 +1031,56 @@ function getRwyAvailable(prefix) {
   return rwyData ? (prefix==='to' ? rwyData.tora : rwyData.lda) : null;
 }
 
+
+// ── DOCUMENTS ──────────────────────────────────────
+// To add a document: upload the file to your GitHub repo
+// and add an entry here with the filename.
+const DOCUMENTS = [
+  {
+    name: 'Aircraft Flight Manual',
+    subtitle: 'AFM 4th Edition Rev. 22',
+    file: 'poh.pdf',
+    type: 'PDF',
+  },
+  {
+    name: 'Minimum Equipment List',
+    subtitle: 'MEL P2006T',
+    file: 'mel.pdf',
+    type: 'PDF',
+  },
+  {
+    name: 'Weight & Balance',
+    subtitle: 'EC-NTJ',
+    file: 'wb.pdf',
+    type: 'PDF',
+  },
+  {
+    name: 'Insurance Certificate',
+    subtitle: 'Current year',
+    file: 'insurance.pdf',
+    type: 'PDF',
+  },
+];
+
+function buildDocsGrid() {
+  var grid = document.getElementById('docs-grid');
+  if (!grid) return;
+  grid.innerHTML = '';
+  DOCUMENTS.forEach(function(doc) {
+    var a = document.createElement('a');
+    a.className = 'doc-card';
+    a.href = doc.file;
+    a.target = '_blank';
+    a.rel = 'noopener';
+    a.innerHTML =
+      '<div class="doc-card-icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg></div>' +
+      '<div class="doc-card-name">' + doc.name + '</div>' +
+      '<div class="doc-card-type">' + doc.subtitle + '</div>' +
+      '<div class="doc-card-type" style="margin-top:2px;">' + doc.type + '</div>';
+    grid.appendChild(a);
+  });
+}
+
 // ── CHECKLIST DATA ─────────────────────────────────
 const CHECKLISTS = [
   {id:'ifr-briefing',name:'Engine Start Sequence / IFR Briefing',icon:'seq',memory:false,type:'seq',items:[{t:'Perform "Before Start Checklist"'},{t:'Copy ATIS'},{t:'Request Engine Start and ATC Clearance'},{t:'Prepare and SID Briefing'},{t:'WANT (Weather, Airspace, NOTAMs, TFRs)'},{t:'Normal Briefing'},{t:'Emergency Briefing'},{t:'Engine Start'},{t:'Ready to Taxi Call'},{t:'Taxi Briefing'}]},
@@ -1096,6 +1219,7 @@ function toggleItem(i) {
   renderItems();
   buildClGrid();
   buildEmergGrid();
+  buildDocsGrid();
 }
 
 function updateProgress() {
@@ -1114,6 +1238,7 @@ function resetChecklist() {
   renderItems();
   buildClGrid();
   buildEmergGrid();
+  buildDocsGrid();
 }
 
 function showClMenu() {
@@ -1122,6 +1247,7 @@ function showClMenu() {
   currentCL = null;
   buildClGrid();
   buildEmergGrid();
+  buildDocsGrid();
 }
 
 function switchClTab(tab) {
@@ -1133,8 +1259,8 @@ function switchClTab(tab) {
 }
 
 // ── SCREEN NAVIGATION ──────────────────────────────
-var screens = ['screen-home','screen-checklist','screen-perf'];
-var navBtns = {'screen-checklist':'nav-checklist','screen-perf':'nav-perf'};
+var screens = ['screen-home','screen-checklist','screen-perf','screen-docs'];
+var navBtns = {'screen-checklist':'nav-checklist','screen-perf':'nav-perf','screen-docs':'nav-docs'};
 
 function showScreen(id) {
   screens.forEach(function(s){
