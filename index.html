@@ -88,8 +88,8 @@ body.on-home .bottom-nav { display: none; }
 .nav-btn.active svg { opacity: 1; }
 
 /* ── SCREENS ──────────────────────────────────── */
-.screen { display: none; flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; }
-.screen.active { display: flex; flex-direction: column; }
+.screen { display: none; }
+.screen.active { display: flex; flex-direction: column; flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; min-height: 0; }
 
 /* ── HOME SCREEN ─────────────────────────────── */
 .home-screen { padding: 16px; display: flex; flex-direction: column; flex: 1; }
