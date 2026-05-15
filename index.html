@@ -3,9 +3,15 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="P2006T Perf">
+<meta name="theme-color" content="#0E1117">
 <title>P2006T · Performance</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Oswald:wght@300;400;500;600;700&family=Share+Tech+Mono&family=Roboto:wght@300;400;500&display=swap');
+
+/* Offline fallback fonts if Google Fonts unavailable */
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -23,9 +29,9 @@
   --text:      #E8EDF5;
   --text-dim:  #8A97B0;
   --text-label:#C5CDD9;
-  --mono:      'Share Tech Mono', monospace;
-  --head:      'Oswald', sans-serif;
-  --body:      'Roboto', sans-serif;
+  --mono:      'Share Tech Mono', 'Courier New', monospace;
+  --head:      'Oswald', 'Impact', sans-serif;
+  --body:      'Roboto', -apple-system, sans-serif;
   --radius:    4px;
 }
 
@@ -88,10 +94,11 @@ body {
 .input-card-val select, .input-card-val input[type="number"] {
   width: 100%; background: transparent; border: none;
   font-family: var(--mono); font-size: 28px; color: var(--amber);
-  text-align: center; padding: 10px 4px; outline: none; cursor: pointer;
+  text-align: center; text-align-last: center; padding: 10px 4px; outline: none; cursor: pointer;
   -webkit-appearance: none; appearance: none;
+  display: block; margin: 0 auto;
 }
-.input-card-val select option { background: #1a2030; color: var(--text); font-size: 14px; }
+.input-card-val select option { background: #1a2030; color: var(--text); font-size: 14px; text-align: center; }
 input[type=number]::-webkit-inner-spin-button,
 input[type=number]::-webkit-outer-spin-button { opacity: 0; }
 
@@ -130,10 +137,11 @@ input[type=number]::-webkit-outer-spin-button { opacity: 0; }
 .corr-input input, .corr-input select {
   width: 100%; background: transparent; border: none;
   font-family: var(--mono); font-size: 20px; color: var(--amber);
-  text-align: center; padding: 8px 4px; outline: none;
+  text-align: center; text-align-last: center; padding: 8px 4px; outline: none;
   -webkit-appearance: none; appearance: none;
+  display: block; margin: 0 auto;
 }
-.corr-input select option { background: #1a2030; color: var(--text); font-size: 13px; }
+.corr-input select option { background: #1a2030; color: var(--text); font-size: 13px; text-align: center; }
 
 /* RESULTS */
 .results-section { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); margin-bottom: 10px; overflow: hidden; }
@@ -697,6 +705,66 @@ setInterval(updateClock,1000);
 updateClock();
 calcTakeoff();
 calcLanding();
+
+// ── SERVICE WORKER — offline support ─────────────────────
+const SW_CODE = `
+const CACHE = 'p2006t-v1';
+const FONTS = [
+  'https://fonts.googleapis.com/css2?family=Oswald:wght@300;400;500;600;700&family=Share+Tech+Mono&family=Roboto:wght@300;400;500&display=swap'
+];
+
+self.addEventListener('install', e => {
+  self.skipWaiting();
+  e.waitUntil(
+    caches.open(CACHE).then(c => c.addAll(FONTS).catch(()=>{}))
+  );
+});
+
+self.addEventListener('activate', e => {
+  e.waitUntil(
+    caches.keys().then(keys =>
+      Promise.all(keys.filter(k => k !== CACHE).map(k => caches.delete(k)))
+    )
+  );
+  self.clients.claim();
+});
+
+self.addEventListener('fetch', e => {
+  e.respondWith(
+    caches.match(e.request).then(cached => {
+      if (cached) return cached;
+      return fetch(e.request).then(resp => {
+        if (resp && resp.status === 200) {
+          const clone = resp.clone();
+          caches.open(CACHE).then(c => c.put(e.request, clone));
+        }
+        return resp;
+      }).catch(() => cached);
+    })
+  );
+});
+`;
+
+if ('serviceWorker' in navigator) {
+  const blob = new Blob([SW_CODE], { type: 'application/javascript' });
+  const swUrl = URL.createObjectURL(blob);
+  navigator.serviceWorker.register(swUrl).then(reg => {
+    console.log('SW registered, offline ready');
+  }).catch(err => console.log('SW error:', err));
+}
+
+// ── ONLINE / OFFLINE indicator ────────────────────────────
+const clockEl = document.getElementById('clock');
+function updateOnlineStatus() {
+  const offline = !navigator.onLine;
+  clockEl.style.color = offline ? 'var(--red)' : '';
+  if (offline) {
+    document.getElementById('clock').title = 'OFFLINE MODE';
+  }
+}
+window.addEventListener('online',  updateOnlineStatus);
+window.addEventListener('offline', updateOnlineStatus);
+updateOnlineStatus();
 </script>
 </body>
 </html>
