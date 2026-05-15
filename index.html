@@ -86,7 +86,7 @@ body.on-home .bottom-nav { display: none; }
   border-top: 2px solid transparent; transition: all 0.18s;
 }
 .nav-btn svg { opacity: 0.4; transition: opacity 0.18s; }
-.nav-btn.active { color: var(--amber); border-top-color: var(--amber); }
+.nav-btn.active { color: #000; background: var(--amber); border-top-color: var(--amber); }
 .nav-btn.active svg { opacity: 1; }
 
 /* ── SCREENS ──────────────────────────────────── */
@@ -425,6 +425,42 @@ input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer
   flex-shrink: 0;
 }
 
+
+/* ── DENSITY ALTITUDE ─────────────────────────── */
+.airport-qnh-row {
+  display: flex; align-items: center; gap: 10px;
+  padding-top: 8px; margin-top: 8px;
+  border-top: 1px solid var(--border);
+}
+.qnh-input-wrap { display: flex; align-items: center; gap: 6px; }
+.qnh-input {
+  width: 80px; background: var(--bg3); border: 1px solid var(--border);
+  border-radius: 4px; font-family: var(--mono); font-size: 18px; font-weight: 700;
+  color: var(--amber); text-align: center; text-align-last: center;
+  padding: 5px 4px; outline: none;
+  -webkit-appearance: none; appearance: none;
+}
+.qnh-input:focus { border-color: var(--amber); }
+.qnh-unit { font-family: var(--head); font-size: 10px; color: var(--text-dim); letter-spacing: 1px; }
+.airport-da-row {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 8px;
+  padding-top: 8px; margin-top: 8px;
+  border-top: 1px solid var(--border);
+}
+.da-card {
+  background: var(--bg3); border: 1px solid var(--border); border-radius: 4px;
+  padding: 8px 10px; text-align: center;
+}
+.da-label {
+  font-family: var(--head); font-size: 9px; font-weight: 600;
+  letter-spacing: 1.5px; text-transform: uppercase; color: var(--text-dim); margin-bottom: 3px;
+}
+.da-value {
+  font-family: var(--mono); font-size: 16px; font-weight: 700; color: var(--green);
+}
+.da-value.warn { color: var(--amber); }
+.da-value.danger { color: var(--red); }
+
 </style>
 </head>
 <body>
@@ -553,6 +589,7 @@ LANDING
     <!-- TAKE-OFF -->
     <div class="perf-page active" id="perf-to">
       <div class="airport-selector">
+        <!-- ROW 1: ICAO + Airport info + Runway -->
         <div class="airport-input-row">
           <div class="airport-icao-wrap">
             <div class="airport-label">DEPARTURE AIRPORT</div>
@@ -568,12 +605,25 @@ LANDING
             <div class="rwy-avail" id="to-rwy-avail" style="color:var(--text-dim);">— m</div>
           </div>
         </div>
+
+        <!-- ROW 3: Press Alt + Density Alt -->
+        <div class="airport-da-row">
+          <div class="da-card">
+            <div class="da-label">PRESS ALT</div>
+            <div class="da-value" id="to-press-alt">— ft</div>
+          </div>
+          <div class="da-card">
+            <div class="da-label">DENSITY ALT</div>
+            <div class="da-value" id="to-density-alt">— ft</div>
+          </div>
+        </div>
       </div>
       <div class="input-grid">
         <div class="input-card"><div class="input-card-label">Weight · kg</div><div class="input-card-val"><input type="number" id="to-weight" value="1180" step="1" min="930" max="1180" oninput="calcTakeoff()"></div></div>
-        <div class="input-card"><div class="input-card-label">Press. Alt · ft</div><div class="input-card-val"><input type="number" id="to-alt" value="0" step="100" min="0" max="10000" oninput="calcTakeoff()"></div></div>
-        <div class="input-card"><div class="input-card-label">OAT · °C</div><div class="input-card-val"><input type="number" id="to-oat" value="15" step="1" min="-40" max="60" oninput="calcTakeoff()"></div></div>
+        <div class="input-card"><div class="input-card-label">QNH · hPa</div><div class="input-card-val"><input type="number" id="to-qnh" value="1013" step="1" min="900" max="1050" oninput="calcDensityAlt('to')"></div></div>
+        <div class="input-card"><div class="input-card-label">OAT · °C</div><div class="input-card-val"><input type="number" id="to-oat" value="15" step="1" min="-40" max="60" oninput="calcDensityAlt('to')"></div></div>
       </div>
+      <input type="hidden" id="to-alt" value="0">
       <div class="corr-panel">
         <div class="corr-panel-title">Runway Conditions</div>
         <div class="corr-row"><div class="corr-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 19V5M5 12l7-7 7 7"/></svg></div><div class="corr-label">Wind (kt)</div><div class="corr-input"><input type="number" id="to-wind" value="0" step="1" min="-30" max="30" oninput="calcTakeoff()"></div></div>
@@ -609,6 +659,7 @@ LANDING
     <!-- LANDING -->
     <div class="perf-page" id="perf-ld">
       <div class="airport-selector">
+        <!-- ROW 1: ICAO + Airport info + Runway -->
         <div class="airport-input-row">
           <div class="airport-icao-wrap">
             <div class="airport-label">DESTINATION AIRPORT</div>
@@ -624,12 +675,25 @@ LANDING
             <div class="rwy-avail" id="ld-rwy-avail" style="color:var(--text-dim);">— m</div>
           </div>
         </div>
+
+        <!-- ROW 3: Press Alt + Density Alt -->
+        <div class="airport-da-row">
+          <div class="da-card">
+            <div class="da-label">PRESS ALT</div>
+            <div class="da-value" id="ld-press-alt">— ft</div>
+          </div>
+          <div class="da-card">
+            <div class="da-label">DENSITY ALT</div>
+            <div class="da-value" id="ld-density-alt">— ft</div>
+          </div>
+        </div>
       </div>
       <div class="input-grid">
         <div class="input-card"><div class="input-card-label">Weight · kg</div><div class="input-card-val"><input type="number" id="ld-weight" value="1180" step="1" min="930" max="1180" oninput="calcLanding()"></div></div>
-        <div class="input-card"><div class="input-card-label">Press. Alt · ft</div><div class="input-card-val"><input type="number" id="ld-alt" value="0" step="100" min="0" max="10000" oninput="calcLanding()"></div></div>
-        <div class="input-card"><div class="input-card-label">OAT · °C</div><div class="input-card-val"><input type="number" id="ld-oat" value="15" step="1" min="-40" max="60" oninput="calcLanding()"></div></div>
+        <div class="input-card"><div class="input-card-label">QNH · hPa</div><div class="input-card-val"><input type="number" id="ld-qnh" value="1013" step="1" min="900" max="1050" oninput="calcDensityAlt('ld')"></div></div>
+        <div class="input-card"><div class="input-card-label">OAT · °C</div><div class="input-card-val"><input type="number" id="ld-oat" value="15" step="1" min="-40" max="60" oninput="calcDensityAlt('ld')"></div></div>
       </div>
+      <input type="hidden" id="ld-alt" value="0">
       <div class="corr-panel">
         <div class="corr-panel-title">Runway Conditions</div>
         <div class="corr-row"><div class="corr-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 19V5M5 12l7-7 7 7"/></svg></div><div class="corr-label">Wind (kt)</div><div class="corr-input"><input type="number" id="ld-wind" value="0" step="1" min="-30" max="30" oninput="calcLanding()"></div></div>
@@ -961,6 +1025,50 @@ const RUNWAYS = {
   },
 };
 
+
+function calcDensityAlt(prefix) {
+  var elevEl = document.getElementById(prefix+'-airport-elev');
+  var altEl  = document.getElementById(prefix+'-alt');
+  var qnh    = parseFloat(document.getElementById(prefix+'-qnh').value) || 1013.25;
+  var oat    = parseFloat(document.getElementById(prefix+'-oat').value) || 15;
+
+  // Get elevation from airport elev display or alt field
+  var elevText = elevEl.textContent;
+  var elevMatch = elevText.match(/(\d+)\s*ft/);
+  var elev = elevMatch ? parseFloat(elevMatch[1]) : (parseFloat(altEl.value) || 0);
+
+  // Pressure altitude = elevation + (1013.25 - QNH) * 27.3
+  var pressAlt = Math.round(elev + (1013.25 - qnh) * 27.3);
+
+  // ISA temp at pressure altitude
+  var isaTemp = 15 - (pressAlt / 1000) * 1.9812;
+
+  // Density altitude = pressAlt + 120 * (OAT - ISA)
+  var densityAlt = Math.round(pressAlt + 120 * (oat - isaTemp));
+
+  // Update display
+  var paEl = document.getElementById(prefix+'-press-alt');
+  var daEl = document.getElementById(prefix+'-density-alt');
+
+  paEl.textContent = pressAlt.toLocaleString() + ' ft';
+  daEl.textContent = densityAlt.toLocaleString() + ' ft';
+
+  // Colour coding for density alt relative to field elevation
+  var diff = densityAlt - elev;
+  daEl.className = 'da-value';
+  if (diff > 4000) daEl.classList.add('danger');
+  else if (diff > 2000) daEl.classList.add('warn');
+
+  // Update Press Alt field display only
+  altEl.value = Math.max(0, Math.min(10000, pressAlt));
+
+  // Store density alt as data attribute for performance calc
+  altEl.dataset.densityAlt = Math.max(0, Math.min(10000, densityAlt));
+
+  // Recalc performance using density alt
+  if (prefix === 'to') calcTakeoff(); else calcLanding();
+}
+
 function lookupAirport(prefix) {
   var icao = document.getElementById(prefix+'-icao').value.toUpperCase().trim();
   var nameEl = document.getElementById(prefix+'-airport-name');
@@ -976,6 +1084,8 @@ function lookupAirport(prefix) {
     nameEl.textContent = ap.name;
     elevEl.textContent = 'Elev: ' + ap.elev + ' ft';
     altEl.value = ap.elev;
+    // Calculate density alt with current QNH
+    setTimeout(function(){ calcDensityAlt(prefix); }, 10);
     // Populate runway selector
     var rwys = RUNWAYS[icao];
     rwySel.innerHTML = '<option value="">—</option>';
@@ -1329,13 +1439,20 @@ function setDelta(id,base,corr){
 }
 function calcTakeoff(){
   var weight=document.getElementById('to-weight').value;
-  var alt=document.getElementById('to-alt').value;
+  var altEl=document.getElementById('to-alt');
+  var alt = altEl.dataset.densityAlt !== undefined && altEl.dataset.densityAlt !== ''
+    ? altEl.dataset.densityAlt : altEl.value;
   var oat=parseFloat(document.getElementById('to-oat').value)||0;
   var wind=parseFloat(document.getElementById('to-wind').value)||0;
   var runway=+document.getElementById('to-runway').value;
   var slope=parseFloat(document.getElementById('to-slope').value)||0;
   var isaEl=document.getElementById('to-isa');
   if(isaEl) isaEl.textContent=isaTemp(+alt).toFixed(1)+' C';
+  // Show density alt being used in info panel
+  var daEl=document.getElementById('to-density-alt');
+  if(daEl && altEl.dataset.densityAlt) {
+    // already shown in airport card
+  }
   var b=getBase(toData,weight,alt,oat);
   var gr=b.gr;
   if(wind>=0) gr-=wind*2.5; else gr+=Math.abs(wind)*10;
@@ -1349,7 +1466,9 @@ function calcTakeoff(){
 }
 function calcLanding(){
   var weight=document.getElementById('ld-weight').value;
-  var alt=document.getElementById('ld-alt').value;
+  var altEl=document.getElementById('ld-alt');
+  var alt = altEl.dataset.densityAlt !== undefined && altEl.dataset.densityAlt !== ''
+    ? altEl.dataset.densityAlt : altEl.value;
   var oat=parseFloat(document.getElementById('ld-oat').value)||0;
   var wind=parseFloat(document.getElementById('ld-wind').value)||0;
   var runway=+document.getElementById('ld-runway').value;
