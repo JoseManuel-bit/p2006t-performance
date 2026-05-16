@@ -838,14 +838,14 @@ input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-
       <div style="padding:0 10px 10px;display:flex;flex-direction:column;gap:6px;flex-shrink:0;">
 
         <div style="display:flex;align-items:stretch;background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;" id="to-metar-row">
-          <div style="font-family:var(--head);font-size:9px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--text-dim);background:var(--panel);padding:10px 14px;border-right:1px solid var(--border);white-space:nowrap;display:flex;align-items:center;flex-shrink:0;">LIVE METAR</div>
+          <div style="font-family:var(--head);font-size:9px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--text-dim);background:var(--panel);padding:10px 14px;border-right:1px solid var(--border);white-space:nowrap;display:flex;align-items:center;flex-shrink:0;min-width:120px;">LIVE METAR</div>
           <div style="flex:1;padding:10px 14px;font-family:var(--mono);font-size:11px;display:flex;align-items:center;">
             <span id="to-metar-text" style="color:var(--text-dim);font-style:italic;">— sync to load —</span>
           </div>
         </div>
 
         <div style="display:flex;align-items:stretch;background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;">
-          <div style="font-family:var(--head);font-size:9px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--text-dim);background:var(--panel);padding:10px 14px;border-right:1px solid var(--border);white-space:nowrap;display:flex;align-items:center;flex-shrink:0;">RUNWAY INFO</div>
+          <div style="font-family:var(--head);font-size:9px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--text-dim);background:var(--panel);padding:10px 14px;border-right:1px solid var(--border);white-space:nowrap;display:flex;align-items:center;flex-shrink:0;min-width:120px;">RUNWAY INFO</div>
           <div style="flex:1;display:flex;">
             <div class="rwy-info-cell"><div class="rwy-info-label">IDENT</div><div class="rwy-info-val" id="to-ri-ident">—</div></div>
             <div class="rwy-info-cell"><div class="rwy-info-label">LENGTH (M)</div><div class="rwy-info-val" id="to-ri-tora">—</div></div>
@@ -2150,26 +2150,56 @@ function syncLiveWX(prefix) {
     restoreBtn();
   }
 
-  // Use allorigins proxy to bypass CORS
+  // Try multiple proxies for CORS bypass
   var targetUrl = 'https://aviationweather.gov/api/data/metar?ids=' + icao + '&format=raw&hours=1';
-  var proxyUrl = 'https://api.allorigins.win/get?url=' + encodeURIComponent(targetUrl);
+  
+  function tryProxy(proxyUrl, isJson, nextFn) {
+    fetch(proxyUrl)
+      .then(function(r) { return isJson ? r.json() : r.text(); })
+      .then(function(data) {
+        var txt = isJson ? (data.contents || '') : data;
+        if (!txt || txt.length < 10) throw new Error('Empty');
+        var lines = txt.split('\n').map(function(l){ return l.trim(); }).filter(Boolean);
+        var metarLine = lines.find(function(l){ return l.indexOf(icao) === 0 && l.match(/\d{6}Z/); });
+        if (!metarLine) metarLine = lines.find(function(l){ return l.match(/\d{6}Z/) && l.match(/Q\d{4}/); });
+        if (!metarLine) throw new Error('No METAR');
+        applyMetar(metarLine);
+      })
+      .catch(function() { if (nextFn) nextFn(); else fail(); });
+  }
 
-  fetch(proxyUrl)
-    .then(function(r) { return r.json(); })
-    .then(function(json) {
-      var txt = json.contents || '';
-      if (!txt) throw new Error('Empty response');
-      var lines = txt.split('\n').map(function(l){ return l.trim(); }).filter(Boolean);
-      var metarLine = lines.find(function(l){ return l.indexOf(icao) === 0 && l.match(/\d{6}Z/); });
-      if (!metarLine) metarLine = lines.find(function(l){ return l.match(/\d{6}Z/) && l.match(/Q\d{4}/); });
-      if (!metarLine) throw new Error('No METAR line found');
-      applyMetar(metarLine);
-    })
-    .catch(function(e) {
-      restoreBtn();
-      var metatText = document.getElementById(prefix + '-metar-text');
-      if (metatText) { metatText.textContent = 'Error: could not fetch METAR for ' + icao; metatText.style.color = 'var(--red)'; }
-    });
+  // Airports known to have METAR service
+  var METAR_AIRPORTS = ['LEMD','LEAL','LEBL','LEBB','LECO','LEAM','LEBZ','LERT','GCFV','GCHI','LEAB','LEBG','LECH','LERL','LEBA','LEVD'];
+  var hasMETAR = METAR_AIRPORTS.indexOf(icao) !== -1;
+
+  function fail() {
+    restoreBtn();
+    var el = document.getElementById(prefix + '-metar-text');
+    if (el) {
+      if (!hasMETAR) {
+        el.textContent = icao + ' does not publish METAR — enter weather manually';
+        el.style.color = 'var(--amber)';
+      } else {
+        el.textContent = 'Could not fetch METAR for ' + icao + ' — check connection';
+        el.style.color = 'var(--red)';
+      }
+      el.style.fontStyle = 'normal';
+    }
+  }
+
+  // Try proxies in order
+  tryProxy(
+    'https://api.allorigins.win/get?url=' + encodeURIComponent(targetUrl), true,
+    function() {
+      tryProxy(
+        'https://corsproxy.io/?' + encodeURIComponent(targetUrl), false,
+        function() {
+          // Direct attempt (works on some networks)
+          tryProxy(targetUrl, false, null);
+        }
+      );
+    }
+  );
 }
 
 
