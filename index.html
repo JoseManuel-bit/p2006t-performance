@@ -543,9 +543,103 @@ input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-
 }
 .rwy-flat-cell:last-child { border-right: none; }
 
+
+/* ── QUICK NAV ───────────────────────────────────── */
+.qnav-btn {
+  display: flex; flex-direction: column; align-items: center;
+  gap: 6px; cursor: pointer;
+}
+.qnav-icon {
+  width: 58px; height: 58px; border-radius: 14px;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+  transition: transform 0.15s;
+}
+.qnav-btn:active .qnav-icon { transform: scale(0.92); }
+.qnav-label {
+  font-family: var(--head); font-size: 9px; font-weight: 600;
+  letter-spacing: 0.5px; color: rgba(255,255,255,0.8);
+  text-align: center;
+}
+
 </style>
 </head>
 <body>
+<!-- QUICK NAV PANEL -->
+<div id="quicknav-panel" style="
+  position:fixed; top:46px; left:50%; transform:translateX(-50%) translateY(-20px);
+  z-index:999; pointer-events:none; opacity:0;
+  transition:opacity 0.2s ease, transform 0.2s ease;
+  width:auto;
+">
+  <div style="
+    background:rgba(19,25,41,0.97);
+    border:1px solid rgba(255,255,255,0.1);
+    border-radius:24px;
+    padding:16px 20px;
+    box-shadow:0 8px 32px rgba(0,0,0,0.6);
+    backdrop-filter:blur(20px);
+    -webkit-backdrop-filter:blur(20px);
+  ">
+    <div style="display:flex;align-items:center;gap:16px;">
+
+      <!-- HOME -->
+      <div onclick="quickNavTo('home')" class="qnav-btn">
+        <div class="qnav-icon" style="background:linear-gradient(145deg,#374151,#1F2937);">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        </div>
+        <span class="qnav-label">HOME</span>
+      </div>
+
+      <!-- CHECKLIST -->
+      <div onclick="quickNavTo('checklist')" class="qnav-btn">
+        <div class="qnav-icon" style="background:linear-gradient(145deg,#2563EB,#1D4ED8);">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+        </div>
+        <span class="qnav-label">CHECKLIST</span>
+      </div>
+
+      <!-- DEP PERF -->
+      <div onclick="quickNavTo('dep')" class="qnav-btn">
+        <div class="qnav-icon" style="background:linear-gradient(145deg,#F5A800,#D97706);">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
+        </div>
+        <span class="qnav-label">DEP PERF</span>
+      </div>
+
+      <!-- ARR PERF -->
+      <div onclick="quickNavTo('arr')" class="qnav-btn">
+        <div class="qnav-icon" style="background:linear-gradient(145deg,#EA580C,#C2410C);">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M19 12l-7 7-7-7"/></svg>
+        </div>
+        <span class="qnav-label">ARR PERF</span>
+      </div>
+
+      <!-- W&B -->
+      <div onclick="quickNavTo('wb')" class="qnav-btn">
+        <div class="qnav-icon" style="background:linear-gradient(145deg,#059669,#047857);">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        </div>
+        <span class="qnav-label">W &amp; B</span>
+      </div>
+
+      <!-- DOCUMENTS -->
+      <div onclick="quickNavTo('docs')" class="qnav-btn">
+        <div class="qnav-icon" style="background:linear-gradient(145deg,#7C3AED,#6D28D9);">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+        </div>
+        <span class="qnav-label">DOCUMENTS</span>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- QUICKNAV OVERLAY (click outside to close) -->
+<div id="quicknav-overlay" onclick="closeQuickNav()" style="
+  display:none;position:fixed;inset:0;z-index:998;
+"></div>
+
 <!-- LANDSCAPE HINT -->
 <div class="landscape-hint">
   <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 2l4 5-4 5"/></svg>
@@ -559,7 +653,12 @@ input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-
   </div>
   <div class="divider-v"></div>
   <div class="topbar-center">
-    <div class="topbar-title">Electronic Flight Bag</div>
+    <div class="topbar-title" id="topbar-title">Electronic Flight Bag</div>
+    <div id="topbar-chevron" onclick="toggleQuickNav()" style="display:none;cursor:pointer;transition:transform 0.2s ease;align-items:center;justify-content:center;padding:4px 16px;">
+      <svg width="20" height="12" viewBox="0 0 20 12" fill="none" stroke="rgba(255,255,255,0.4)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="1,1 10,11 19,1"/>
+      </svg>
+    </div>
   </div>
   <div class="divider-v"></div>
   <div class="topbar-right">
@@ -816,7 +915,7 @@ input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-
           <div style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;display:flex;flex-direction:column;height:100%;">
             <div style="background:var(--panel);border-bottom:1px solid var(--border);padding:18px;text-align:center;">
               <div style="font-family:var(--head);font-size:20px;font-weight:600;letter-spacing:4px;color:var(--text-dim);text-transform:uppercase;">
-                TAKE OFF &nbsp; RWY &nbsp;<span style="color:var(--amber);" id="to-card-rwy">—</span>
+                TAKE OFF · RWY <span style="color:var(--amber);" id="to-card-rwy">—</span>
               </div>
             </div>
             <div style="padding:14px 16px;display:flex;flex-direction:column;gap:10px;flex:1;">
@@ -870,50 +969,68 @@ input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-
     <!-- LANDING -->
     <div class="perf-page" id="perf-ld">
       <div class="perf-left">
-      <div class="airport-selector">
-        <div class="airport-row">
+      <div class="airport-selector" style="margin-bottom:8px;">
+        <div style="display:flex;align-items:flex-start;gap:12px;">
           <!-- ICAO -->
-          <div class="airport-icao-wrap">
+          <div class="airport-icao-wrap" style="flex-shrink:0;">
             <div class="airport-label">DESTINATION AIRPORT</div>
             <input type="text" id="ld-icao" placeholder="ICAO" maxlength="4" oninput="if(window.lookupAirport)lookupAirport('ld')" class="icao-input">
           </div>
-          <!-- Name + Elev -->
-          <div class="airport-info-wrap">
+          <!-- RUNWAY selector inline -->
+          <div class="airport-icao-wrap">
+            <div class="airport-label">RUNWAY</div>
+            <select id="ld-rwy-sel" onchange="selectRunway('ld')" class="rwy-select" style="min-width:80px;"><option value="">—</option></select>
+          </div>
+          <!-- Name + Elev + LDA -->
+          <div style="flex:1;min-width:0;display:flex;flex-direction:column;justify-content:center;padding-top:18px;">
             <div class="airport-name" id="ld-airport-name">—</div>
-            <div class="airport-elev" id="ld-airport-elev">Elev: — ft</div>
+            <div style="display:flex;align-items:center;gap:12px;margin-top:3px;">
+              <div class="airport-elev" id="ld-airport-elev">Elev: — ft</div>
+              <div style="font-family:var(--head);font-size:10px;color:var(--text-dim);">·</div>
+              <div style="font-family:var(--head);font-size:10px;color:var(--text-dim);">LDA <span style="color:var(--green);font-family:var(--mono);" id="ld-rwy-avail">—</span> m</div>
+            </div>
           </div>
           <!-- PA / DA chips -->
-          <div class="airport-alt-chips">
-            <div class="alt-chip">
-              <span class="alt-chip-label">PRESS ALT</span>
-              <span class="alt-chip-val" id="ld-press-alt">— ft</span>
-            </div>
-            <div class="alt-chip">
-              <span class="alt-chip-label">DENSITY ALT</span>
-              <span class="alt-chip-val" id="ld-density-alt">— ft</span>
-            </div>
-          </div>
-          <!-- Runway -->
-          <div class="rwy-wrap">
-            <div class="airport-label">RUNWAY</div>
-            <select id="ld-rwy-sel" onchange="selectRunway('ld')" class="rwy-select"><option value="">—</option></select>
-            <div class="rwy-avail" id="ld-rwy-avail" style="color:var(--text-dim);">— m</div>
+          <div class="airport-alt-chips" style="flex-shrink:0;">
+            <div class="alt-chip"><span class="alt-chip-label">PRESS ALT</span><span class="alt-chip-val" id="ld-press-alt">— ft</span></div>
+            <div class="alt-chip"><span class="alt-chip-label">DENSITY ALT</span><span class="alt-chip-val" id="ld-density-alt">— ft</span></div>
           </div>
         </div>
       </div>
-      <div class="input-grid">
+      <div class="input-grid" style="margin-bottom:8px;">
         <div class="input-card"><div class="input-card-label">Weight · kg</div><div class="input-card-val"><input type="number" id="ld-weight" value="1180" step="1" min="930" max="1180" oninput="calcLanding()"></div></div>
         <div class="input-card"><div class="input-card-label">QNH · hPa</div><div class="input-card-val"><input type="number" id="ld-qnh" value="1013" step="1" min="900" max="1050" oninput="calcDensityAlt('ld')"></div></div>
         <div class="input-card"><div class="input-card-label">OAT · °C</div><div class="input-card-val"><input type="number" id="ld-oat" value="15" step="1" min="-40" max="60" oninput="calcDensityAlt('ld')"></div></div>
       </div>
       <input type="hidden" id="ld-alt" value="0">
-      <div class="input-grid" style="grid-template-columns:repeat(3,1fr);">
+      <div class="input-grid" style="grid-template-columns:repeat(3,1fr);margin-bottom:8px;">
         <div class="input-card"><div class="input-card-label">Wind · kt <span id="ld-wind-info" style="font-size:8px;letter-spacing:0;text-transform:none;font-family:var(--body);font-weight:400;margin-left:4px;"></span></div><div class="input-card-val"><input type="number" id="ld-wind" value="0" step="1" min="-30" max="30" oninput="calcLanding()"></div></div>
         <div class="input-card"><div class="input-card-label">Runway</div><div class="input-card-val"><select id="ld-runway" onchange="calcLanding()" style="pointer-events:none;color:var(--text-dim);"><option value="0">GRASS</option><option value="1">PAVED</option></select></div></div>
         <div class="input-card"><div class="input-card-label">Slope · %</div><div class="input-card-val"><input type="number" id="ld-slope" value="0" step="0.1" min="-5" max="5" oninput="calcLanding()"></div></div>
       </div>
+      <!-- WEATHER CONDITIONS -->
+      <div class="wx-panel" style="margin-bottom:8px;">
+        <div class="wx-panel-header">
+          <span class="wx-panel-title">WEATHER CONDITIONS</span>
+          <button id="ld-sync-wx-btn" onclick="syncLiveWX('ld')" class="wx-sync-btn">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-.28-4.79"/></svg>
+            SYNC LIVE WX
+          </button>
+        </div>
+        <div class="wx-inputs">
+          <div class="wx-field"><div class="wx-field-label">WIND</div><div class="wx-field-val" id="ld-wx-wind">—/—</div><div class="wx-field-unit">kt</div></div>
+          <div class="wx-field"><div class="wx-field-label">TEMPERATURE</div><div class="wx-field-val" id="ld-wx-temp">—</div><div class="wx-field-unit">°C</div></div>
+          <div class="wx-field"><div class="wx-field-label">QNH (HPA)</div><div class="wx-field-val" id="ld-wx-qnh">—</div><div class="wx-field-unit">hPa</div></div>
+        </div>
+      </div>
+      <!-- METAR banner -->
+      <div style="display:flex;align-items:center;background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:8px;" id="ld-metar-row">
+        <div style="flex:1;padding:10px 14px;display:flex;align-items:center;justify-content:center;text-align:center;">
+          <span id="ld-metar-text" style="color:var(--text-dim);font-family:var(--head);font-size:10px;font-weight:600;letter-spacing:2px;">LIVE METAR</span>
+        </div>
+      </div>
       <!-- RWYCC Selector -->
-      <div class="rwycc-panel">
+      <div class="rwycc-panel" style="margin-bottom:8px;">
         
         <div class="rwycc-buttons" id="rwycc-btns">
           <div class="rwycc-btn active" data-code="6" onclick="setRWYCC(6)"><div class="rwycc-code">6</div><div class="rwycc-label">DRY</div></div>
@@ -965,10 +1082,9 @@ input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-
       <span id="ld-ldr-115" style="display:none;"></span>
       <div id="ld-lda-section" style="display:none;"></div>
       </div><!-- /perf-left -->
-      <div class="perf-right" style="width:260px;display:flex;flex-direction:column;padding:12px 10px;gap:10px;overflow:hidden;">
+      <div class="perf-right" style="width:340px;display:flex;flex-direction:column;padding:16px 14px;gap:20px;overflow:hidden;background:transparent;">
         <!-- Runway diagram — tall -->
-        <div style="font-family:var(--head);font-size:9px;letter-spacing:2px;color:var(--text-dim);text-align:center;">RUNWAY</div>
-        <canvas id="ld-rwy-canvas" width="180" height="100" style="display:block;width:100%;flex:1;min-height:0;border-radius:6px;"></canvas>
+        <canvas id="ld-rwy-canvas" width="180" height="100" style="display:block;width:180px;align-self:center;flex:1;min-height:0;border-radius:6px;"></canvas>
         <!-- LDA / LDR table below runway -->
         <div id="ld-lda-table" style="display:none;">
           <div style="display:grid;grid-template-columns:1fr 1fr 1fr;border:1px solid var(--border);border-radius:6px;overflow:hidden;">
@@ -1118,14 +1234,28 @@ input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-
 </div>
 
 <!-- DOCS -->
-<div class="screen" id="screen-docs">
-  <div class="cl-header">
-    <button class="cl-back-btn" onclick="goBackToAC()">BACK</button>
-    <div class="cl-header-title" style="text-align:right;flex:1;">P2006T · DOCUMENTS</div>
+<div class="screen" id="screen-docs" style="flex-direction:row;background:var(--bg);">
+
+  <!-- Left: document list -->
+  <div style="width:220px;flex-shrink:0;display:flex;flex-direction:column;padding:10px;gap:8px;overflow-y:auto;">
+    <!-- Back button -->
+    <button class="cl-back-btn" onclick="goBackToAC()" style="width:100%;margin-bottom:2px;">BACK</button>
+    <!-- Doc icons list -->
+    <div id="docs-list" style="display:flex;flex-direction:column;gap:8px;"></div>
   </div>
-  <div class="docs-content">
-    <div class="docs-grid" id="docs-grid"></div>
+
+  <!-- Right: inline PDF viewer -->
+  <div style="flex:1;display:flex;flex-direction:column;padding:10px 10px 10px 0;overflow:hidden;">
+    <!-- Viewer box with rounded corners like Fenix -->
+    <div style="flex:1;background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;display:flex;flex-direction:column;">
+      <div id="docs-placeholder" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;">
+        <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="rgba(138,151,176,0.25)" stroke-width="1" stroke-linecap="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+        <div style="font-family:var(--head);font-size:10px;letter-spacing:2px;color:rgba(138,151,176,0.3);">SELECT A DOCUMENT</div>
+      </div>
+      <iframe id="docs-iframe" src="" style="display:none;flex:1;border:none;width:100%;height:100%;"></iframe>
+    </div>
   </div>
+
 </div>
 
 <script>
@@ -1512,22 +1642,39 @@ const DOCUMENTS = [
 ];
 
 function buildDocsGrid() {
-  var grid = document.getElementById('docs-grid');
-  if (!grid) return;
-  grid.innerHTML = '';
-  DOCUMENTS.forEach(function(doc) {
-    var a = document.createElement('a');
-    a.className = 'doc-card';
-    a.href = doc.file;
-    a.target = '_blank';
-    a.rel = 'noopener';
-    a.innerHTML =
-      '<div class="doc-card-icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg></div>' +
-      '<div class="doc-card-name">' + doc.name + '</div>' +
-      '<div class="doc-card-type">' + doc.subtitle + '</div>' +
-      '<div class="doc-card-type" style="margin-top:2px;">' + doc.type + '</div>';
-    grid.appendChild(a);
+  var list = document.getElementById('docs-list');
+  if (!list) return;
+  list.innerHTML = '';
+  DOCUMENTS.forEach(function(doc, idx) {
+    var btn = document.createElement('div');
+    btn.id = 'doc-btn-' + idx;
+    btn.onclick = function() { openDoc(doc, idx); };
+    btn.style.cssText = 'cursor:pointer;background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:16px 12px;transition:all 0.15s;display:flex;flex-direction:column;align-items:center;gap:10px;text-align:center;';
+    btn.innerHTML =
+      '<div style="width:70px;height:70px;background:var(--bg3);border:1px solid var(--border);border-radius:12px;display:flex;align-items:center;justify-content:center;">' +
+        '<svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.2" stroke-linecap="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>' +
+      '</div>' +
+      '<div style="font-family:var(--head);font-size:10px;font-weight:600;letter-spacing:0.5px;color:var(--text);line-height:1.3;">' + doc.name + '</div>';
+    list.appendChild(btn);
   });
+}
+
+function openDoc(doc, idx) {
+  // Highlight selected
+  document.querySelectorAll('#docs-list > div').forEach(function(b, i) {
+    b.style.background = i === idx ? 'var(--panel)' : 'var(--bg2)';
+    b.style.borderColor = i === idx ? 'var(--amber)' : 'var(--border)';
+  });
+  // Update title and link
+
+  // Show iframe, hide placeholder
+  var iframe = document.getElementById('docs-iframe');
+  var placeholder = document.getElementById('docs-placeholder');
+  if (iframe && placeholder) {
+    placeholder.style.display = 'none';
+    iframe.style.display = 'block';
+    iframe.src = doc.file;
+  }
 }
 
 // ── CHECKLIST DATA ─────────────────────────────────
@@ -2463,6 +2610,53 @@ function showWindInfo(prefix, comp, windDirStr, windSpd) {
   el.style.color = comp.headwind >= 0 ? 'var(--green)' : 'var(--red)';
 }
 
+
+// ── QUICK NAV ─────────────────────────────────────
+var quickNavOpen = false;
+
+function toggleQuickNav() {
+  quickNavOpen ? closeQuickNav() : openQuickNav();
+}
+
+function openQuickNav() {
+  var panel = document.getElementById('quicknav-panel');
+  var overlay = document.getElementById('quicknav-overlay');
+  if (!panel) return;
+  quickNavOpen = true;
+  overlay.style.display = 'block';
+  panel.style.pointerEvents = 'auto';
+  panel.style.opacity = '1';
+  panel.style.transform = 'translateX(-50%) translateY(0)';
+  // Rotate chevron
+  var chev = document.getElementById('topbar-chevron');
+  if (chev) chev.style.transform = 'rotate(180deg)';
+}
+
+function closeQuickNav() {
+  var panel = document.getElementById('quicknav-panel');
+  var overlay = document.getElementById('quicknav-overlay');
+  if (!panel) return;
+  quickNavOpen = false;
+  overlay.style.display = 'none';
+  panel.style.pointerEvents = 'none';
+  panel.style.opacity = '0';
+  panel.style.transform = 'translateX(-50%) translateY(-20px)';
+  var chev = document.getElementById('topbar-chevron');
+  if (chev) chev.style.transform = '';
+}
+
+function quickNavTo(dest) {
+  closeQuickNav();
+  setTimeout(function() {
+    if (dest === 'home') { showScreen('screen-home'); }
+    else if (dest === 'checklist') { goTo('screen-checklist'); }
+    else if (dest === 'dep') { goToPerf('to'); }
+    else if (dest === 'arr') { goToPerf('ld'); }
+    else if (dest === 'wb') { goTo('screen-wb'); }
+    else if (dest === 'docs') { goTo('screen-docs'); buildDocsGrid(); }
+  }, 150);
+}
+
 // ── SCREEN NAVIGATION ──────────────────────────────
 var screens = ['screen-home','screen-ac-home','screen-checklist','screen-perf','screen-wb','screen-docs'];
 
@@ -2492,6 +2686,20 @@ function goToPerf(tab) {
 }
 
 function showScreen(id) {
+  // Show chevron only on sub-screens (not home or ac-home)
+  var subScreens = ['screen-checklist','screen-perf','screen-wb','screen-docs'];
+  var chevron = document.getElementById('topbar-chevron');
+  var title = document.getElementById('topbar-title');
+  if (chevron) {
+    if (subScreens.indexOf(id) !== -1) {
+      chevron.style.display = 'flex';
+      if (title) title.style.display = 'none';
+    } else {
+      chevron.style.display = 'none';
+      if (title) title.style.display = '';
+      closeQuickNav();
+    }
+  }
   screens.forEach(function(s){
     var el = document.getElementById(s);
     el.classList.toggle('active', s===id);
