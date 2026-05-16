@@ -839,7 +839,7 @@ input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-
 
         <div style="display:flex;align-items:stretch;background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;" id="to-metar-row">
           <div style="font-family:var(--head);font-size:9px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--text-dim);background:var(--panel);padding:10px 14px;border-right:1px solid var(--border);white-space:nowrap;display:flex;align-items:center;flex-shrink:0;min-width:120px;">LIVE METAR</div>
-          <div style="flex:1;padding:10px 14px;font-family:var(--mono);font-size:11px;display:flex;align-items:center;">
+          <div style="flex:1;padding:10px 14px;font-family:var(--mono);font-size:11px;display:flex;align-items:center;justify-content:center;text-align:center;">
             <span id="to-metar-text" style="color:var(--text-dim);font-style:italic;">— sync to load —</span>
           </div>
         </div>
@@ -2105,70 +2105,6 @@ function syncLiveWX(prefix) {
     if (btn) { btn.classList.remove('loading'); btn.innerHTML = btnHTML || 'SYNC LIVE WX'; }
   }
 
-  function applyMetar(raw) {
-    // Parse raw METAR string
-    // Wind: dddss(G)KT or dddssKT
-    var windMatch = raw.match(/\b(\d{3}|VRB)(\d{2,3})(?:G\d{2,3})?KT\b/);
-    var windDir = '--', windSpd = 0;
-    if (windMatch) {
-      windDir = windMatch[1];
-      windSpd = parseInt(windMatch[2]) || 0;
-    }
-    document.getElementById(prefix + '-wx-wind').textContent = windDir + '/' + String(windSpd).padStart(2,'0');
-
-    // Temperature/dewpoint: M?dd/M?dd
-    var tempMatch = raw.match(/\b(M?\d{2})\/M?\d{2}\b/);
-    if (tempMatch) {
-      var tempStr = tempMatch[1];
-      var temp = tempStr.startsWith('M') ? -parseInt(tempStr.slice(1)) : parseInt(tempStr);
-      document.getElementById(prefix + '-wx-temp').textContent = temp;
-      var oatEl = document.getElementById(prefix + '-oat');
-      if (oatEl) { oatEl.value = temp; }
-    }
-
-    // QNH: Qdddd
-    var qnhMatch = raw.match(/\bQ(\d{4})\b/);
-    if (qnhMatch) {
-      var qnh = parseInt(qnhMatch[1]);
-      document.getElementById(prefix + '-wx-qnh').textContent = qnh;
-      var qnhEl = document.getElementById(prefix + '-qnh');
-      if (qnhEl) { qnhEl.value = qnh; }
-    }
-
-    // Wind in perf input
-    var windEl = document.getElementById(prefix + '-wind');
-    if (windEl) { windEl.value = windSpd; }
-
-    // Recalc
-    calcDensityAlt(prefix);
-
-    // Show METAR
-    var metatRow = document.getElementById(prefix + '-metar-row');
-    var metatText = document.getElementById(prefix + '-metar-text');
-    if (metatRow && metatText) { metatText.textContent = raw; metatText.style.color = ''; metatText.style.fontStyle = ''; }
-
-    restoreBtn();
-  }
-
-  // Try multiple proxies for CORS bypass
-  var targetUrl = 'https://aviationweather.gov/api/data/metar?ids=' + icao + '&format=raw&hours=1';
-  
-  function tryProxy(proxyUrl, isJson, nextFn) {
-    fetch(proxyUrl)
-      .then(function(r) { return isJson ? r.json() : r.text(); })
-      .then(function(data) {
-        var txt = isJson ? (data.contents || '') : data;
-        if (!txt || txt.length < 10) throw new Error('Empty');
-        var lines = txt.split('\n').map(function(l){ return l.trim(); }).filter(Boolean);
-        var metarLine = lines.find(function(l){ return l.indexOf(icao) === 0 && l.match(/\d{6}Z/); });
-        if (!metarLine) metarLine = lines.find(function(l){ return l.match(/\d{6}Z/) && l.match(/Q\d{4}/); });
-        if (!metarLine) throw new Error('No METAR');
-        applyMetar(metarLine);
-      })
-      .catch(function() { if (nextFn) nextFn(); else fail(); });
-  }
-
-  // Airports known to have METAR service
   var METAR_AIRPORTS = ['LEMD','LEAL','LEBL','LEBB','LECO','LEAM','LEBZ','LERT','GCFV','GCHI','LEAB','LEBG','LECH','LERL','LEBA','LEVD'];
   var hasMETAR = METAR_AIRPORTS.indexOf(icao) !== -1;
 
@@ -2187,20 +2123,88 @@ function syncLiveWX(prefix) {
     }
   }
 
-  // Try proxies in order
-  tryProxy(
-    'https://api.allorigins.win/get?url=' + encodeURIComponent(targetUrl), true,
-    function() {
-      tryProxy(
-        'https://corsproxy.io/?' + encodeURIComponent(targetUrl), false,
-        function() {
-          // Direct attempt (works on some networks)
-          tryProxy(targetUrl, false, null);
-        }
-      );
+  function applyMetar(raw) {
+    var windMatch = raw.match(/\b(\d{3}|VRB)(\d{2,3})(?:G\d{2,3})?KT\b/);
+    var windDir = '---', windSpd = 0;
+    if (windMatch) { windDir = windMatch[1]; windSpd = parseInt(windMatch[2]) || 0; }
+    document.getElementById(prefix + '-wx-wind').textContent = windDir + '/' + String(windSpd).padStart(2,'0');
+
+    var tempMatch = raw.match(/\b(M?\d{2})\/M?\d{2}\b/);
+    if (tempMatch) {
+      var tempStr = tempMatch[1];
+      var temp = tempStr.startsWith('M') ? -parseInt(tempStr.slice(1)) : parseInt(tempStr);
+      document.getElementById(prefix + '-wx-temp').textContent = temp;
+      var oatEl = document.getElementById(prefix + '-oat');
+      if (oatEl) oatEl.value = temp;
     }
-  );
+
+    var qnhMatch = raw.match(/\bQ(\d{4})\b/);
+    if (qnhMatch) {
+      var qnh = parseInt(qnhMatch[1]);
+      document.getElementById(prefix + '-wx-qnh').textContent = qnh;
+      var qnhEl = document.getElementById(prefix + '-qnh');
+      if (qnhEl) qnhEl.value = qnh;
+    }
+
+    var windEl = document.getElementById(prefix + '-wind');
+    if (windEl) windEl.value = windSpd;
+
+    calcDensityAlt(prefix);
+    if (prefix === 'to') calcTakeoff(); else calcLanding();
+
+    var metatText = document.getElementById(prefix + '-metar-text');
+    if (metatText) {
+      metatText.textContent = raw;
+      metatText.style.color = '';
+      metatText.style.fontStyle = 'normal';
+    }
+    restoreBtn();
+  }
+
+  // CheckWX API — fast, direct, no proxy needed
+  fetch('https://api.checkwx.com/metar/' + icao + '/decoded', {
+    headers: { 'X-API-Key': 'd77cca3714884c8ab4c75df71e381ad6' }
+  })
+  .then(function(r) { return r.json(); })
+  .then(function(json) {
+    if (!json.data || !json.data.length) throw new Error('No data');
+    var m = json.data[0];
+    var raw = m.raw_text || '';
+    if (raw) { applyMetar(raw); return; }
+    // Manual fill if no raw text
+    var windDir = (m.wind && m.wind.degrees) ? String(m.wind.degrees).padStart(3,'0') : '---';
+    var windSpd = (m.wind && m.wind.speed_kts) ? m.wind.speed_kts : 0;
+    document.getElementById(prefix + '-wx-wind').textContent = windDir + '/' + String(windSpd).padStart(2,'0');
+    if (m.temperature && m.temperature.celsius !== undefined) {
+      document.getElementById(prefix + '-wx-temp').textContent = m.temperature.celsius;
+      var oatEl = document.getElementById(prefix + '-oat'); if (oatEl) oatEl.value = m.temperature.celsius;
+    }
+    if (m.barometer && m.barometer.mb) {
+      var qnh = Math.round(m.barometer.mb);
+      document.getElementById(prefix + '-wx-qnh').textContent = qnh;
+      var qnhEl = document.getElementById(prefix + '-qnh'); if (qnhEl) qnhEl.value = qnh;
+    }
+    calcDensityAlt(prefix);
+    if (prefix === 'to') calcTakeoff(); else calcLanding();
+    restoreBtn();
+  })
+  .catch(function() {
+    // Fallback: allorigins proxy
+    var targetUrl = 'https://aviationweather.gov/api/data/metar?ids=' + icao + '&format=raw&hours=1';
+    fetch('https://api.allorigins.win/get?url=' + encodeURIComponent(targetUrl))
+      .then(function(r) { return r.json(); })
+      .then(function(json) {
+        var txt = json.contents || '';
+        if (!txt) throw new Error('empty');
+        var lines = txt.split('\n').map(function(l){ return l.trim(); }).filter(Boolean);
+        var line = lines.find(function(l){ return l.indexOf(icao) === 0 && l.match(/\d{6}Z/); });
+        if (!line) throw new Error('no metar');
+        applyMetar(line);
+      })
+      .catch(function() { fail(); });
+  });
 }
+
 
 
 // ── MANUAL CALCULATE ─────────────────────────────────
