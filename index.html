@@ -433,6 +433,7 @@ input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-
 .wx-metar-row {
   display: flex; align-items: flex-start; gap: 8px;
   padding: 8px 12px; background: var(--bg3);
+  border-top: 1px solid var(--border);
 }
 .wx-metar-label {
   font-family: var(--head); font-size: 8px; font-weight: 700;
@@ -716,9 +717,9 @@ input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-
               <div class="wx-field-unit">hPa</div>
             </div>
           </div>
-          <div class="wx-metar-row" id="to-metar-row" style="display:none;">
-            <span class="wx-metar-label">METAR</span>
-            <span class="wx-metar-text" id="to-metar-text"></span>
+          <div class="wx-metar-row" id="to-metar-row">
+            <span class="wx-metar-label">LIVE METAR</span>
+            <span class="wx-metar-text" id="to-metar-text" style="color:var(--text-dim);font-style:italic;">— sync to load —</span>
           </div>
         </div>
 
@@ -728,11 +729,10 @@ input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-
       <div class="perf-right" style="display:flex;flex-direction:column;overflow:hidden;">
 
         <!-- Header centred -->
-        <div class="to-card-header" style="justify-content:center;text-align:center;flex-direction:column;gap:4px;padding:18px;">
-          <div class="to-card-title">TAKE OFF</div>
-          <div style="display:flex;align-items:baseline;gap:10px;justify-content:center;">
-            <span style="font-family:var(--head);font-size:14px;color:var(--text-dim);letter-spacing:2px;">RWY</span>
-            <span class="to-card-rwy-num" id="to-card-rwy">—</span>
+        <div class="to-card-header" style="justify-content:center;text-align:center;padding:20px 18px;">
+          <div style="font-family:var(--head);font-size:15px;font-weight:600;letter-spacing:4px;color:var(--text-dim);text-transform:uppercase;">TAKE OFF</div>
+          <div style="font-family:var(--mono);font-size:38px;font-weight:700;color:var(--amber);letter-spacing:6px;line-height:1.1;margin-top:4px;">
+            RWY <span id="to-card-rwy">—</span>
           </div>
         </div>
 
@@ -2070,43 +2070,30 @@ function syncLiveWX(prefix) {
     // Show METAR
     var metatRow = document.getElementById(prefix + '-metar-row');
     var metatText = document.getElementById(prefix + '-metar-text');
-    if (metatRow && metatText) { metatText.textContent = raw; metatRow.style.display = 'flex'; }
+    if (metatRow && metatText) { metatText.textContent = raw; metatText.style.color = ''; metatText.style.fontStyle = ''; }
 
     restoreBtn();
   }
 
-  // Try aviationweather.gov text format (no CORS issues with text)
-  var url = 'https://aviationweather.gov/api/data/metar?ids=' + icao + '&format=raw&hours=1';
-  fetch(url)
-    .then(function(r) { return r.text(); })
-    .then(function(txt) {
-      // Find the METAR line
-      var lines = txt.split('\n').map(function(l){ return l.trim(); });
-      var metarLine = lines.find(function(l){ return l.startsWith(icao) || l.indexOf(icao) === 0; });
-      if (!metarLine) metarLine = lines.find(function(l){ return l.length > 20 && l.match(/\d{6}Z/); });
-      if (!metarLine) throw new Error('No METAR in response');
+  // Use allorigins proxy to bypass CORS
+  var targetUrl = 'https://aviationweather.gov/api/data/metar?ids=' + icao + '&format=raw&hours=1';
+  var proxyUrl = 'https://api.allorigins.win/get?url=' + encodeURIComponent(targetUrl);
+
+  fetch(proxyUrl)
+    .then(function(r) { return r.json(); })
+    .then(function(json) {
+      var txt = json.contents || '';
+      if (!txt) throw new Error('Empty response');
+      var lines = txt.split('\n').map(function(l){ return l.trim(); }).filter(Boolean);
+      var metarLine = lines.find(function(l){ return l.indexOf(icao) === 0 && l.match(/\d{6}Z/); });
+      if (!metarLine) metarLine = lines.find(function(l){ return l.match(/\d{6}Z/) && l.match(/Q\d{4}/); });
+      if (!metarLine) throw new Error('No METAR line found');
       applyMetar(metarLine);
     })
-    .catch(function() {
-      // Fallback: try JSON
-      fetch('https://aviationweather.gov/api/data/metar?ids=' + icao + '&format=json')
-        .then(function(r) { return r.json(); })
-        .then(function(data) {
-          if (!data || !data.length) throw new Error('No data');
-          var m = data[0];
-          var raw = m.rawOb || m.raw_text || '';
-          if (raw) { applyMetar(raw); return; }
-          // Manual fill from JSON fields
-          if (m.wspd !== undefined) document.getElementById(prefix+'-wx-wind').textContent = (m.wdir||'---')+'/'+String(m.wspd||0).padStart(2,'0');
-          if (m.temp !== undefined) { document.getElementById(prefix+'-wx-temp').textContent = m.temp; var o=document.getElementById(prefix+'-oat'); if(o) o.value=m.temp; }
-          if (m.altim !== undefined) { var q=Math.round(m.altim); document.getElementById(prefix+'-wx-qnh').textContent=q; var qe=document.getElementById(prefix+'-qnh'); if(qe) qe.value=q; }
-          calcDensityAlt(prefix);
-          restoreBtn();
-        })
-        .catch(function() {
-          restoreBtn();
-          alert('Cannot fetch METAR for ' + icao + '.\nMake sure you are online and the airport has METAR service.');
-        });
+    .catch(function(e) {
+      restoreBtn();
+      var metatText = document.getElementById(prefix + '-metar-text');
+      if (metatText) { metatText.textContent = 'Error: could not fetch METAR for ' + icao; metatText.style.color = 'var(--red)'; }
     });
 }
 
