@@ -2020,68 +2020,93 @@ function updateRunwayDiagrams() {
 // ── METAR / LIVE WEATHER ────────────────────────────
 function syncLiveWX(prefix) {
   var icao = document.getElementById(prefix + '-icao').value.toUpperCase().trim();
-  if (!icao || icao.length < 4) {
-    alert('Enter an ICAO code first');
-    return;
-  }
+  if (!icao || icao.length < 4) { alert('Enter an ICAO code first'); return; }
+
   var btn = document.getElementById(prefix + '-sync-wx-btn');
-  if (btn) { btn.classList.add('loading'); btn.textContent = 'LOADING...'; }
+  var btnHTML = btn ? btn.innerHTML : '';
+  if (btn) { btn.classList.add('loading'); btn.innerHTML = '⟳ LOADING...'; }
 
-  var url = 'https://aviationweather.gov/api/data/metar?ids=' + icao + '&format=json';
+  function restoreBtn() {
+    if (btn) { btn.classList.remove('loading'); btn.innerHTML = btnHTML || 'SYNC LIVE WX'; }
+  }
 
+  function applyMetar(raw) {
+    // Parse raw METAR string
+    // Wind: dddss(G)KT or dddssKT
+    var windMatch = raw.match(/\b(\d{3}|VRB)(\d{2,3})(?:G\d{2,3})?KT\b/);
+    var windDir = '--', windSpd = 0;
+    if (windMatch) {
+      windDir = windMatch[1];
+      windSpd = parseInt(windMatch[2]) || 0;
+    }
+    document.getElementById(prefix + '-wx-wind').textContent = windDir + '/' + String(windSpd).padStart(2,'0');
+
+    // Temperature/dewpoint: M?dd/M?dd
+    var tempMatch = raw.match(/\b(M?\d{2})\/M?\d{2}\b/);
+    if (tempMatch) {
+      var tempStr = tempMatch[1];
+      var temp = tempStr.startsWith('M') ? -parseInt(tempStr.slice(1)) : parseInt(tempStr);
+      document.getElementById(prefix + '-wx-temp').textContent = temp;
+      var oatEl = document.getElementById(prefix + '-oat');
+      if (oatEl) { oatEl.value = temp; }
+    }
+
+    // QNH: Qdddd
+    var qnhMatch = raw.match(/\bQ(\d{4})\b/);
+    if (qnhMatch) {
+      var qnh = parseInt(qnhMatch[1]);
+      document.getElementById(prefix + '-wx-qnh').textContent = qnh;
+      var qnhEl = document.getElementById(prefix + '-qnh');
+      if (qnhEl) { qnhEl.value = qnh; }
+    }
+
+    // Wind in perf input
+    var windEl = document.getElementById(prefix + '-wind');
+    if (windEl) { windEl.value = windSpd; }
+
+    // Recalc
+    calcDensityAlt(prefix);
+
+    // Show METAR
+    var metatRow = document.getElementById(prefix + '-metar-row');
+    var metatText = document.getElementById(prefix + '-metar-text');
+    if (metatRow && metatText) { metatText.textContent = raw; metatRow.style.display = 'flex'; }
+
+    restoreBtn();
+  }
+
+  // Try aviationweather.gov text format (no CORS issues with text)
+  var url = 'https://aviationweather.gov/api/data/metar?ids=' + icao + '&format=raw&hours=1';
   fetch(url)
-    .then(function(r) { return r.json(); })
-    .then(function(data) {
-      if (!data || !data.length) throw new Error('No METAR found');
-      var m = data[0];
-
-      // Wind
-      var windDir = m.wdir || 0;
-      var windSpd = m.wspd || 0;
-      var windStr = String(windDir).padStart(3,'0') + '/' + String(windSpd).padStart(2,'0');
-      document.getElementById(prefix + '-wx-wind').textContent = windStr;
-
-      // Temperature
-      var temp = m.temp !== undefined ? m.temp : null;
-      if (temp !== null) {
-        document.getElementById(prefix + '-wx-temp').textContent = temp;
-        // Auto-fill OAT
-        var oatEl = document.getElementById(prefix + '-oat');
-        if (oatEl) { oatEl.value = temp; calcDensityAlt(prefix); }
-      }
-
-      // QNH
-      var altim = m.altim || null;
-      if (altim) {
-        var qnh = Math.round(altim);
-        document.getElementById(prefix + '-wx-qnh').textContent = qnh;
-        // Auto-fill QNH
-        var qnhEl = document.getElementById(prefix + '-qnh');
-        if (qnhEl) { qnhEl.value = qnh; calcDensityAlt(prefix); }
-        // Auto-fill wind
-        var windEl = document.getElementById(prefix + '-wind');
-        if (windEl) { windEl.value = windSpd; }
-      }
-
-      // Auto-fill wind in perf
-      var windEl = document.getElementById(prefix + '-wind');
-      if (windEl) { windEl.value = windSpd; }
-      if (prefix === 'to') calcTakeoff(); else calcLanding();
-
-      // Show raw METAR
-      var metar = m.rawOb || '';
-      var metatRow = document.getElementById(prefix + '-metar-row');
-      var metatText = document.getElementById(prefix + '-metar-text');
-      if (metatRow && metatText && metar) {
-        metatText.textContent = metar;
-        metatRow.style.display = 'flex';
-      }
-
-      if (btn) { btn.classList.remove('loading'); btn.innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-.28-4.79"/></svg> SYNC LIVE WX'; }
+    .then(function(r) { return r.text(); })
+    .then(function(txt) {
+      // Find the METAR line
+      var lines = txt.split('\n').map(function(l){ return l.trim(); });
+      var metarLine = lines.find(function(l){ return l.startsWith(icao) || l.indexOf(icao) === 0; });
+      if (!metarLine) metarLine = lines.find(function(l){ return l.length > 20 && l.match(/\d{6}Z/); });
+      if (!metarLine) throw new Error('No METAR in response');
+      applyMetar(metarLine);
     })
-    .catch(function(err) {
-      if (btn) { btn.classList.remove('loading'); btn.innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-.28-4.79"/></svg> SYNC LIVE WX'; }
-      alert('Could not fetch METAR for ' + icao + '. Check connection.');
+    .catch(function() {
+      // Fallback: try JSON
+      fetch('https://aviationweather.gov/api/data/metar?ids=' + icao + '&format=json')
+        .then(function(r) { return r.json(); })
+        .then(function(data) {
+          if (!data || !data.length) throw new Error('No data');
+          var m = data[0];
+          var raw = m.rawOb || m.raw_text || '';
+          if (raw) { applyMetar(raw); return; }
+          // Manual fill from JSON fields
+          if (m.wspd !== undefined) document.getElementById(prefix+'-wx-wind').textContent = (m.wdir||'---')+'/'+String(m.wspd||0).padStart(2,'0');
+          if (m.temp !== undefined) { document.getElementById(prefix+'-wx-temp').textContent = m.temp; var o=document.getElementById(prefix+'-oat'); if(o) o.value=m.temp; }
+          if (m.altim !== undefined) { var q=Math.round(m.altim); document.getElementById(prefix+'-wx-qnh').textContent=q; var qe=document.getElementById(prefix+'-qnh'); if(qe) qe.value=q; }
+          calcDensityAlt(prefix);
+          restoreBtn();
+        })
+        .catch(function() {
+          restoreBtn();
+          alert('Cannot fetch METAR for ' + icao + '.\nMake sure you are online and the airport has METAR service.');
+        });
     });
 }
 
