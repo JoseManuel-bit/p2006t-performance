@@ -117,9 +117,6 @@ body{font-family:var(--body);background:var(--bg);color:var(--text);display:flex
 .perf-tabs{display:flex;background:var(--bg2);border-bottom:1px solid var(--border);flex-shrink:0;}
 .perf-tab{flex:1;padding:10px 8px;font-family:var(--head);font-size:12px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--text-dim);background:none;border:none;cursor:pointer;border-bottom:3px solid transparent;transition:all 0.18s;}
 .perf-tab.active{color:var(--amber);border-bottom-color:var(--amber);background:rgba(245,168,0,0.06);}
-.perf-content{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:10px;}
-.perf-page{display:none;}
-.perf-page.active{display:block;}
 /* AIRPORT SELECTOR */
 .airport-selector{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:10px 12px;margin-bottom:8px;}
 .airport-input-row{display:flex;align-items:center;gap:12px;}
@@ -136,7 +133,7 @@ body{font-family:var(--body);background:var(--bg);color:var(--text);display:flex
 /* DENSITY ALT */
 
 /* INPUT GRID */
-.input-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:8px;}
+.input-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;}
 .input-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;}
 .input-card-label{background:var(--panel);font-family:var(--head);font-size:10px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--text-dim);text-align:center;padding:5px 4px;border-bottom:1px solid var(--border);}
 .input-card-val{display:flex;align-items:center;justify-content:center;background:var(--bg3);}
@@ -249,7 +246,7 @@ input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-
 .cl-seq-text { font-size: 16px; }
 
 /* ── PERFORMANCE — two column layout ────────────── */
-.perf-content { display: flex; flex-direction: row; gap: 0; padding: 0; overflow: hidden; }
+.perf-content { display: flex; flex-direction: row; gap: 0; padding: 0; overflow: hidden; flex: 1; }
 .perf-page { display: none; flex-direction: row; width: 100%; }
 .perf-page.active { display: flex; }
 .perf-left { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; padding: 10px; border-right: 1px solid var(--border); }
@@ -371,7 +368,7 @@ input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-
   width: 100px; flex-shrink: 0;
 }
 .to-result-val {
-  font-family: var(--mono); font-size: 32px; font-weight: 700;
+  font-family: var(--mono); font-size: 26px; font-weight: 700;
   color: var(--text); line-height: 1;
 }
 .to-result-val.green { color: var(--green); }
@@ -388,7 +385,7 @@ input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-
 /* ── WEATHER PANEL ───────────────────────────────── */
 .wx-panel {
   background: var(--bg2); border: 1px solid var(--border);
-  border-radius: var(--radius); overflow: hidden; margin-top: 0;
+  border-radius: var(--radius); overflow: hidden;
 }
 .wx-panel-header {
   display: flex; align-items: center; justify-content: space-between;
@@ -443,6 +440,108 @@ input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-
   font-family: var(--mono); font-size: 10px; color: var(--text-dim);
   line-height: 1.5; word-break: break-all;
 }
+
+
+/* ── RUNWAY INFO TABLE ───────────────────────────── */
+.rwy-info-table {
+  display: flex; align-items: stretch;
+  background: var(--bg2); border: 1px solid var(--border);
+  border-radius: var(--radius); overflow: hidden; margin-top: 0;
+}
+.rwy-info-title {
+  font-family: var(--head); font-size: 9px; font-weight: 600;
+  letter-spacing: 1.5px; text-transform: uppercase; color: var(--text-dim);
+  background: var(--panel); display: flex; align-items: center;
+  padding: 0 12px; border-right: 1px solid var(--border); white-space: nowrap;
+  flex-shrink: 0;
+}
+.rwy-info-cell {
+  flex: 1; display: flex; flex-direction: column; align-items: center;
+  justify-content: center; padding: 8px 4px;
+  border-right: 1px solid var(--border);
+}
+.rwy-info-cell:last-child { border-right: none; }
+.rwy-info-label {
+  font-family: var(--head); font-size: 8px; font-weight: 600;
+  letter-spacing: 1px; text-transform: uppercase; color: var(--text-dim);
+  margin-bottom: 3px;
+}
+.rwy-info-val {
+  font-family: var(--mono); font-size: 14px; font-weight: 700; color: var(--text);
+}
+
+/* ── CALCULATE / RESET BUTTONS ───────────────────── */
+.calc-btn {
+  padding: 14px; background: var(--amber); border: none;
+  border-radius: var(--radius); font-family: var(--head); font-size: 14px;
+  font-weight: 700; letter-spacing: 3px; color: #000; cursor: pointer;
+  transition: all 0.2s;
+}
+.calc-btn:hover { background: var(--amber2); }
+.reset-btn {
+  padding: 14px 20px; background: var(--bg2); border: 1px solid var(--border);
+  border-radius: var(--radius); font-family: var(--head); font-size: 12px;
+  font-weight: 600; letter-spacing: 2px; color: var(--text-dim); cursor: pointer;
+  transition: all 0.2s;
+}
+.reset-btn:hover { border-color: var(--red); color: var(--red); }
+
+
+/* ── PERF FULL WIDTH ROWS ─────────────────────────── */
+.perf-fullwidth-row {
+  display: flex; align-items: center; gap: 0;
+  width: 100%; flex-shrink: 0;
+  background: var(--bg2); border-top: 1px solid var(--border);
+}
+.perf-fullwidth-row.rwy-info-row { background: var(--bg3); }
+
+
+/* ── PERF FULL WIDTH BOXES ───────────────────────── */
+
+.perf-fw-buttons {
+  display: flex; flex-direction: column; gap: 6px;
+}
+.calc-btn-full {
+  width: 100%; padding: 16px; background: var(--blue);
+  border: none; border-radius: var(--radius);
+  font-family: var(--head); font-size: 15px;
+  font-weight: 700; letter-spacing: 3px; color: white; cursor: pointer;
+  transition: all 0.2s;
+}
+.calc-btn-full:hover { background: var(--blue2); }
+.reset-btn-full {
+  width: 100%; padding: 14px; background: var(--bg2);
+  border: 1px solid var(--border); border-radius: var(--radius);
+  font-family: var(--head); font-size: 12px; font-weight: 600;
+  letter-spacing: 2px; color: var(--text-dim); cursor: pointer;
+  transition: all 0.2s;
+}
+.reset-btn-full:hover { color: var(--red); background: rgba(239,68,68,0.05); border-color: var(--red); }
+
+
+/* ── PERF FLAT ROWS (Fenix style) ────────────────── */
+.perf-flat-row {
+  display: flex; align-items: center;
+  background: var(--bg2); border: 1px solid var(--border);
+  border-radius: var(--radius); overflow: hidden;
+}
+.perf-flat-label {
+  font-family: var(--head); font-size: 9px; font-weight: 600;
+  letter-spacing: 1.5px; text-transform: uppercase; color: var(--text-dim);
+  background: var(--panel); padding: 12px 14px; border-right: 1px solid var(--border);
+  white-space: nowrap; flex-shrink: 0; align-self: stretch;
+  display: flex; align-items: center;
+}
+.perf-flat-content {
+  flex: 1; padding: 10px 14px;
+  font-family: var(--mono); font-size: 11px; color: var(--text);
+}
+.rwy-flat-cell {
+  flex: 1; display: flex; flex-direction: column; align-items: center;
+  justify-content: center; padding: 8px 6px;
+  border-right: 1px solid var(--border);
+}
+.rwy-flat-cell:last-child { border-right: none; }
 
 </style>
 </head>
@@ -644,156 +743,123 @@ input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-
   </div>
   <div class="perf-content">
     <!-- TAKE-OFF -->
-    <div class="perf-page active" id="perf-to">
-      <div class="perf-left">
+    <div class="perf-page active" id="perf-to" style="flex-direction:column;">
 
-        <!-- Airport row -->
-        <div class="airport-selector">
-          <div class="airport-row">
-            <div class="airport-icao-wrap">
-              <div class="airport-label">DEPARTURE AIRPORT</div>
-              <input type="text" id="to-icao" placeholder="ICAO" maxlength="4" oninput="if(window.lookupAirport)lookupAirport('to')" class="icao-input">
-            </div>
-            <div class="airport-info-wrap">
-              <div class="airport-name" id="to-airport-name">—</div>
-              <div class="airport-elev" id="to-airport-elev">Elev: — ft</div>
-            </div>
-            <div class="airport-alt-chips">
-              <div class="alt-chip">
-                <span class="alt-chip-label">PRESS ALT</span>
-                <span class="alt-chip-val" id="to-press-alt">— ft</span>
+      <!-- TOP ROW: inputs left + results right -->
+      <div style="display:flex;flex-direction:row;min-height:0;flex-shrink:0;">
+
+        <!-- LEFT col -->
+        <div class="perf-left" style="flex:1;overflow-y:auto;">
+
+          <div class="airport-selector" style="margin-bottom:8px;">
+            <div class="airport-row">
+              <div class="airport-icao-wrap">
+                <div class="airport-label">DEPARTURE AIRPORT</div>
+                <input type="text" id="to-icao" placeholder="ICAO" maxlength="4" oninput="if(window.lookupAirport)lookupAirport('to')" class="icao-input">
               </div>
-              <div class="alt-chip">
-                <span class="alt-chip-label">DENSITY ALT</span>
-                <span class="alt-chip-val" id="to-density-alt">— ft</span>
+              <div class="airport-info-wrap">
+                <div class="airport-name" id="to-airport-name">—</div>
+                <div class="airport-elev" id="to-airport-elev">Elev: — ft</div>
+              </div>
+              <div class="airport-alt-chips">
+                <div class="alt-chip"><span class="alt-chip-label">PRESS ALT</span><span class="alt-chip-val" id="to-press-alt">— ft</span></div>
+                <div class="alt-chip"><span class="alt-chip-label">DENSITY ALT</span><span class="alt-chip-val" id="to-density-alt">— ft</span></div>
+              </div>
+              <div class="rwy-wrap">
+                <div class="airport-label">RUNWAY</div>
+                <select id="to-rwy-sel" onchange="selectRunway('to')" class="rwy-select"><option value="">—</option></select>
+                <div class="rwy-avail" id="to-rwy-avail" style="color:var(--text-dim);">— m</div>
               </div>
             </div>
-            <div class="rwy-wrap">
-              <div class="airport-label">RUNWAY</div>
-              <select id="to-rwy-sel" onchange="selectRunway('to')" class="rwy-select"><option value="">—</option></select>
-              <div class="rwy-avail" id="to-rwy-avail" style="color:var(--text-dim);">— m</div>
+          </div>
+
+          <div class="input-grid" style="margin-bottom:8px;">
+            <div class="input-card"><div class="input-card-label">Weight · kg</div><div class="input-card-val"><input type="number" id="to-weight" value="1180" step="1" min="930" max="1180" oninput="calcTakeoff()"></div></div>
+            <div class="input-card"><div class="input-card-label">QNH · hPa</div><div class="input-card-val"><input type="number" id="to-qnh" value="1013" step="1" min="900" max="1050" oninput="calcDensityAlt('to')"></div></div>
+            <div class="input-card"><div class="input-card-label">OAT · °C</div><div class="input-card-val"><input type="number" id="to-oat" value="15" step="1" min="-40" max="60" oninput="calcDensityAlt('to')"></div></div>
+          </div>
+          <input type="hidden" id="to-alt" value="0">
+
+          <div class="input-grid" style="margin-bottom:8px;">
+            <div class="input-card"><div class="input-card-label">Wind · kt</div><div class="input-card-val"><input type="number" id="to-wind" value="0" step="1" min="-30" max="30" oninput="calcTakeoff()"></div></div>
+            <div class="input-card"><div class="input-card-label">Runway</div><div class="input-card-val"><select id="to-runway" onchange="calcTakeoff()" style="pointer-events:none;color:var(--text-dim);"><option value="0">GRASS</option><option value="1">PAVED</option></select></div></div>
+            <div class="input-card"><div class="input-card-label">Slope · %</div><div class="input-card-val"><input type="number" id="to-slope" value="0" step="0.1" min="-5" max="5" oninput="calcTakeoff()"></div></div>
+          </div>
+
+          <div class="wx-panel">
+            <div class="wx-panel-header">
+              <span class="wx-panel-title">WEATHER CONDITIONS</span>
+              <button id="to-sync-wx-btn" onclick="syncLiveWX('to')" class="wx-sync-btn">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-.28-4.79"/></svg>
+                SYNC LIVE WX
+              </button>
             </div>
+            <div class="wx-inputs">
+              <div class="wx-field"><div class="wx-field-label">WIND</div><div class="wx-field-val" id="to-wx-wind">—/—</div><div class="wx-field-unit">kt</div></div>
+              <div class="wx-field"><div class="wx-field-label">TEMPERATURE</div><div class="wx-field-val" id="to-wx-temp">—</div><div class="wx-field-unit">°C</div></div>
+              <div class="wx-field"><div class="wx-field-label">QNH (HPA)</div><div class="wx-field-val" id="to-wx-qnh">—</div><div class="wx-field-unit">hPa</div></div>
+            </div>
+          </div>
+
+        </div><!-- /left col -->
+
+        <!-- RIGHT col: results box, same height as left -->
+        <div style="width:340px;flex-shrink:0;padding:10px;background:var(--bg);">
+          <div style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;display:flex;flex-direction:column;height:100%;">
+            <div style="background:var(--panel);border-bottom:1px solid var(--border);padding:18px;text-align:center;">
+              <div style="font-family:var(--head);font-size:20px;font-weight:600;letter-spacing:4px;color:var(--text-dim);text-transform:uppercase;">
+                TAKE OFF &nbsp; RWY &nbsp;<span style="color:var(--amber);" id="to-card-rwy">—</span>
+              </div>
+            </div>
+            <div style="padding:14px 16px;display:flex;flex-direction:column;gap:10px;flex:1;">
+              <div class="to-result-group">
+                <div class="to-result-group-title">Base Values</div>
+                <div class="to-result-row"><div class="to-result-label">Ground Roll</div><div class="to-result-val" id="to-base-gr-m">–</div><div class="to-result-unit">m</div><div class="to-result-ft" id="to-base-gr-ft">– ft</div></div>
+                <div class="to-result-row"><div class="to-result-label">Dist. 50ft</div><div class="to-result-val" id="to-base-50-m">–</div><div class="to-result-unit">m</div><div class="to-result-ft" id="to-base-50-ft">– ft</div></div>
+              </div>
+              <div style="height:1px;background:var(--border);"></div>
+              <div class="to-result-group">
+                <div class="to-result-group-title" style="color:var(--green);">With All Corrections</div>
+                <div class="to-result-row"><div class="to-result-label">Ground Roll</div><div class="to-result-val green" id="to-corr-gr-m">–</div><div class="to-result-unit">m</div><div class="to-result-ft" id="to-corr-gr-ft">– ft</div><span class="delta-badge zero" id="to-delta-gr">±0</span></div>
+                <div class="to-result-row"><div class="to-result-label">Dist. 50ft</div><div class="to-result-val green" id="to-corr-50-m">–</div><div class="to-result-unit">m</div><div class="to-result-ft" id="to-corr-50-ft">– ft</div><span class="delta-badge zero" id="to-delta-50">±0</span></div>
+              </div>
+              <div style="height:1px;background:var(--border);"></div>
+              <div class="to-result-group">
+                <div class="to-result-group-title">Runway Available</div>
+                <div class="to-result-row"><div class="to-result-label">TORA</div><div class="to-result-val" id="to-tora-val">–</div><div class="to-result-unit">m</div></div>
+              </div>
+            </div>
+          </div>
+        </div><!-- /right col -->
+
+      </div><!-- /top row -->
+
+      <!-- BOTTOM ROW: full width -->
+      <div style="padding:0 10px 10px;display:flex;flex-direction:column;gap:6px;flex-shrink:0;">
+
+        <div style="display:flex;align-items:stretch;background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;" id="to-metar-row">
+          <div style="font-family:var(--head);font-size:9px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--text-dim);background:var(--panel);padding:10px 14px;border-right:1px solid var(--border);white-space:nowrap;display:flex;align-items:center;flex-shrink:0;">LIVE METAR</div>
+          <div style="flex:1;padding:10px 14px;font-family:var(--mono);font-size:11px;display:flex;align-items:center;">
+            <span id="to-metar-text" style="color:var(--text-dim);font-style:italic;">— sync to load —</span>
           </div>
         </div>
 
-        <!-- Weight / QNH / OAT -->
-        <div class="input-grid">
-          <div class="input-card"><div class="input-card-label">Weight · kg</div><div class="input-card-val"><input type="number" id="to-weight" value="1180" step="1" min="930" max="1180" oninput="calcTakeoff()"></div></div>
-          <div class="input-card"><div class="input-card-label">QNH · hPa</div><div class="input-card-val"><input type="number" id="to-qnh" value="1013" step="1" min="900" max="1050" oninput="calcDensityAlt('to')"></div></div>
-          <div class="input-card"><div class="input-card-label">OAT · °C</div><div class="input-card-val"><input type="number" id="to-oat" value="15" step="1" min="-40" max="60" oninput="calcDensityAlt('to')"></div></div>
-        </div>
-        <input type="hidden" id="to-alt" value="0">
-
-        <!-- Wind / Runway / Slope -->
-        <div class="input-grid" style="grid-template-columns:repeat(3,1fr);">
-          <div class="input-card"><div class="input-card-label">Wind · kt</div><div class="input-card-val"><input type="number" id="to-wind" value="0" step="1" min="-30" max="30" oninput="calcTakeoff()"></div></div>
-          <div class="input-card"><div class="input-card-label">Runway</div><div class="input-card-val"><select id="to-runway" onchange="calcTakeoff()" style="pointer-events:none;color:var(--text-dim);"><option value="0">GRASS</option><option value="1">PAVED</option></select></div></div>
-          <div class="input-card"><div class="input-card-label">Slope · %</div><div class="input-card-val"><input type="number" id="to-slope" value="0" step="0.1" min="-5" max="5" oninput="calcTakeoff()"></div></div>
-        </div>
-
-        <!-- Weather Conditions -->
-        <div class="wx-panel">
-          <div class="wx-panel-header">
-            <span class="wx-panel-title">WEATHER CONDITIONS</span>
-            <button id="to-sync-wx-btn" onclick="syncLiveWX('to')" class="wx-sync-btn">
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-.28-4.79"/></svg>
-              SYNC LIVE WX
-            </button>
-          </div>
-          <div class="wx-inputs">
-            <div class="wx-field">
-              <div class="wx-field-label">WIND</div>
-              <div class="wx-field-val" id="to-wx-wind">—/—</div>
-              <div class="wx-field-unit">kt</div>
-            </div>
-            <div class="wx-field">
-              <div class="wx-field-label">TEMPERATURE</div>
-              <div class="wx-field-val" id="to-wx-temp">—</div>
-              <div class="wx-field-unit">°C</div>
-            </div>
-            <div class="wx-field">
-              <div class="wx-field-label">QNH (HPA)</div>
-              <div class="wx-field-val" id="to-wx-qnh">—</div>
-              <div class="wx-field-unit">hPa</div>
-            </div>
-          </div>
-          <div class="wx-metar-row" id="to-metar-row">
-            <span class="wx-metar-label">LIVE METAR</span>
-            <span class="wx-metar-text" id="to-metar-text" style="color:var(--text-dim);font-style:italic;">— sync to load —</span>
+        <div style="display:flex;align-items:stretch;background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;">
+          <div style="font-family:var(--head);font-size:9px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--text-dim);background:var(--panel);padding:10px 14px;border-right:1px solid var(--border);white-space:nowrap;display:flex;align-items:center;flex-shrink:0;">RUNWAY INFO</div>
+          <div style="flex:1;display:flex;">
+            <div class="rwy-info-cell"><div class="rwy-info-label">IDENT</div><div class="rwy-info-val" id="to-ri-ident">—</div></div>
+            <div class="rwy-info-cell"><div class="rwy-info-label">LENGTH (M)</div><div class="rwy-info-val" id="to-ri-tora">—</div></div>
+            <div class="rwy-info-cell" style="flex:2;"><div class="rwy-info-label">COORD</div><div class="rwy-info-val" id="to-ri-coord" style="font-size:11px;">—</div></div>
+            <div class="rwy-info-cell" style="border-right:none;"><div class="rwy-info-label">ELEV (FT)</div><div class="rwy-info-val" id="to-ri-elev">—</div></div>
           </div>
         </div>
 
-      </div><!-- /perf-left -->
+        <button onclick="calcTakeoffManual()" style="width:100%;padding:16px;background:var(--blue);border:none;border-radius:var(--radius);font-family:var(--head);font-size:15px;font-weight:700;letter-spacing:3px;color:white;cursor:pointer;">CALCULATE</button>
+        <button onclick="resetPerfTO()" style="width:100%;padding:14px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);font-family:var(--head);font-size:12px;font-weight:600;letter-spacing:2px;color:var(--text-dim);cursor:pointer;">RESET</button>
 
-      <!-- RIGHT: Takeoff card -->
-      <div class="perf-right" style="display:flex;flex-direction:column;overflow:hidden;">
+      </div><!-- /bottom row -->
 
-        <!-- Header centred -->
-        <div class="to-card-header" style="justify-content:center;text-align:center;padding:20px 18px;">
-          <div style="font-family:var(--head);font-size:15px;font-weight:600;letter-spacing:4px;color:var(--text-dim);text-transform:uppercase;">TAKE OFF</div>
-          <div style="font-family:var(--mono);font-size:38px;font-weight:700;color:var(--amber);letter-spacing:6px;line-height:1.1;margin-top:4px;">
-            RWY <span id="to-card-rwy">—</span>
-          </div>
-        </div>
-
-        <!-- Results body -->
-        <div style="padding:16px;display:flex;flex-direction:column;gap:14px;flex:1;overflow-y:auto;">
-
-          <!-- Base values -->
-          <div class="to-result-group">
-            <div class="to-result-group-title">Base Values</div>
-            <div class="to-result-row">
-              <div class="to-result-label">Ground Roll</div>
-              <div class="to-result-val" id="to-base-gr-m">–</div>
-              <div class="to-result-unit">m</div>
-              <div class="to-result-ft" id="to-base-gr-ft">– ft</div>
-            </div>
-            <div class="to-result-row">
-              <div class="to-result-label">Dist. 50ft</div>
-              <div class="to-result-val" id="to-base-50-m">–</div>
-              <div class="to-result-unit">m</div>
-              <div class="to-result-ft" id="to-base-50-ft">– ft</div>
-            </div>
-          </div>
-
-          <div style="height:1px;background:var(--border);"></div>
-
-          <!-- Corrected values -->
-          <div class="to-result-group">
-            <div class="to-result-group-title" style="color:var(--green);">With All Corrections</div>
-            <div class="to-result-row">
-              <div class="to-result-label">Ground Roll</div>
-              <div class="to-result-val green" id="to-corr-gr-m">–</div>
-              <div class="to-result-unit">m</div>
-              <div class="to-result-ft" id="to-corr-gr-ft">– ft</div>
-              <span class="delta-badge zero" id="to-delta-gr">±0</span>
-            </div>
-            <div class="to-result-row">
-              <div class="to-result-label">Dist. 50ft</div>
-              <div class="to-result-val green" id="to-corr-50-m">–</div>
-              <div class="to-result-unit">m</div>
-              <div class="to-result-ft" id="to-corr-50-ft">– ft</div>
-              <span class="delta-badge zero" id="to-delta-50">±0</span>
-            </div>
-          </div>
-
-          <div style="height:1px;background:var(--border);"></div>
-
-          <!-- TORA — always visible -->
-          <div class="to-result-group">
-            <div class="to-result-group-title">Runway Available</div>
-            <div class="to-result-row">
-              <div class="to-result-label">TORA</div>
-              <div class="to-result-val" id="to-tora-val">–</div>
-              <div class="to-result-unit">m</div>
-              <div class="to-result-ft" id="to-tora-status" style="font-family:var(--mono);font-size:11px;"></div>
-            </div>
-          </div>
-
-        </div>
-      </div><!-- /perf-right -->
     </div>
-
     <!-- LANDING -->
     <div class="perf-page" id="perf-ld">
       <div class="perf-left">
@@ -1276,8 +1342,17 @@ function selectRunway(prefix) {
       var cardRwy = document.getElementById('to-card-rwy');
       if (cardRwy) cardRwy.textContent = rwySel.value || '—';
       var toraVal = document.getElementById('to-tora-val');
-      var toraStatus = document.getElementById('to-tora-status');
       if (toraVal) toraVal.textContent = rwyData.tora;
+      // Update runway info table
+      // Runway info table
+      var riIdent = document.getElementById('to-ri-ident'); if(riIdent) riIdent.textContent = rwySel.value;
+      var riTora = document.getElementById('to-ri-tora'); if(riTora) riTora.textContent = rwyData.tora || '—';
+      var riElev = document.getElementById('to-ri-elev');
+      if(riElev) {
+        var apData = AIRPORTS[icao];
+        riElev.textContent = apData ? apData.elev : '—';
+      }
+      var riCoord = document.getElementById('to-ri-coord'); if(riCoord) riCoord.textContent = '—';
       calcTakeoff();
     } else calcLanding();
     updateRunwayDiagrams();
@@ -2095,6 +2170,57 @@ function syncLiveWX(prefix) {
       var metatText = document.getElementById(prefix + '-metar-text');
       if (metatText) { metatText.textContent = 'Error: could not fetch METAR for ' + icao; metatText.style.color = 'var(--red)'; }
     });
+}
+
+
+// ── MANUAL CALCULATE ─────────────────────────────────
+function calcTakeoffManual() {
+  calcTakeoff();
+  // Visual feedback
+  var btn = document.querySelector('.calc-btn');
+  if (btn) {
+    btn.textContent = 'CALCULATED ✓';
+    btn.style.background = 'var(--green)';
+    setTimeout(function() {
+      btn.textContent = 'CALCULATE';
+      btn.style.background = '';
+    }, 2000);
+  }
+}
+
+function resetPerfTO() {
+  // Reset all editable inputs in T/O page
+  var toIcao = document.getElementById('to-icao'); if (toIcao) toIcao.value = '';
+  var toWeight = document.getElementById('to-weight'); if (toWeight) toWeight.value = 1180;
+  var toQnh = document.getElementById('to-qnh'); if (toQnh) toQnh.value = 1013;
+  var toOat = document.getElementById('to-oat'); if (toOat) toOat.value = 15;
+  var toWind = document.getElementById('to-wind'); if (toWind) toWind.value = 0;
+  var toSlope = document.getElementById('to-slope'); if (toSlope) toSlope.value = 0;
+  // Reset displays
+  var els = ['to-airport-name','to-airport-elev','to-press-alt','to-density-alt','to-rwy-avail','to-card-rwy','to-tora-val'];
+  var defaults = ['—','Elev: — ft','— ft','— ft','— m','—','–'];
+  els.forEach(function(id,i){ var e=document.getElementById(id); if(e) e.textContent=defaults[i]; });
+  // Reset runway selector
+  var rwySel = document.getElementById('to-rwy-sel');
+  if (rwySel) { rwySel.innerHTML = '<option value="">—</option>'; }
+  // Reset WX
+  ['to-wx-wind','to-wx-temp','to-wx-qnh'].forEach(function(id,i){
+    var e=document.getElementById(id); if(e) e.textContent=['—/—','—','—'][i];
+  });
+  var metatText = document.getElementById('to-metar-text');
+  if (metatText) { metatText.textContent = '— sync to load —'; metatText.style.color = 'var(--text-dim)'; metatText.style.fontStyle = 'italic'; }
+  // Reset results
+  ['to-base-gr-m','to-base-gr-ft','to-corr-gr-m','to-corr-gr-ft','to-base-50-m','to-base-50-ft','to-corr-50-m','to-corr-50-ft'].forEach(function(id){
+    var e=document.getElementById(id); if(e) e.textContent='–';
+  });
+  ['to-delta-gr','to-delta-50'].forEach(function(id){
+    var e=document.getElementById(id); if(e){ e.textContent='±0'; e.className='delta-badge zero'; }
+  });
+  // Reset runway info
+  ['to-ri-ident','to-ri-tora','to-ri-coord','to-ri-elev'].forEach(function(id){
+    var e=document.getElementById(id); if(e) e.textContent='—';
+  });
+  if (toIcao) lookupAirport('to');
 }
 
 // ── SCREEN NAVIGATION ──────────────────────────────
