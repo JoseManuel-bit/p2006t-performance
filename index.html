@@ -128,7 +128,7 @@ body{font-family:var(--body);background:var(--bg);color:var(--text);display:flex
 .airport-name{font-family:var(--head);font-size:14px;font-weight:600;color:var(--text);letter-spacing:0.5px;}
 .airport-elev{font-family:var(--mono);font-size:11px;color:var(--amber);margin-top:3px;}
 .rwy-wrap{display:flex;flex-direction:column;gap:4px;flex-shrink:0;}
-.rwy-select{background:var(--bg3);border:1px solid var(--border);border-radius:4px;font-family:var(--mono);font-size:18px;font-weight:700;color:var(--amber);text-align:center;text-align-last:center;padding:6px 4px;outline:none;-webkit-appearance:none;appearance:none;width:90px;}
+.rwy-select{background:var(--bg3);border:1px solid var(--border);border-radius:4px;font-family:var(--mono);font-size:22px;font-weight:700;color:var(--amber);text-align:center;text-align-last:center;padding:6px 4px;outline:none;-webkit-appearance:none;appearance:none;width:90px;}
 .rwy-avail{font-family:var(--mono);font-size:11px;color:var(--green);text-align:center;font-weight:700;}
 /* DENSITY ALT */
 
@@ -752,23 +752,31 @@ input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-
         <div class="perf-left" style="flex:1;overflow-y:auto;">
 
           <div class="airport-selector" style="margin-bottom:8px;">
-            <div class="airport-row">
-              <div class="airport-icao-wrap">
+            <div style="display:flex;align-items:flex-start;gap:12px;">
+              <!-- ICAO -->
+              <div class="airport-icao-wrap" style="flex-shrink:0;">
                 <div class="airport-label">DEPARTURE AIRPORT</div>
                 <input type="text" id="to-icao" placeholder="ICAO" maxlength="4" oninput="if(window.lookupAirport)lookupAirport('to')" class="icao-input">
               </div>
-              <div class="airport-info-wrap">
-                <div class="airport-name" id="to-airport-name">—</div>
-                <div class="airport-elev" id="to-airport-elev">Elev: — ft</div>
+              <!-- RUNWAY selector right after ICAO -->
+              <div class="airport-icao-wrap">
+                <div class="airport-label">RUNWAY</div>
+                <select id="to-rwy-sel" onchange="selectRunway('to')" class="rwy-select" style="min-width:80px;"><option value="">—</option></select>
+
               </div>
-              <div class="airport-alt-chips">
+              <!-- Name + Elev + TORA -->
+              <div style="flex:1;min-width:0;display:flex;flex-direction:column;justify-content:center;padding-top:18px;">
+                <div class="airport-name" id="to-airport-name">—</div>
+                <div style="display:flex;align-items:center;gap:12px;margin-top:3px;">
+                  <div class="airport-elev" id="to-airport-elev">Elev: — ft</div>
+                  <div style="font-family:var(--head);font-size:10px;color:var(--text-dim);">·</div>
+                  <div style="font-family:var(--head);font-size:10px;color:var(--text-dim);">TORA <span style="color:var(--green);font-family:var(--mono);" id="to-tora-label">—</span> m</div>
+                </div>
+              </div>
+              <!-- PA / DA chips -->
+              <div class="airport-alt-chips" style="flex-shrink:0;">
                 <div class="alt-chip"><span class="alt-chip-label">PRESS ALT</span><span class="alt-chip-val" id="to-press-alt">— ft</span></div>
                 <div class="alt-chip"><span class="alt-chip-label">DENSITY ALT</span><span class="alt-chip-val" id="to-density-alt">— ft</span></div>
-              </div>
-              <div class="rwy-wrap">
-                <div class="airport-label">RUNWAY</div>
-                <select id="to-rwy-sel" onchange="selectRunway('to')" class="rwy-select"><option value="">—</option></select>
-                <div class="rwy-avail" id="to-rwy-avail" style="color:var(--text-dim);">— m</div>
               </div>
             </div>
           </div>
@@ -781,7 +789,7 @@ input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-
           <input type="hidden" id="to-alt" value="0">
 
           <div class="input-grid" style="margin-bottom:8px;">
-            <div class="input-card"><div class="input-card-label">Wind · kt</div><div class="input-card-val"><input type="number" id="to-wind" value="0" step="1" min="-30" max="30"></div></div>
+            <div class="input-card"><div class="input-card-label">Wind · kt <span id="to-wind-info" style="font-size:8px;letter-spacing:0;text-transform:none;font-family:var(--body);font-weight:400;margin-left:4px;"></span></div><div class="input-card-val"><input type="number" id="to-wind" value="0" step="1" min="-30" max="30"></div></div>
             <div class="input-card"><div class="input-card-label">Runway</div><div class="input-card-val"><select id="to-runway" style="pointer-events:none;color:var(--text-dim);"><option value="0">GRASS</option><option value="1">PAVED</option></select></div></div>
             <div class="input-card"><div class="input-card-label">Slope · %</div><div class="input-card-val"><input type="number" id="to-slope" value="0" step="0.1" min="-5" max="5"></div></div>
           </div>
@@ -837,10 +845,9 @@ input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-
       <!-- BOTTOM ROW: full width -->
       <div style="padding:0 10px 10px;display:flex;flex-direction:column;gap:6px;flex-shrink:0;">
 
-        <div style="display:flex;align-items:stretch;background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;" id="to-metar-row">
-          <div style="font-family:var(--head);font-size:9px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--text-dim);background:var(--panel);padding:10px 14px;border-right:1px solid var(--border);white-space:nowrap;display:flex;align-items:center;flex-shrink:0;min-width:120px;">LIVE METAR</div>
-          <div style="flex:1;padding:10px 14px;font-family:var(--mono);font-size:11px;display:flex;align-items:center;justify-content:center;text-align:center;">
-            <span id="to-metar-text" style="color:var(--text-dim);font-style:italic;">— sync to load —</span>
+        <div style="display:flex;align-items:center;background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;" id="to-metar-row">
+          <div style="flex:1;padding:10px 14px;display:flex;align-items:center;justify-content:center;text-align:center;">
+            <span id="to-metar-text" style="color:var(--text-dim);font-family:var(--head);font-size:10px;font-weight:600;letter-spacing:2px;">LIVE METAR</span>
           </div>
         </div>
 
@@ -901,7 +908,7 @@ input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-
       </div>
       <input type="hidden" id="ld-alt" value="0">
       <div class="input-grid" style="grid-template-columns:repeat(3,1fr);">
-        <div class="input-card"><div class="input-card-label">Wind · kt</div><div class="input-card-val"><input type="number" id="ld-wind" value="0" step="1" min="-30" max="30" oninput="calcLanding()"></div></div>
+        <div class="input-card"><div class="input-card-label">Wind · kt <span id="ld-wind-info" style="font-size:8px;letter-spacing:0;text-transform:none;font-family:var(--body);font-weight:400;margin-left:4px;"></span></div><div class="input-card-val"><input type="number" id="ld-wind" value="0" step="1" min="-30" max="30" oninput="calcLanding()"></div></div>
         <div class="input-card"><div class="input-card-label">Runway</div><div class="input-card-val"><select id="ld-runway" onchange="calcLanding()" style="pointer-events:none;color:var(--text-dim);"><option value="0">GRASS</option><option value="1">PAVED</option></select></div></div>
         <div class="input-card"><div class="input-card-label">Slope · %</div><div class="input-card-val"><input type="number" id="ld-slope" value="0" step="0.1" min="-5" max="5" oninput="calcLanding()"></div></div>
       </div>
@@ -1125,26 +1132,46 @@ input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-
 
 // ── AIRPORT DATABASE ──────────────────────────────
 const AIRPORTS = {
-  'LEVD': {name:'Valladolid / Villanubla', elev:2775},
-  'LEAL': {name:'Alicante / Elche', elev:142},
-  'LEMU': {name:'Alicante / Muchamiel', elev:482},
-  'LECU': {name:'Madrid / Cuatro Vientos', elev:2269},
-  'LEMD': {name:'Madrid / Barajas', elev:1998},
-  'LEMT': {name:'Toledo / Casarrubios', elev:2050},
-  'LECO': {name:'A Coruna', elev:330},
-  'LEAB': {name:'Albacete', elev:2301},
-  'LEAM': {name:'Almeria', elev:70},
-  'LESU': {name:'Andorra / La Seu D Urgell', elev:2630},
-  'LEBZ': {name:'Badajoz / Talavera La Real', elev:608},
-  'LEBL': {name:'Barcelona / El Prat', elev:14},
-  'LEBB': {name:'Bilbao', elev:136},
-  'LEBG': {name:'Burgos / Villafria', elev:2962},
-  'LERT': {name:'Cadiz / Rota', elev:86},
-  'LECH': {name:'Castellon', elev:1182},
-  'LERL': {name:'Ciudad Real', elev:2120},
-  'LEBA': {name:'Cordoba', elev:307},
-  'GCHI': {name:'El Hierro', elev:106},
-  'GCFV': {name:'Fuerteventura', elev:83},
+  'LEVD': {name:'Valladolid / Villanubla', elev:2775, coord:"41°42'22N 004°51'07W"},
+  'LEAL': {name:'Alicante / Elche', elev:142, coord:"38°16'56N 000°33'29W"},
+  'LEMU': {name:'Alicante / Muchamiel', elev:482, coord:"38°26'33N 000°28'67W"},
+  'LECU': {name:'Madrid / Cuatro Vientos', elev:2269, coord:"40°22'04N 003°46'24W"},
+  'LEMD': {name:'Madrid / Barajas', elev:1998, coord:"40°29'34N 003°34'22W"},
+  'LEMT': {name:'Toledo / Casarrubios', elev:2050, coord:"40°14'16N 004°01'35W"},
+  'LECO': {name:'A Coruña', elev:330, coord:"43°18'02N 008°22'42W"},
+  'LEAB': {name:'Albacete', elev:2301, coord:"38°56'52N 001°52'44W"},
+  'LEAM': {name:'Almería', elev:70, coord:"36°50'38N 002°22'12W"},
+  'LESU': {name:'Andorra / La Seu D Urgell', elev:2630, coord:"42°20'19N 001°24'33E"},
+  'LEBZ': {name:'Badajoz / Talavera La Real', elev:608, coord:"38°53'29N 006°49'17W"},
+  'LEBL': {name:'Barcelona / El Prat', elev:14, coord:"41°17'49N 002°04'42E"},
+  'LEBB': {name:'Bilbao', elev:136, coord:"43°18'04N 002°54'38W"},
+  'LEBG': {name:'Burgos / Villafría', elev:2962, coord:"42°21'27N 003°36'49W"},
+  'LERT': {name:'Cádiz / Rota', elev:86, coord:"36°38'43N 006°20'58W"},
+  'LECH': {name:'Castellón', elev:1182, coord:"40°12'35N 000°04'11E"},
+  'LERL': {name:'Ciudad Real', elev:2120, coord:"38°51'23N 003°58'12W"},
+  'LEBA': {name:'Córdoba', elev:307, coord:"37°50'31N 004°50'56W"},
+  'GCHI': {name:'El Hierro', elev:106, coord:"27°48'53N 017°53'13W"},
+  'GCFV': {name:'Fuerteventura', elev:83, coord:"28°27'09N 013°51'49W"},
+  'LEGE': {name:'Girona', elev:469, coord:"41°54'03N 002°45'38E"},
+  'LEGA': {name:'Granada / Armilla', elev:2300, coord:"37°08'07N 003°38'09W"},
+  'LEGR': {name:'Granada / F. García Lorca', elev:1860, coord:"37°11'19N 003°46'39W"},
+  'LEHC': {name:'Huesca / Pirineos', elev:1769, coord:"42°04'51N 000°19'24W"},
+  'LEIB': {name:'Ibiza', elev:23, coord:"38°52'22N 001°22'23E"},
+  'LEJR': {name:'Jerez', elev:93, coord:"36°44'41N 006°03'36W"},
+  'GCLA': {name:'La Palma', elev:107, coord:"28°37'35N 017°45'20W"},
+  'GCRR': {name:'Lanzarote / César Manrique', elev:47, coord:"28°56'44N 013°36'19W"},
+  'LELN': {name:'León', elev:3006, coord:"42°35'20N 005°39'20W"},
+  'LEDA': {name:'Lleida / Alguaire', elev:1152, coord:"41°43'41N 000°32'06E"},
+  'LERJ': {name:'Logroño', elev:1156, coord:"42°27'38N 002°19'14W"},
+  'LEGT': {name:'Madrid / Getafe', elev:2032, coord:"40°17'39N 003°43'26W"},
+  'LETO': {name:'Madrid / Torrejón', elev:2026, coord:"40°29'48N 003°26'45W"},
+  'LEMG': {name:'Málaga / Costa del Sol', elev:52, coord:"36°40'30N 004°29'57W"},
+  'LESB': {name:'Mallorca / Son Bonet', elev:153, coord:"39°35'56N 002°42'10E"},
+  'GEMI': {name:'Melilla', elev:156, coord:"35°16'47N 002°57'23W"},
+  'LEMH': {name:'Menorca', elev:303, coord:"39°51'45N 004°13'07E"},
+  'LEMI': {name:'Murcia / Región de Murcia', elev:644, coord:"37°48'13N 001°07'27W"},
+  'LELC': {name:'Murcia / San Javier', elev:29, coord:"37°46'30N 000°48'45W"},
+  'LEPA': {name:'Palma de Mallorca', elev:27, coord:"39°33'06N 002°44'20E"},
 };
 
 const RUNWAYS = {
@@ -1166,17 +1193,17 @@ const RUNWAYS = {
   },
   'LEMD': {
     '14L': {tora:3500, toda:3800, asda:3500, lda:3500, surface:'PAVED'},
-    '32R': {tora:3000, toda:3000, asda:3000, lda:3000, surface:'PAVED'},
+    '32R': {tora:0,    toda:0,    asda:0,    lda:3000, surface:'PAVED'},
     '14R': {tora:3988, toda:4210, asda:3988, lda:3988, surface:'PAVED'},
-    '32L': {tora:3060, toda:3060, asda:3060, lda:3060, surface:'PAVED'},
-    '18L': {tora:3000, toda:3000, asda:3000, lda:3000, surface:'PAVED'},
+    '32L': {tora:0,    toda:0,    asda:0,    lda:3060, surface:'PAVED'},
+    '18L': {tora:0,    toda:0,    asda:0,    lda:3000, surface:'PAVED'},
     '36R': {tora:3500, toda:3800, asda:3500, lda:3500, surface:'PAVED'},
-    '18R': {tora:3365, toda:3365, asda:3365, lda:3365, surface:'PAVED'},
+    '18R': {tora:0,    toda:0,    asda:0,    lda:3365, surface:'PAVED'},
     '36L': {tora:4179, toda:4609, asda:4179, lda:4179, surface:'PAVED'},
   },
   'LEMT': {
-    '08': {tora:950, toda:950, asda:950, lda:950, surface:'PAVED'},
-    '26': {tora:950, toda:950, asda:950, lda:950, surface:'PAVED'},
+    '08': {tora:950,  toda:950,  asda:950,  lda:950,  surface:'PAVED'},
+    '26': {tora:950,  toda:950,  asda:950,  lda:950,  surface:'PAVED'},
   },
   'LECO': {
     '03': {tora:2188, toda:2488, asda:2188, lda:2188, surface:'PAVED'},
@@ -1238,7 +1265,93 @@ const RUNWAYS = {
   },
   'GCFV': {
     '01': {tora:3406, toda:3466, asda:3406, lda:2406, surface:'PAVED'},
-    '19': {tora:2406, toda:2466, asda:2406, lda:2940, surface:'PAVED'},
+    '19': {tora:2406, toda:2466, asda:3406, lda:2940, surface:'PAVED'},
+  },
+  'LEGE': {
+    '01': {tora:2400, toda:2460, asda:2400, lda:2400, surface:'PAVED'},
+    '19': {tora:2400, toda:2460, asda:2400, lda:2240, surface:'PAVED'},
+  },
+  'LEGA': {
+    '18': {tora:1300, toda:1300, asda:1300, lda:1300, surface:'PAVED'},
+    '36': {tora:1300, toda:1300, asda:1300, lda:1300, surface:'PAVED'},
+  },
+  'LEGR': {
+    '09': {tora:2900, toda:2960, asda:2900, lda:2900, surface:'PAVED'},
+    '27': {tora:2900, toda:2960, asda:2900, lda:2900, surface:'PAVED'},
+  },
+  'LEHC': {
+    '12R': {tora:2100, toda:2100, asda:2100, lda:2100, surface:'PAVED'},
+    '30L': {tora:2100, toda:2100, asda:2100, lda:2100, surface:'PAVED'},
+    '12L': {tora:615,  toda:615,  asda:615,  lda:615,  surface:'PAVED'},
+    '30R': {tora:615,  toda:615,  asda:615,  lda:615,  surface:'PAVED'},
+  },
+  'LEIB': {
+    '06': {tora:2799, toda:2859, asda:2799, lda:2799, surface:'PAVED'},
+    '24': {tora:2799, toda:2859, asda:2799, lda:2799, surface:'PAVED'},
+  },
+  'LEJR': {
+    '02': {tora:2300, toda:2300, asda:2300, lda:2300, surface:'PAVED'},
+    '20': {tora:2300, toda:2300, asda:2300, lda:2300, surface:'PAVED'},
+  },
+  'GCLA': {
+    '18': {tora:2110, toda:2260, asda:2110, lda:2058, surface:'PAVED'},
+    '36': {tora:2200, toda:2312, asda:2200, lda:2058, surface:'PAVED'},
+  },
+  'GCRR': {
+    '03': {tora:2400, toda:2460, asda:2400, lda:2310, surface:'PAVED'},
+    '21': {tora:2310, toda:2460, asda:2310, lda:2310, surface:'PAVED'},
+  },
+  'LELN': {
+    '05': {tora:3000, toda:3000, asda:3000, lda:3000, surface:'PAVED'},
+    '23': {tora:3000, toda:3000, asda:3000, lda:3000, surface:'PAVED'},
+  },
+  'LEDA': {
+    '13': {tora:2500, toda:2500, asda:2500, lda:2500, surface:'PAVED'},
+    '31': {tora:2500, toda:2500, asda:2500, lda:2410, surface:'PAVED'},
+  },
+  'LERJ': {
+    '11': {tora:2200, toda:2260, asda:2200, lda:2200, surface:'PAVED'},
+    '29': {tora:2200, toda:2260, asda:2200, lda:2200, surface:'PAVED'},
+  },
+  'LEGT': {
+    '04': {tora:2477, toda:2627, asda:2627, lda:2477, surface:'PAVED'},
+    '22': {tora:2477, toda:2852, asda:2602, lda:2477, surface:'PAVED'},
+  },
+  'LETO': {
+    '04': {tora:3658, toda:3658, asda:3743, lda:3658, surface:'PAVED'},
+    '22': {tora:3658, toda:3658, asda:4253, lda:3658, surface:'PAVED'},
+  },
+  'LEMG': {
+    '12': {tora:0,    toda:0,    asda:0,    lda:2749, surface:'PAVED'},
+    '30': {tora:3089, toda:3089, asda:3089, lda:3089, surface:'PAVED'},
+    '13': {tora:3198, toda:3448, asda:3198, lda:3198, surface:'PAVED'},
+    '31': {tora:3198, toda:3417, asda:3198, lda:3198, surface:'PAVED'},
+  },
+  'LESB': {
+    '05': {tora:1263, toda:1323, asda:1263, lda:1080, surface:'PAVED'},
+    '23': {tora:1299, toda:1359, asda:1299, lda:1116, surface:'PAVED'},
+  },
+  'GEMI': {
+    '15': {tora:1433, toda:1433, asda:1433, lda:1198, surface:'PAVED'},
+    '33': {tora:1371, toda:1431, asda:1371, lda:1371, surface:'PAVED'},
+  },
+  'LEMH': {
+    '01': {tora:2350, toda:2425, asda:2350, lda:2350, surface:'PAVED'},
+    '19': {tora:2550, toda:2625, asda:2550, lda:2350, surface:'PAVED'},
+  },
+  'LEMI': {
+    '05': {tora:3000, toda:3060, asda:3000, lda:3000, surface:'PAVED'},
+    '23': {tora:3000, toda:3060, asda:3000, lda:3000, surface:'PAVED'},
+  },
+  'LELC': {
+    '04R': {tora:2320, toda:2516, asda:2320, lda:2320, surface:'PAVED'},
+    '22L': {tora:2320, toda:2508, asda:2320, lda:2320, surface:'PAVED'},
+  },
+  'LEPA': {
+    '06L': {tora:3270, toda:3330, asda:3270, lda:3270, surface:'PAVED'},
+    '24R': {tora:3270, toda:3330, asda:3270, lda:3200, surface:'PAVED'},
+    '06R': {tora:3000, toda:3060, asda:3000, lda:2590, surface:'PAVED'},
+    '24L': {tora:2590, toda:2590, asda:3000, lda:3000, surface:'PAVED'},
   },
 };
 
@@ -1333,8 +1446,7 @@ function selectRunway(prefix) {
   var rwyAvail = document.getElementById(prefix+'-rwy-avail');
   var rwyData = RUNWAYS[icao] && RUNWAYS[icao][rwySel.value];
   if (rwyData) {
-    rwyAvail.textContent = rwyData.tora + ' m';
-    rwyAvail.style.color = 'var(--green)';
+    if (rwyAvail) { rwyAvail.textContent = rwyData.tora + ' m'; rwyAvail.style.color = 'var(--green)'; }
     var rwyType = document.getElementById(prefix+'-runway');
     if (rwyType) rwyType.value = rwyData.surface==='PAVED' ? '1' : '0';
     // Update TO card header runway number
@@ -1343,6 +1455,8 @@ function selectRunway(prefix) {
       if (cardRwy) cardRwy.textContent = rwySel.value || '—';
       var toraVal = document.getElementById('to-tora-val');
       if (toraVal) toraVal.textContent = rwyData.tora;
+      var toraLabel = document.getElementById('to-tora-label');
+      if (toraLabel) toraLabel.textContent = rwyData.tora || '—';
       // Update runway info table
       // Runway info table
       var riIdent = document.getElementById('to-ri-ident'); if(riIdent) riIdent.textContent = rwySel.value;
@@ -1352,13 +1466,21 @@ function selectRunway(prefix) {
         var apData = AIRPORTS[icao];
         riElev.textContent = apData ? apData.elev : '—';
       }
-      var riCoord = document.getElementById('to-ri-coord'); if(riCoord) riCoord.textContent = '—';
+      var riCoord = document.getElementById('to-ri-coord');
+      if(riCoord) { var apInfo = AIRPORTS[icao]; riCoord.textContent = apInfo && apInfo.coord ? apInfo.coord : '—'; }
       calcTakeoff();
-    } else calcLanding();
+    } else {
+      calcLanding();
+      if (windData['ld'] && windData['ld'].spd > 0) {
+        var comp = calcWindComponents(windData['ld'].dir, windData['ld'].spd, rwySel.value);
+        var windEl = document.getElementById('ld-wind');
+        if (windEl) { windEl.value = comp.headwind; calcLanding(); }
+        showWindInfo('ld', comp, windData['ld'].dir, windData['ld'].spd);
+      }
+    }
     updateRunwayDiagrams();
   } else {
-    rwyAvail.textContent = '— m';
-    rwyAvail.style.color = 'var(--text-dim)';
+    if (rwyAvail) { rwyAvail.textContent = '— m'; rwyAvail.style.color = 'var(--text-dim)'; }
     if (prefix==='to') {
       var cardRwy = document.getElementById('to-card-rwy');
       if (cardRwy) cardRwy.textContent = '—';
@@ -2125,9 +2247,27 @@ function syncLiveWX(prefix) {
 
   function applyMetar(raw) {
     var windMatch = raw.match(/\b(\d{3}|VRB)(\d{2,3})(?:G\d{2,3})?KT\b/);
-    var windDir = '---', windSpd = 0;
-    if (windMatch) { windDir = windMatch[1]; windSpd = parseInt(windMatch[2]) || 0; }
-    document.getElementById(prefix + '-wx-wind').textContent = windDir + '/' + String(windSpd).padStart(2,'0');
+    var windDir = 0, windSpd = 0, windDirStr = '---';
+    if (windMatch) {
+      windDirStr = windMatch[1];
+      windDir = windMatch[1] === 'VRB' ? 0 : (parseInt(windMatch[1]) || 0);
+      windSpd = parseInt(windMatch[2]) || 0;
+    }
+    document.getElementById(prefix + '-wx-wind').textContent = windDirStr + '/' + String(windSpd).padStart(2,'0');
+    // Store for component calculation
+    windData[prefix] = {dir: windDir, spd: windSpd};
+    // Apply wind component to perf input
+    var rwySel = document.getElementById(prefix + '-rwy-sel');
+    if (rwySel && rwySel.value) {
+      var comp = calcWindComponents(windDir, windSpd, rwySel.value);
+      var windEl = document.getElementById(prefix + '-wind');
+      if (windEl) windEl.value = comp.headwind;
+      // Show crosswind info
+      showWindInfo(prefix, comp, windDirStr, windSpd);
+    } else {
+      var windEl = document.getElementById(prefix + '-wind');
+      if (windEl) windEl.value = windSpd;
+    }
 
     var tempMatch = raw.match(/\b(M?\d{2})\/M?\d{2}\b/);
     if (tempMatch) {
@@ -2155,8 +2295,11 @@ function syncLiveWX(prefix) {
     var metatText = document.getElementById(prefix + '-metar-text');
     if (metatText) {
       metatText.textContent = raw;
-      metatText.style.color = '';
-      metatText.style.fontStyle = 'normal';
+      metatText.style.color = 'var(--text)';
+      metatText.style.fontFamily = 'var(--mono)';
+      metatText.style.fontSize = '11px';
+      metatText.style.fontWeight = 'normal';
+      metatText.style.letterSpacing = '0';
     }
     restoreBtn();
   }
@@ -2251,8 +2394,8 @@ function resetPerfTO() {
   var toWind = document.getElementById('to-wind'); if (toWind) toWind.value = 0;
   var toSlope = document.getElementById('to-slope'); if (toSlope) toSlope.value = 0;
   // Reset displays
-  var els = ['to-airport-name','to-airport-elev','to-press-alt','to-density-alt','to-rwy-avail','to-card-rwy','to-tora-val'];
-  var defaults = ['—','Elev: — ft','— ft','— ft','— m','—','–'];
+  var els = ['to-airport-name','to-airport-elev','to-press-alt','to-density-alt','to-card-rwy','to-tora-val','to-tora-label'];
+  var defaults = ['—','Elev: — ft','— ft','— ft','—','–','—'];
   els.forEach(function(id,i){ var e=document.getElementById(id); if(e) e.textContent=defaults[i]; });
   // Reset runway selector
   var rwySel = document.getElementById('to-rwy-sel');
@@ -2262,7 +2405,7 @@ function resetPerfTO() {
     var e=document.getElementById(id); if(e) e.textContent=['—/—','—','—'][i];
   });
   var metatText = document.getElementById('to-metar-text');
-  if (metatText) { metatText.textContent = '— sync to load —'; metatText.style.color = 'var(--text-dim)'; metatText.style.fontStyle = 'italic'; }
+  if (metatText) { metatText.textContent = 'LIVE METAR'; metatText.style.color = 'var(--text-dim)'; metatText.style.fontFamily = 'var(--head)'; metatText.style.fontSize = '10px'; metatText.style.fontWeight = '600'; metatText.style.letterSpacing = '2px'; }
   // Reset results
   ['to-base-gr-m','to-base-gr-ft','to-corr-gr-m','to-corr-gr-ft','to-base-50-m','to-base-50-ft','to-corr-50-m','to-corr-50-ft'].forEach(function(id){
     var e=document.getElementById(id); if(e) e.textContent='–';
@@ -2275,6 +2418,49 @@ function resetPerfTO() {
     var e=document.getElementById(id); if(e) e.textContent='—';
   });
   if (toIcao) lookupAirport('to');
+}
+
+
+// ── WIND COMPONENT CALCULATOR ─────────────────────────────────────────────
+// Returns {headwind, crosswind} in knots
+// Positive headwind = into wind (reduces distance)
+// Negative headwind = tailwind (increases distance)
+function calcWindComponents(windDir, windSpd, rwyIdent) {
+  if (!windDir || !windSpd || !rwyIdent) return {headwind: 0, crosswind: 0};
+
+  // Get runway heading from identifier (e.g. "27" -> 270, "09" -> 090, "06L" -> 060)
+  var rwyNum = parseInt(rwyIdent.replace(/[LRC]/g, ''));
+  if (isNaN(rwyNum)) return {headwind: 0, crosswind: 0};
+  var rwyHdg = rwyNum * 10;
+
+  // Angle between wind and runway
+  var angle = (windDir - rwyHdg + 360) % 360;
+  var angleRad = angle * Math.PI / 180;
+
+  var headwind  = Math.round(windSpd * Math.cos(angleRad));  // + = headwind, - = tailwind
+  var crosswind = Math.round(Math.abs(windSpd * Math.sin(angleRad)));
+
+  return {headwind: headwind, crosswind: crosswind};
+}
+
+// Store last known wind data for recalculation
+var windData = {to: {dir: 0, spd: 0}, ld: {dir: 0, spd: 0}};
+
+
+function showWindInfo(prefix, comp, windDirStr, windSpd) {
+  // Find or create wind info element
+  var infoId = prefix + '-wind-info';
+  var el = document.getElementById(infoId);
+  if (!el) return;
+
+  if (windSpd === 0) { el.textContent = ''; return; }
+
+  var hwText = comp.headwind >= 0
+    ? comp.headwind + 'kt HW'
+    : Math.abs(comp.headwind) + 'kt TW';
+  var xwText = comp.crosswind + 'kt XW';
+  el.textContent = hwText + ' · ' + xwText;
+  el.style.color = comp.headwind >= 0 ? 'var(--green)' : 'var(--red)';
 }
 
 // ── SCREEN NAVIGATION ──────────────────────────────
