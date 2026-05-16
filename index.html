@@ -432,6 +432,28 @@ input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-
   padding: 8px 12px; background: var(--bg3);
   border-top: 1px solid var(--border);
 }
+
+/* ── ARRIVAL COMPACT OVERRIDES ───────────────────── */
+#perf-ld .airport-selector { padding: 6px 10px; margin-bottom: 6px; }
+#perf-ld .input-grid { gap: 4px; margin-bottom: 6px !important; }
+#perf-ld .input-card-label { padding: 3px 4px; font-size: 9px; }
+#perf-ld .input-card-val input[type="number"],
+#perf-ld .input-card-val select { font-size: 20px; padding: 5px 4px; }
+#perf-ld .wx-panel-header { padding: 5px 10px; }
+#perf-ld .wx-field { padding: 7px 6px; gap: 2px; }
+#perf-ld .wx-field-val { font-size: 17px; }
+#perf-ld .rwycc-btn { padding: 7px 4px; }
+#perf-ld .rwycc-code { font-size: 15px; }
+#perf-ld .rwycc-label { font-size: 6px; }
+#perf-ld .rwycc-panel { margin-bottom: 6px; }
+#perf-ld .results-compact { margin-bottom: 6px; }
+#perf-ld .results-compact-label { padding: 6px 10px; font-size: 10px; }
+#perf-ld .results-compact-val { padding: 6px 10px; }
+#perf-ld .rcv-num { font-size: 18px; }
+#perf-ld .alt-chip { padding: 3px 8px; }
+#perf-ld .alt-chip-val { font-size: 11px; }
+#perf-ld .airport-name { font-size: 13px; }
+
 .wx-metar-label {
   font-family: var(--head); font-size: 8px; font-weight: 700;
   letter-spacing: 1.5px; color: var(--text-dim); flex-shrink: 0; padding-top: 1px;
@@ -967,143 +989,143 @@ input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-
 
     </div>
     <!-- LANDING -->
-    <div class="perf-page" id="perf-ld">
-      <div class="perf-left">
-      <div class="airport-selector" style="margin-bottom:8px;">
-        <div style="display:flex;align-items:flex-start;gap:12px;">
-          <!-- ICAO -->
-          <div class="airport-icao-wrap" style="flex-shrink:0;">
-            <div class="airport-label">DESTINATION AIRPORT</div>
-            <input type="text" id="ld-icao" placeholder="ICAO" maxlength="4" oninput="if(window.lookupAirport)lookupAirport('ld')" class="icao-input">
-          </div>
-          <!-- RUNWAY selector inline -->
-          <div class="airport-icao-wrap">
-            <div class="airport-label">RUNWAY</div>
-            <select id="ld-rwy-sel" onchange="selectRunway('ld')" class="rwy-select" style="min-width:80px;"><option value="">—</option></select>
-          </div>
-          <!-- Name + Elev + LDA -->
-          <div style="flex:1;min-width:0;display:flex;flex-direction:column;justify-content:center;padding-top:18px;">
-            <div class="airport-name" id="ld-airport-name">—</div>
-            <div style="display:flex;align-items:center;gap:12px;margin-top:3px;">
-              <div class="airport-elev" id="ld-airport-elev">Elev: — ft</div>
-              <div style="font-family:var(--head);font-size:10px;color:var(--text-dim);">·</div>
-              <div style="font-family:var(--head);font-size:10px;color:var(--text-dim);">LDA <span style="color:var(--green);font-family:var(--mono);" id="ld-rwy-avail">—</span> m</div>
+    <div class="perf-page" id="perf-ld" style="flex-direction:row;">
+
+        <!-- LEFT col: all inputs and results -->
+        <div class="perf-left" style="flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:0;">
+
+          <div class="airport-selector" style="margin-bottom:6px;">
+            <div style="display:flex;align-items:flex-start;gap:10px;">
+              <div class="airport-icao-wrap" style="flex-shrink:0;">
+                <div class="airport-label">DESTINATION AIRPORT</div>
+                <input type="text" id="ld-icao" placeholder="ICAO" maxlength="4" oninput="if(window.lookupAirport)lookupAirport('ld')" class="icao-input">
+              </div>
+              <div class="airport-icao-wrap">
+                <div class="airport-label">RUNWAY</div>
+                <select id="ld-rwy-sel" onchange="selectRunway('ld')" class="rwy-select" style="min-width:80px;"><option value="">—</option></select>
+              </div>
+              <div style="flex:1;min-width:0;display:flex;flex-direction:column;justify-content:center;padding-top:16px;">
+                <div class="airport-name" id="ld-airport-name">—</div>
+                <div style="display:flex;align-items:center;gap:10px;margin-top:2px;">
+                  <div class="airport-elev" id="ld-airport-elev">Elev: — ft</div>
+                  <div style="font-family:var(--head);font-size:10px;color:var(--text-dim);">·</div>
+                  <div style="font-family:var(--head);font-size:10px;color:var(--text-dim);">LDA <span style="color:var(--green);font-family:var(--mono);" id="ld-rwy-avail">—</span> m</div>
+                </div>
+              </div>
+              <div class="airport-alt-chips" style="flex-shrink:0;">
+                <div class="alt-chip"><span class="alt-chip-label">PRESS ALT</span><span class="alt-chip-val" id="ld-press-alt">— ft</span></div>
+                <div class="alt-chip"><span class="alt-chip-label">DENSITY ALT</span><span class="alt-chip-val" id="ld-density-alt">— ft</span></div>
+              </div>
             </div>
           </div>
-          <!-- PA / DA chips -->
-          <div class="airport-alt-chips" style="flex-shrink:0;">
-            <div class="alt-chip"><span class="alt-chip-label">PRESS ALT</span><span class="alt-chip-val" id="ld-press-alt">— ft</span></div>
-            <div class="alt-chip"><span class="alt-chip-label">DENSITY ALT</span><span class="alt-chip-val" id="ld-density-alt">— ft</span></div>
+
+          <input type="hidden" id="ld-alt" value="0">
+
+          <div class="input-grid" style="margin-bottom:6px;">
+            <div class="input-card"><div class="input-card-label">Weight · kg</div><div class="input-card-val"><input type="number" id="ld-weight" value="1180" step="1" min="930" max="1180" oninput="calcLanding()"></div></div>
+            <div class="input-card"><div class="input-card-label">QNH · hPa</div><div class="input-card-val"><input type="number" id="ld-qnh" value="1013" step="1" min="900" max="1050" oninput="calcDensityAlt('ld')"></div></div>
+            <div class="input-card"><div class="input-card-label">OAT · °C</div><div class="input-card-val"><input type="number" id="ld-oat" value="15" step="1" min="-40" max="60" oninput="calcDensityAlt('ld')"></div></div>
           </div>
-        </div>
-      </div>
-      <div class="input-grid" style="margin-bottom:8px;">
-        <div class="input-card"><div class="input-card-label">Weight · kg</div><div class="input-card-val"><input type="number" id="ld-weight" value="1180" step="1" min="930" max="1180" oninput="calcLanding()"></div></div>
-        <div class="input-card"><div class="input-card-label">QNH · hPa</div><div class="input-card-val"><input type="number" id="ld-qnh" value="1013" step="1" min="900" max="1050" oninput="calcDensityAlt('ld')"></div></div>
-        <div class="input-card"><div class="input-card-label">OAT · °C</div><div class="input-card-val"><input type="number" id="ld-oat" value="15" step="1" min="-40" max="60" oninput="calcDensityAlt('ld')"></div></div>
-      </div>
-      <input type="hidden" id="ld-alt" value="0">
-      <div class="input-grid" style="grid-template-columns:repeat(3,1fr);margin-bottom:8px;">
-        <div class="input-card"><div class="input-card-label">Wind · kt <span id="ld-wind-info" style="font-size:8px;letter-spacing:0;text-transform:none;font-family:var(--body);font-weight:400;margin-left:4px;"></span></div><div class="input-card-val"><input type="number" id="ld-wind" value="0" step="1" min="-30" max="30" oninput="calcLanding()"></div></div>
-        <div class="input-card"><div class="input-card-label">Runway</div><div class="input-card-val"><select id="ld-runway" onchange="calcLanding()" style="pointer-events:none;color:var(--text-dim);"><option value="0">GRASS</option><option value="1">PAVED</option></select></div></div>
-        <div class="input-card"><div class="input-card-label">Slope · %</div><div class="input-card-val"><input type="number" id="ld-slope" value="0" step="0.1" min="-5" max="5" oninput="calcLanding()"></div></div>
-      </div>
-      <!-- WEATHER CONDITIONS -->
-      <div class="wx-panel" style="margin-bottom:8px;">
-        <div class="wx-panel-header">
-          <span class="wx-panel-title">WEATHER CONDITIONS</span>
-          <button id="ld-sync-wx-btn" onclick="syncLiveWX('ld')" class="wx-sync-btn">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-.28-4.79"/></svg>
-            SYNC LIVE WX
-          </button>
-        </div>
-        <div class="wx-inputs">
-          <div class="wx-field"><div class="wx-field-label">WIND</div><div class="wx-field-val" id="ld-wx-wind">—/—</div><div class="wx-field-unit">kt</div></div>
-          <div class="wx-field"><div class="wx-field-label">TEMPERATURE</div><div class="wx-field-val" id="ld-wx-temp">—</div><div class="wx-field-unit">°C</div></div>
-          <div class="wx-field"><div class="wx-field-label">QNH (HPA)</div><div class="wx-field-val" id="ld-wx-qnh">—</div><div class="wx-field-unit">hPa</div></div>
-        </div>
-      </div>
-      <!-- METAR banner -->
-      <div style="display:flex;align-items:center;background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:8px;" id="ld-metar-row">
-        <div style="flex:1;padding:10px 14px;display:flex;align-items:center;justify-content:center;text-align:center;">
-          <span id="ld-metar-text" style="color:var(--text-dim);font-family:var(--head);font-size:10px;font-weight:600;letter-spacing:2px;">LIVE METAR</span>
-        </div>
-      </div>
-      <!-- RWYCC Selector -->
-      <div class="rwycc-panel" style="margin-bottom:8px;">
-        
-        <div class="rwycc-buttons" id="rwycc-btns">
-          <div class="rwycc-btn active" data-code="6" onclick="setRWYCC(6)"><div class="rwycc-code">6</div><div class="rwycc-label">DRY</div></div>
-          <div class="rwycc-btn" data-code="5" onclick="setRWYCC(5)"><div class="rwycc-code">5</div><div class="rwycc-label">GOOD</div></div>
-          <div class="rwycc-btn" data-code="4" onclick="setRWYCC(4)"><div class="rwycc-code">4</div><div class="rwycc-label">GOOD/MED</div></div>
-          <div class="rwycc-btn" data-code="3" onclick="setRWYCC(3)"><div class="rwycc-code">3</div><div class="rwycc-label">MED</div></div>
-          <div class="rwycc-btn" data-code="2" onclick="setRWYCC(2)"><div class="rwycc-code">2</div><div class="rwycc-label">MED/POOR</div></div>
-          <div class="rwycc-btn" data-code="1" onclick="setRWYCC(1)"><div class="rwycc-code">1</div><div class="rwycc-label">POOR</div></div>
-        </div>
-        <div style="padding:6px 12px;background:rgba(245,168,0,0.08);border-top:1px solid var(--border);border-radius:0 0 var(--radius) var(--radius);">
-          <span style="font-family:var(--body);font-size:9px;color:var(--amber);letter-spacing:0.3px;">⚠ EASA generic factors — not P2006T specific data</span>
-        </div>
-      </div>
-      <!-- Results -->
-      <div class="results-compact">
-        <div class="results-compact-header">
-          <div class="results-compact-col-title">BASE VALUES</div>
-          <div class="results-compact-col-title corrected-title">WITH ALL CORRECTIONS</div>
-        </div>
-        <div class="results-compact-row">
-          <div class="results-compact-label">Ground Roll</div>
-          <div class="results-compact-val">
-            <span class="rcv-num" id="ld-base-gr-m">–</span>
-            <span class="rcv-ft" id="ld-base-gr-ft">– ft</span>
+
+          <div class="input-grid" style="margin-bottom:6px;">
+            <div class="input-card"><div class="input-card-label">Wind · kt <span id="ld-wind-info" style="font-size:8px;letter-spacing:0;text-transform:none;font-family:var(--body);font-weight:400;margin-left:4px;"></span></div><div class="input-card-val"><input type="number" id="ld-wind" value="0" step="1" min="-30" max="30" oninput="calcLanding()"></div></div>
+            <div class="input-card"><div class="input-card-label">Runway</div><div class="input-card-val"><select id="ld-runway" onchange="calcLanding()" style="pointer-events:none;color:var(--text-dim);"><option value="0">GRASS</option><option value="1">PAVED</option></select></div></div>
+            <div class="input-card"><div class="input-card-label">Slope · %</div><div class="input-card-val"><input type="number" id="ld-slope" value="0" step="0.1" min="-5" max="5" oninput="calcLanding()"></div></div>
           </div>
-          <div class="results-compact-divider"></div>
-          <div class="results-compact-val corrected">
-            <span class="rcv-num green" id="ld-corr-gr-m">–</span>
-            <span class="rcv-ft" id="ld-corr-gr-ft">– ft</span>
-            <span class="delta-badge zero" id="ld-delta-gr">±0</span>
-          </div>
-        </div>
-        <div class="results-compact-row">
-          <div class="results-compact-label">Landing Dist.</div>
-          <div class="results-compact-val">
-            <span class="rcv-num" id="ld-base-50-m">–</span>
-            <span class="rcv-ft" id="ld-base-50-ft">– ft</span>
-          </div>
-          <div class="results-compact-divider"></div>
-          <div class="results-compact-val corrected">
-            <span class="rcv-num green" id="ld-corr-50-m">–</span>
-            <span class="rcv-ft" id="ld-corr-50-ft">– ft</span>
-            <span class="delta-badge zero" id="ld-delta-50">±0</span>
-          </div>
-        </div>
-      </div>
-      <span id="ld-lda-avail" style="display:none;"></span>
-      <span id="ld-ldr-req" style="display:none;"></span>
-      <span id="ld-ldr-115" style="display:none;"></span>
-      <div id="ld-lda-section" style="display:none;"></div>
-      </div><!-- /perf-left -->
-      <div class="perf-right" style="width:340px;display:flex;flex-direction:column;padding:16px 14px;gap:20px;overflow:hidden;background:transparent;">
-        <!-- Runway diagram — tall -->
-        <canvas id="ld-rwy-canvas" width="180" height="100" style="display:block;width:180px;align-self:center;flex:1;min-height:0;border-radius:6px;"></canvas>
-        <!-- LDA / LDR table below runway -->
-        <div id="ld-lda-table" style="display:none;">
-          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;border:1px solid var(--border);border-radius:6px;overflow:hidden;">
-            <div style="background:var(--panel);padding:6px 4px;text-align:center;border-right:1px solid var(--border);">
-              <div style="font-family:var(--head);font-size:8px;letter-spacing:1px;color:var(--text-dim);">LDA (M)</div>
-              <div style="font-family:var(--mono);font-size:16px;font-weight:700;color:var(--text);margin-top:3px;" id="ld-lda-tbl">–</div>
+
+          <div class="wx-panel" style="margin-bottom:6px;">
+            <div class="wx-panel-header">
+              <span class="wx-panel-title">WEATHER CONDITIONS</span>
+              <button id="ld-sync-wx-btn" onclick="syncLiveWX('ld')" class="wx-sync-btn">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-.28-4.79"/></svg>
+                SYNC LIVE WX
+              </button>
             </div>
-            <div style="background:var(--panel);padding:6px 4px;text-align:center;border-right:1px solid var(--border);">
-              <div style="font-family:var(--head);font-size:8px;letter-spacing:1px;color:var(--text-dim);">LDR (M)</div>
-              <div style="font-family:var(--mono);font-size:16px;font-weight:700;margin-top:3px;" id="ld-ldr-tbl">–</div>
-            </div>
-            <div style="background:var(--panel);padding:6px 4px;text-align:center;">
-              <div style="font-family:var(--head);font-size:8px;letter-spacing:1px;color:var(--text-dim);">1.15 LDR</div>
-              <div style="font-family:var(--mono);font-size:16px;font-weight:700;margin-top:3px;" id="ld-ldr115-tbl">–</div>
+            <div class="wx-inputs">
+              <div class="wx-field"><div class="wx-field-label">WIND</div><div class="wx-field-val" id="ld-wx-wind">—/—</div><div class="wx-field-unit">kt</div></div>
+              <div class="wx-field"><div class="wx-field-label">TEMPERATURE</div><div class="wx-field-val" id="ld-wx-temp">—</div><div class="wx-field-unit">°C</div></div>
+              <div class="wx-field"><div class="wx-field-label">QNH (HPA)</div><div class="wx-field-val" id="ld-wx-qnh">—</div><div class="wx-field-unit">hPa</div></div>
             </div>
           </div>
-        </div>
-      </div><!-- /perf-right -->
-    </div>
+
+          <div style="display:flex;align-items:center;background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:6px;" id="ld-metar-row">
+            <div style="flex:1;padding:7px 14px;display:flex;align-items:center;justify-content:center;text-align:center;">
+              <span id="ld-metar-text" style="color:var(--text-dim);font-family:var(--head);font-size:10px;font-weight:600;letter-spacing:2px;">LIVE METAR</span>
+            </div>
+          </div>
+
+          <div class="rwycc-panel" style="margin-bottom:6px;">
+            <div class="rwycc-buttons" id="rwycc-btns">
+              <div class="rwycc-btn active" data-code="6" onclick="setRWYCC(6)"><div class="rwycc-code">6</div><div class="rwycc-label">DRY</div></div>
+              <div class="rwycc-btn" data-code="5" onclick="setRWYCC(5)"><div class="rwycc-code">5</div><div class="rwycc-label">GOOD</div></div>
+              <div class="rwycc-btn" data-code="4" onclick="setRWYCC(4)"><div class="rwycc-code">4</div><div class="rwycc-label">GOOD/MED</div></div>
+              <div class="rwycc-btn" data-code="3" onclick="setRWYCC(3)"><div class="rwycc-code">3</div><div class="rwycc-label">MED</div></div>
+              <div class="rwycc-btn" data-code="2" onclick="setRWYCC(2)"><div class="rwycc-code">2</div><div class="rwycc-label">MED/POOR</div></div>
+              <div class="rwycc-btn" data-code="1" onclick="setRWYCC(1)"><div class="rwycc-code">1</div><div class="rwycc-label">POOR</div></div>
+            </div>
+            <div style="padding:4px 12px;background:rgba(245,168,0,0.08);border-top:1px solid var(--border);">
+              <span style="font-family:var(--body);font-size:9px;color:var(--amber);letter-spacing:0.3px;">⚠ EASA generic factors — not P2006T specific data</span>
+            </div>
+          </div>
+
+          <div class="results-compact" style="margin-bottom:6px;">
+            <div class="results-compact-header">
+              <div class="results-compact-col-title">BASE VALUES</div>
+              <div class="results-compact-col-title corrected-title">WITH ALL CORRECTIONS</div>
+            </div>
+            <div class="results-compact-row">
+              <div class="results-compact-label">Ground Roll</div>
+              <div class="results-compact-val"><span class="rcv-num" id="ld-base-gr-m">–</span><span class="rcv-ft" id="ld-base-gr-ft">– ft</span></div>
+              <div class="results-compact-divider"></div>
+              <div class="results-compact-val corrected"><span class="rcv-num green" id="ld-corr-gr-m">–</span><span class="rcv-ft" id="ld-corr-gr-ft">– ft</span><span class="delta-badge zero" id="ld-delta-gr">±0</span></div>
+            </div>
+            <div class="results-compact-row">
+              <div class="results-compact-label">Landing Dist.</div>
+              <div class="results-compact-val"><span class="rcv-num" id="ld-base-50-m">–</span><span class="rcv-ft" id="ld-base-50-ft">– ft</span></div>
+              <div class="results-compact-divider"></div>
+              <div class="results-compact-val corrected"><span class="rcv-num green" id="ld-corr-50-m">–</span><span class="rcv-ft" id="ld-corr-50-ft">– ft</span><span class="delta-badge zero" id="ld-delta-50">±0</span></div>
+            </div>
+          </div>
+
+          <div style="display:flex;align-items:stretch;background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:6px;">
+            <div style="font-family:var(--head);font-size:9px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--text-dim);background:var(--panel);padding:8px 12px;border-right:1px solid var(--border);white-space:nowrap;display:flex;align-items:center;flex-shrink:0;min-width:110px;">RUNWAY INFO</div>
+            <div style="flex:1;display:flex;">
+              <div class="rwy-info-cell"><div class="rwy-info-label">IDENT</div><div class="rwy-info-val" id="ld-ri-ident">—</div></div>
+              <div class="rwy-info-cell"><div class="rwy-info-label">LDA (M)</div><div class="rwy-info-val" id="ld-ri-lda">—</div></div>
+              <div class="rwy-info-cell" style="flex:2;"><div class="rwy-info-label">COORD</div><div class="rwy-info-val" id="ld-ri-coord" style="font-size:11px;">—</div></div>
+              <div class="rwy-info-cell" style="border-right:none;"><div class="rwy-info-label">ELEV (FT)</div><div class="rwy-info-val" id="ld-ri-elev">—</div></div>
+            </div>
+          </div>
+
+          <span id="ld-lda-avail" style="display:none;"></span>
+          <span id="ld-ldr-req" style="display:none;"></span>
+          <span id="ld-ldr-115" style="display:none;"></span>
+          <div id="ld-lda-section" style="display:none;"></div>
+
+        </div><!-- /left col -->
+
+        <!-- RIGHT col: runway canvas only -->
+        <div class="perf-right" style="width:300px;display:flex;flex-direction:column;align-items:center;justify-content:space-between;padding:12px 12px 6px;background:transparent;">
+          <canvas id="ld-rwy-canvas" width="180" height="100" style="display:block;width:200px;flex:1;min-height:0;border-radius:6px;"></canvas>
+          <div id="ld-lda-table" style="display:none;width:100%;margin-top:6px;">
+            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;border:1px solid var(--border);border-radius:6px;overflow:hidden;">
+              <div style="background:var(--panel);padding:6px 4px;text-align:center;border-right:1px solid var(--border);">
+                <div style="font-family:var(--head);font-size:8px;letter-spacing:1px;color:var(--text-dim);">LDA (M)</div>
+                <div style="font-family:var(--mono);font-size:16px;font-weight:700;color:var(--text);margin-top:3px;" id="ld-lda-tbl">–</div>
+              </div>
+              <div style="background:var(--panel);padding:6px 4px;text-align:center;border-right:1px solid var(--border);">
+                <div style="font-family:var(--head);font-size:8px;letter-spacing:1px;color:var(--text-dim);">LDR (M)</div>
+                <div style="font-family:var(--mono);font-size:16px;font-weight:700;margin-top:3px;" id="ld-ldr-tbl">–</div>
+              </div>
+              <div style="background:var(--panel);padding:6px 4px;text-align:center;">
+                <div style="font-family:var(--head);font-size:8px;letter-spacing:1px;color:var(--text-dim);">1.15 LDR</div>
+                <div style="font-family:var(--mono);font-size:16px;font-weight:700;margin-top:3px;" id="ld-ldr115-tbl">–</div>
+              </div>
+            </div>
+          </div>
+        </div><!-- /right col -->
+
+    </div><!-- /perf-ld -->
   </div><!-- /perf-content -->
 </div>
 
@@ -1600,6 +1622,11 @@ function selectRunway(prefix) {
       if(riCoord) { var apInfo = AIRPORTS[icao]; riCoord.textContent = apInfo && apInfo.coord ? apInfo.coord : '—'; }
       calcTakeoff();
     } else {
+      // Populate Arrival RUNWAY INFO
+      var ldRiIdent = document.getElementById('ld-ri-ident'); if(ldRiIdent) ldRiIdent.textContent = rwySel.value || '—';
+      var ldRiLda   = document.getElementById('ld-ri-lda');   if(ldRiLda)   ldRiLda.textContent   = rwyData.lda || rwyData.tora || '—';
+      var ldRiElev  = document.getElementById('ld-ri-elev');  if(ldRiElev)  { var apD = AIRPORTS[icao]; ldRiElev.textContent = apD ? apD.elev : '—'; }
+      var ldRiCoord = document.getElementById('ld-ri-coord'); if(ldRiCoord) { var apI = AIRPORTS[icao]; ldRiCoord.textContent = apI && apI.coord ? apI.coord : '—'; }
       calcLanding();
       if (windData['ld'] && windData['ld'].spd > 0) {
         var comp = calcWindComponents(windData['ld'].dir, windData['ld'].spd, rwySel.value);
@@ -2230,7 +2257,7 @@ function drawRunwayDiagram(canvasId, rwyName, windKt, windDir, lda, ldr) {
   var dpr = window.devicePixelRatio || 1;
   var W = 120, H = 220;
   canvas.width  = W * dpr;
-  var H = canvas.offsetHeight > 20 ? canvas.offsetHeight : (canvasId === 'ld-rwy-canvas' ? 300 : 220);
+  var H = canvasId === 'ld-rwy-canvas' ? (canvas.offsetHeight > 20 ? canvas.offsetHeight : 400) : (canvas.offsetHeight > 20 ? canvas.offsetHeight : 220);
   var CW = canvas.offsetWidth > 20 ? canvas.offsetWidth : W;
   W = CW;
   canvas.width  = CW * dpr;
