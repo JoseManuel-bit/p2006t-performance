@@ -196,6 +196,24 @@ input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-
 ::-webkit-scrollbar{width:3px;}
 ::-webkit-scrollbar-track{background:var(--bg);}
 ::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px;}
+
+
+/* W&B TABLE */
+.wb-table { background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:8px; }
+.wb-row { display:flex;align-items:center;border-bottom:1px solid var(--border);min-height:46px; }
+.wb-row:last-child { border-bottom:none; }
+.wb-label { flex:1;font-family:var(--head);font-size:13px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--text-label);padding:0 12px; }
+.wb-input-cell { width:100px;border-left:1px solid var(--border);background:var(--bg3);display:flex;align-items:center;justify-content:center; }
+.wb-input { width:100%;background:transparent;border:none;font-family:var(--mono);font-size:20px;color:var(--amber);text-align:center;text-align-last:center;padding:6px 4px;outline:none;-webkit-appearance:none;appearance:none; }
+.wb-unit { width:36px;font-family:var(--head);font-size:9px;font-weight:600;letter-spacing:1px;color:var(--text-dim);text-align:center;border-left:1px solid var(--border);align-self:stretch;display:flex;align-items:center;justify-content:center; }
+.wb-header-row { background:var(--panel); }
+.wb-header-row .wb-label { color:var(--text); }
+.wb-result-row { background:var(--bg3); }
+.wb-result-label { color:var(--text);font-weight:700; }
+.wb-result-val { width:100px;font-family:var(--mono);font-size:20px;font-weight:700;color:var(--green);text-align:center;border-left:1px solid var(--border);padding:6px 4px; }
+.wb-divider { height:6px;background:var(--bg);border-bottom:1px solid var(--border); }
+
+
 </style>
 </head>
 <body>
@@ -327,7 +345,7 @@ input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-
       <div class="corr-panel">
         <div class="corr-panel-title">Runway Conditions</div>
         <div class="corr-row"><div class="corr-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 19V5M5 12l7-7 7 7"/></svg></div><div class="corr-label">Wind (kt)</div><div class="corr-input"><input type="number" id="to-wind" value="0" step="1" min="-30" max="30" oninput="calcTakeoff()"></div></div>
-        <div class="corr-row"><div class="corr-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="11" width="18" height="2" rx="1"/><path d="M3 17h18M3 7h18"/></svg></div><div class="corr-label">Runway</div><div class="corr-input"><select id="to-runway" onchange="calcTakeoff()"><option value="0">GRASS</option><option value="1">PAVED</option></select></div></div>
+        <div class="corr-row"><div class="corr-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="11" width="18" height="2" rx="1"/><path d="M3 17h18M3 7h18"/></svg></div><div class="corr-label">Runway<span style="font-size:8px;color:var(--text-dim);text-transform:none;font-family:var(--body);"> · auto</span></div><div class="corr-input"><select id="to-runway" onchange="calcTakeoff()" style="color:var(--text-dim);pointer-events:none;"><option value="0">GRASS</option><option value="1">PAVED</option></select></div></div>
         <div class="corr-row"><div class="corr-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></div><div class="corr-label">Slope (%)</div><div class="corr-input"><input type="number" id="to-slope" value="0" step="0.1" min="-5" max="5" oninput="calcTakeoff()"></div></div>
       </div>
       <div class="results-section">
@@ -373,7 +391,7 @@ input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-
       <div class="corr-panel">
         <div class="corr-panel-title">Runway Conditions</div>
         <div class="corr-row"><div class="corr-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 19V5M5 12l7-7 7 7"/></svg></div><div class="corr-label">Wind (kt)</div><div class="corr-input"><input type="number" id="ld-wind" value="0" step="1" min="-30" max="30" oninput="calcLanding()"></div></div>
-        <div class="corr-row"><div class="corr-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="11" width="18" height="2" rx="1"/><path d="M3 17h18M3 7h18"/></svg></div><div class="corr-label">Runway</div><div class="corr-input"><select id="ld-runway" onchange="calcLanding()"><option value="0">GRASS</option><option value="1">PAVED</option></select></div></div>
+        <div class="corr-row"><div class="corr-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="11" width="18" height="2" rx="1"/><path d="M3 17h18M3 7h18"/></svg></div><div class="corr-label">Runway<span style="font-size:8px;color:var(--text-dim);text-transform:none;font-family:var(--body);"> · auto</span></div><div class="corr-input"><select id="ld-runway" onchange="calcLanding()" style="color:var(--text-dim);pointer-events:none;"><option value="0">GRASS</option><option value="1">PAVED</option></select></div></div>
         <div class="corr-row"><div class="corr-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></div><div class="corr-label">Slope (%)</div><div class="corr-input"><input type="number" id="ld-slope" value="0" step="0.1" min="-5" max="5" oninput="calcLanding()"></div></div>
       </div>
       <div class="results-section">
@@ -388,6 +406,129 @@ input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-
       </div>
     </div>
   </div><!-- /perf-content -->
+</div>
+
+<!-- WEIGHT & BALANCE -->
+<div class="screen" id="screen-wb">
+  <div class="cl-header">
+    <button class="cl-back-btn" onclick="showScreen('screen-home')">HOME</button>
+    <div class="cl-header-title" style="text-align:right;flex:1;">P2006T · WEIGHT &amp; BALANCE</div>
+  </div>
+  <div style="flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:10px;padding-bottom:70px;">
+
+    <!-- W&B TABLE -->
+    <div class="wb-table"><span id="wb-cg" style="display:none;"></span>
+
+      <!-- BEW -->
+      <div class="wb-row wb-header-row">
+        <div class="wb-label">BEW</div>
+        <div class="wb-input-cell"><div style="font-family:var(--mono);font-size:20px;color:var(--text-dim);text-align:center;padding:6px 4px;width:100%;">878</div><input type="hidden" id="wb-bew" value="878"></div>
+        <div class="wb-unit">kg</div>
+      </div>
+      <div class="wb-row wb-header-row">
+        <div class="wb-label" style="font-size:11px;">BEW Moment</div>
+        <div class="wb-input-cell"><input type="number" id="wb-bew-moment" value="345.76" step="0.01" oninput="calcWB()" class="wb-input" style="font-size:16px;"></div>
+        <div class="wb-unit">kg·m</div>
+      </div>
+
+      <!-- FRONT PAX -->
+      <div class="wb-row">
+        <div class="wb-label">Front Pax</div>
+        <div class="wb-input-cell"><input type="number" id="wb-front-pax" value="0" step="1" min="0" max="400" oninput="calcWB()" class="wb-input"></div>
+        <div class="wb-unit">kg</div>
+      </div>
+
+      <!-- REAR PAX -->
+      <div class="wb-row">
+        <div class="wb-label">Rear Pax</div>
+        <div class="wb-input-cell"><input type="number" id="wb-rear-pax" value="0" step="1" min="0" max="300" oninput="calcWB()" class="wb-input"></div>
+        <div class="wb-unit">kg</div>
+      </div>
+
+      <!-- BAGGAGE -->
+      <div class="wb-row">
+        <div class="wb-label">Baggage</div>
+        <div class="wb-input-cell"><input type="number" id="wb-baggage" value="0" step="1" min="0" max="30" oninput="calcWB()" class="wb-input"></div>
+        <div class="wb-unit">kg</div>
+      </div>
+
+      <!-- ACTUAL ZFW -->
+      <div class="wb-row wb-result-row" id="wb-zfw-row">
+        <div class="wb-label wb-result-label">Actual ZFW</div>
+        <div class="wb-result-val" id="wb-zfw">—</div>
+        <div class="wb-unit">kg</div>
+      </div>
+
+      <div class="wb-divider"></div>
+
+      <!-- FOB -->
+      <div class="wb-row">
+        <div class="wb-label">FOB</div>
+        <div class="wb-input-cell"><input type="number" id="wb-fob" value="100" step="1" min="0" max="194" oninput="calcWB()" class="wb-input"></div>
+        <div class="wb-unit">l</div>
+      </div>
+
+      <!-- T&R FUEL -->
+      <div class="wb-row">
+        <div class="wb-label">T &amp; R Fuel</div>
+        <div class="wb-input-cell"><input type="number" id="wb-tr-fuel" value="0" step="0.1" min="0" max="20" oninput="calcWB()" class="wb-input"></div>
+        <div class="wb-unit">l</div>
+      </div>
+
+      <!-- ATOW -->
+      <div class="wb-row wb-result-row" id="wb-atow-row">
+        <div class="wb-label wb-result-label">ATOW</div>
+        <div class="wb-result-val" id="wb-atow">—</div>
+        <div class="wb-unit">kg</div>
+      </div>
+
+      <div class="wb-divider"></div>
+
+      <!-- TRIP FUEL -->
+      <div class="wb-row">
+        <div class="wb-label">Trip Fuel</div>
+        <div class="wb-input-cell"><input type="number" id="wb-trip-fuel" value="0" step="0.1" min="0" max="194" oninput="calcWB()" class="wb-input"></div>
+        <div class="wb-unit">l</div>
+      </div>
+
+      <!-- ALW -->
+      <div class="wb-row wb-result-row" id="wb-alw-row">
+        <div class="wb-label wb-result-label">ALW</div>
+        <div class="wb-result-val" id="wb-alw">—</div>
+        <div class="wb-unit">kg</div>
+      </div>
+
+
+
+    </div>
+
+    <!-- STATUS -->
+    <div id="wb-status" style="text-align:center;font-family:var(--head);font-size:13px;font-weight:700;letter-spacing:1px;color:var(--text-dim);padding:10px 0;">Enter weights above</div>
+
+    <!-- CG ENVELOPE -->
+    <div style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:10px;">
+      <div style="padding:10px 12px 6px;display:flex;align-items:center;justify-content:space-between;">
+        <div style="font-family:var(--head);font-size:10px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--text-dim);">CG ENVELOPE</div>
+        <div style="display:flex;gap:12px;">
+          <div style="display:flex;align-items:center;gap:4px;font-family:var(--body);font-size:9px;color:var(--text-dim);"><div style="width:8px;height:8px;border-radius:50%;background:#22C55E;"></div>ATOW</div>
+          <div style="display:flex;align-items:center;gap:4px;font-family:var(--body);font-size:9px;color:var(--text-dim);"><div style="width:8px;height:8px;border-radius:50%;background:#F59E0B;"></div>ALW</div>
+
+        </div>
+      </div>
+      <canvas id="wb-canvas" width="600" height="300" style="width:100%;display:block;"></canvas>
+    </div>
+
+    <!-- BUTTONS -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;">
+      <button onclick="sendATOW()" style="padding:14px 8px;background:var(--blue);border:none;border-radius:var(--radius);font-family:var(--head);font-size:14px;font-weight:700;letter-spacing:2px;color:white;cursor:pointer;">
+        SEND ATOW
+      </button>
+      <button onclick="sendALW()" style="padding:14px 8px;background:#065F46;border:none;border-radius:var(--radius);font-family:var(--head);font-size:14px;font-weight:700;letter-spacing:2px;color:white;cursor:pointer;">
+        SEND ALW
+      </button>
+    </div>
+
+  </div>
 </div>
 
 <!-- DOCS -->
@@ -405,6 +546,7 @@ input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-
 <div class="bottom-nav" id="bottom-nav">
   <button class="nav-btn" id="nav-checklist" onclick="showScreen('screen-checklist')">CHECKLIST</button>
   <button class="nav-btn" id="nav-perf" onclick="showScreen('screen-perf')">PERF</button>
+  <button class="nav-btn" id="nav-wb" onclick="showScreen('screen-wb')">W&amp;B</button>
   <button class="nav-btn" id="nav-docs" onclick="showScreen('screen-docs')">DOCS</button>
 </div>
 
@@ -413,258 +555,20 @@ input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-
 
 // ── AIRPORT DATABASE ──────────────────────────────
 const AIRPORTS = {
-  'LECU': {name:'Madrid Cuatro Vientos', elev:2269},
-  'LEMD': {name:'Madrid Barajas', elev:2000},
-  'LEPA': {name:'Palma de Mallorca', elev:27},
-  'LEBL': {name:'Barcelona El Prat', elev:12},
-  'LEZL': {name:'Sevilla', elev:112},
-  'LEBB': {name:'Bilbao', elev:138},
-  'LEVC': {name:'Valencia', elev:240},
-  'LEAL': {name:'Alicante', elev:142},
-  'LEMG': {name:'Malaga', elev:53},
-  'LEGR': {name:'Granada', elev:1860},
-  'LEZG': {name:'Zaragoza', elev:863},
-  'LEVX': {name:'Vigo', elev:856},
-  'LECO': {name:'La Coruna', elev:326},
-  'LEST': {name:'Santiago de Compostela', elev:1213},
-  'LEAM': {name:'Almeria', elev:70},
-  'GCFV': {name:'Fuerteventura', elev:85},
-  'GCLP': {name:'Gran Canaria', elev:78},
-  'GCTS': {name:'Tenerife Sur', elev:209},
-  'GCXO': {name:'Tenerife Norte', elev:2076},
-  'GCLA': {name:'La Palma', elev:1368},
-  'LEIB': {name:'Ibiza', elev:24},
-  'LEMH': {name:'Menorca', elev:302},
-  'LELL': {name:'Sabadell', elev:485},
-  'LEBA': {name:'Burgos', elev:2945},
-  'LEVD': {name:'Valladolid', elev:2776},
-  'LEMO': {name:'Moron', elev:285},
-  'LEOC': {name:'Ocana', elev:2405},
-  'LEFM': {name:'Fuentemilanos', elev:3307},
-  'LELT': {name:'La Torre', elev:1706},
-  'LECV': {name:'Casarrubios', elev:1896},
-  'LERM': {name:'Rozas', elev:2600},
-  'LESB': {name:'Son Bonet', elev:157},
-  'LEMT': {name:'Montijo', elev:0},
-  'LEAG': {name:'Algeciras', elev:25},
-  'LERI': {name:'Logrono', elev:1161},
-  'LPPT': {name:'Lisboa', elev:374},
-  'LPPO': {name:'Porto', elev:228},
-  'LPFR': {name:'Faro', elev:24},
-  'LFPG': {name:'Paris CDG', elev:392},
-  'LFPO': {name:'Paris Orly', elev:292},
-  'EGLL': {name:'London Heathrow', elev:83},
-  'LIRF': {name:'Roma Fiumicino', elev:13},
-  'LIMC': {name:'Milan Malpensa', elev:768},
-  'GMMN': {name:'Casablanca', elev:656},
-  'LEAL': {name:'Alicante', elev:142},
-  'LEMU': {name:'Muchamiel', elev:475},
+  'LEVD': {name:'Valladolid / Villanubla', elev:2775},
+  'LEAL': {name:'Alicante / Elche', elev:142},
+  'LEMU': {name:'Alicante / Muchamiel', elev:482},
+  'LECU': {name:'Madrid / Cuatro Vientos', elev:2269},
+  'LEMD': {name:'Madrid / Barajas', elev:1998},
+  'LEMT': {name:'Toledo / Casarrubios', elev:2050},
+  'LECO': {name:'A Coruna', elev:330},
+  'LEAB': {name:'Albacete', elev:2301},
 };
 
-// Runway database: ICAO -> { runway_id: { tora, lda, surface } }
-// TORA = Take-Off Run Available (m), LDA = Landing Distance Available (m)
 const RUNWAYS = {
-  'LECU': {
-    '09': {tora:1500, lda:1500, surface:'PAVED'},
-    '27': {tora:1500, lda:1500, surface:'PAVED'},
-  },
-  'LEMD': {
-    '32L':{tora:3500, lda:3500, surface:'PAVED'},
-    '32R':{tora:4350, lda:4350, surface:'PAVED'},
-    '18L':{tora:3500, lda:3500, surface:'PAVED'},
-    '18R':{tora:4350, lda:4350, surface:'PAVED'},
-    '14L':{tora:3500, lda:3500, surface:'PAVED'},
-    '14R':{tora:4350, lda:4350, surface:'PAVED'},
-  },
-  'LEPA': {
-    '06L':{tora:2990, lda:2990, surface:'PAVED'},
-    '06R':{tora:3270, lda:3270, surface:'PAVED'},
-    '24L':{tora:3270, lda:3270, surface:'PAVED'},
-    '24R':{tora:2990, lda:2990, surface:'PAVED'},
-  },
-  'LEBL': {
-    '07L':{tora:2540, lda:2540, surface:'PAVED'},
-    '07R':{tora:3352, lda:3352, surface:'PAVED'},
-    '25L':{tora:3352, lda:3352, surface:'PAVED'},
-    '25R':{tora:2540, lda:2540, surface:'PAVED'},
-  },
-  'LEZL': {
-    '09': {tora:2990, lda:2990, surface:'PAVED'},
-    '27': {tora:2990, lda:2990, surface:'PAVED'},
-  },
-  'LELL': {
-    '07': {tora:1200, lda:1200, surface:'PAVED'},
-    '25': {tora:1200, lda:1200, surface:'PAVED'},
-  },
-  'LEOC': {
-    '14': {tora:1000, lda:1000, surface:'GRASS'},
-    '32': {tora:1000, lda:1000, surface:'GRASS'},
-    '03': {tora:1200, lda:1200, surface:'GRASS'},
-    '21': {tora:1200, lda:1200, surface:'GRASS'},
-  },
-  'LEFM': {
-    '08': {tora:900,  lda:900,  surface:'GRASS'},
-    '26': {tora:900,  lda:900,  surface:'GRASS'},
-  },
-  'LELT': {
-    '17': {tora:800,  lda:800,  surface:'GRASS'},
-    '35': {tora:800,  lda:800,  surface:'GRASS'},
-  },
-  'LECV': {
-    '10': {tora:1000, lda:1000, surface:'GRASS'},
-    '28': {tora:1000, lda:1000, surface:'GRASS'},
-  },
-  'LERM': {
-    '03': {tora:800,  lda:800,  surface:'GRASS'},
-    '21': {tora:800,  lda:800,  surface:'GRASS'},
-  },
-  'LESB': {
-    '06': {tora:1350, lda:1350, surface:'PAVED'},
-    '24': {tora:1350, lda:1350, surface:'PAVED'},
-  },
-  'LEMO': {
-    '20': {tora:1800, lda:1800, surface:'PAVED'},
-    '02': {tora:1800, lda:1800, surface:'PAVED'},
-  },
-  'LEBB': {
-    '30': {tora:2880, lda:2880, surface:'PAVED'},
-    '12': {tora:2880, lda:2880, surface:'PAVED'},
-  },
-  'LEVC': {
-    '12': {tora:2660, lda:2660, surface:'PAVED'},
-    '30': {tora:2660, lda:2660, surface:'PAVED'},
-  },
-  'LEMG': {
-    '13': {tora:3200, lda:3200, surface:'PAVED'},
-    '31': {tora:3200, lda:3200, surface:'PAVED'},
-  },
-  'LEGR': {
-    '09': {tora:3000, lda:3000, surface:'PAVED'},
-    '27': {tora:3000, lda:3000, surface:'PAVED'},
-  },
-  'LEIB': {
-    '06': {tora:2800, lda:2800, surface:'PAVED'},
-    '24': {tora:2800, lda:2800, surface:'PAVED'},
-  },
-  'LEMH': {
-    '01': {tora:2350, lda:2350, surface:'PAVED'},
-    '19': {tora:2350, lda:2350, surface:'PAVED'},
-  },
-  'LPPT': {
-    '03': {tora:3805, lda:3805, surface:'PAVED'},
-    '21': {tora:3805, lda:3805, surface:'PAVED'},
-  },
-  'LEZG': {
-    '12': {tora:3658, lda:3658, surface:'PAVED'},
-    '30': {tora:3658, lda:3658, surface:'PAVED'},
-  },
-  'LEVX': {
-    '20': {tora:2700, lda:2700, surface:'PAVED'},
-    '02': {tora:2700, lda:2700, surface:'PAVED'},
-  },
-  'LECO': {
-    '03': {tora:2100, lda:2100, surface:'PAVED'},
-    '21': {tora:2100, lda:2100, surface:'PAVED'},
-  },
-  'LEST': {
-    '17': {tora:3200, lda:3200, surface:'PAVED'},
-    '35': {tora:3200, lda:3200, surface:'PAVED'},
-  },
-  'LEAM': {
-    '07': {tora:2300, lda:2300, surface:'PAVED'},
-    '25': {tora:2300, lda:2300, surface:'PAVED'},
-  },
-  'GCFV': {
-    '01': {tora:3100, lda:3100, surface:'PAVED'},
-    '19': {tora:3100, lda:3100, surface:'PAVED'},
-  },
-  'GCLP': {
-    '03L':{tora:3100, lda:3100, surface:'PAVED'},
-    '03R':{tora:2800, lda:2800, surface:'PAVED'},
-    '21L':{tora:3100, lda:3100, surface:'PAVED'},
-    '21R':{tora:2800, lda:2800, surface:'PAVED'},
-  },
-  'GCTS': {
-    '07': {tora:3200, lda:3200, surface:'PAVED'},
-    '25': {tora:3200, lda:3200, surface:'PAVED'},
-  },
-  'GCXO': {
-    '12': {tora:2400, lda:2400, surface:'PAVED'},
-    '30': {tora:2400, lda:2400, surface:'PAVED'},
-  },
-  'GCLA': {
-    '01': {tora:1800, lda:1800, surface:'PAVED'},
-    '19': {tora:1800, lda:1800, surface:'PAVED'},
-  },
-  'LEBA': {
-    '07': {tora:2300, lda:2300, surface:'PAVED'},
-    '25': {tora:2300, lda:2300, surface:'PAVED'},
-  },
   'LEVD': {
-    '05': {tora:2400, lda:2400, surface:'PAVED'},
-    '23': {tora:2400, lda:2400, surface:'PAVED'},
-  },
-  'LEAG': {
-    '02': {tora:1750, lda:1750, surface:'PAVED'},
-    '20': {tora:1750, lda:1750, surface:'PAVED'},
-  },
-  'LERI': {
-    '09': {tora:2000, lda:2000, surface:'PAVED'},
-    '27': {tora:2000, lda:2000, surface:'PAVED'},
-  },
-  'LEMT': {
-    '10': {tora:1900, lda:1900, surface:'PAVED'},
-    '28': {tora:1900, lda:1900, surface:'PAVED'},
-  },
-  'LPPO': {
-    '17': {tora:3480, lda:3480, surface:'PAVED'},
-    '35': {tora:3480, lda:3480, surface:'PAVED'},
-  },
-  'LPFR': {
-    '10': {tora:2490, lda:2490, surface:'PAVED'},
-    '28': {tora:2490, lda:2490, surface:'PAVED'},
-  },
-  'LFPG': {
-    '08L':{tora:3600, lda:3600, surface:'PAVED'},
-    '08R':{tora:4200, lda:4200, surface:'PAVED'},
-    '26L':{tora:4200, lda:4200, surface:'PAVED'},
-    '26R':{tora:3600, lda:3600, surface:'PAVED'},
-    '09L':{tora:2700, lda:2700, surface:'PAVED'},
-    '09R':{tora:2700, lda:2700, surface:'PAVED'},
-    '27L':{tora:2700, lda:2700, surface:'PAVED'},
-    '27R':{tora:2700, lda:2700, surface:'PAVED'},
-  },
-  'LFPO': {
-    '08': {tora:3650, lda:3650, surface:'PAVED'},
-    '26': {tora:3650, lda:3650, surface:'PAVED'},
-    '07': {tora:2400, lda:2400, surface:'PAVED'},
-    '25': {tora:2400, lda:2400, surface:'PAVED'},
-  },
-  'EGLL': {
-    '09L':{tora:3902, lda:3902, surface:'PAVED'},
-    '09R':{tora:3658, lda:3658, surface:'PAVED'},
-    '27L':{tora:3658, lda:3658, surface:'PAVED'},
-    '27R':{tora:3902, lda:3902, surface:'PAVED'},
-  },
-  'LIRF': {
-    '07':{tora:3900, lda:3900, surface:'PAVED'},
-    '25':{tora:3900, lda:3900, surface:'PAVED'},
-    '16L':{tora:3900, lda:3900, surface:'PAVED'},
-    '16R':{tora:3307, lda:3307, surface:'PAVED'},
-    '34L':{tora:3307, lda:3307, surface:'PAVED'},
-    '34R':{tora:3900, lda:3900, surface:'PAVED'},
-  },
-  'LIMC': {
-    '17L':{tora:3920, lda:3920, surface:'PAVED'},
-    '17R':{tora:3920, lda:3920, surface:'PAVED'},
-    '35L':{tora:3920, lda:3920, surface:'PAVED'},
-    '35R':{tora:3920, lda:3920, surface:'PAVED'},
-  },
-  'GMMN': {
-    '17L':{tora:4000, lda:4000, surface:'PAVED'},
-    '17R':{tora:3720, lda:3720, surface:'PAVED'},
-    '35L':{tora:3720, lda:3720, surface:'PAVED'},
-    '35R':{tora:4000, lda:4000, surface:'PAVED'},
+    '05': {tora:3005, lda:3005, surface:'PAVED'},
+    '23': {tora:3005, lda:3005, surface:'PAVED'},
   },
   'LEAL': {
     '10': {tora:3000, lda:3000, surface:'PAVED'},
@@ -673,6 +577,32 @@ const RUNWAYS = {
   'LEMU': {
     '30': {tora:1000, lda:1000, surface:'PAVED'},
     '12': {tora:1000, lda:1000, surface:'PAVED'},
+  },
+  'LECU': {
+    '09': {tora:1500, lda:1500, surface:'PAVED'},
+    '27': {tora:1500, lda:1500, surface:'PAVED'},
+  },
+  'LEMD': {
+    '14R': {tora:3988, lda:3988, surface:'PAVED'},
+    '32L': {tora:3988, lda:3988, surface:'PAVED'},
+    '32R': {tora:3500, lda:3500, surface:'PAVED'},
+    '14L': {tora:3500, lda:3500, surface:'PAVED'},
+    '36R': {tora:3500, lda:3500, surface:'PAVED'},
+    '18L': {tora:3500, lda:3500, surface:'PAVED'},
+    '36L': {tora:4179, lda:4179, surface:'PAVED'},
+    '18R': {tora:4179, lda:4179, surface:'PAVED'},
+  },
+  'LEMT': {
+    '08': {tora:950, lda:950, surface:'PAVED'},
+    '26': {tora:950, lda:950, surface:'PAVED'},
+  },
+  'LECO': {
+    '03': {tora:2188, lda:2188, surface:'PAVED'},
+    '21': {tora:2188, lda:2188, surface:'PAVED'},
+  },
+  'LEAB': {
+    '09': {tora:2700, lda:2700, surface:'PAVED'},
+    '27': {tora:2700, lda:2700, surface:'PAVED'},
   },
 };
 
@@ -996,9 +926,316 @@ function switchClTab(tab) {
   document.getElementById('tab-emergency').classList.toggle('active',isEmerg);
 }
 
+
+// ── WEIGHT & BALANCE ────────────────────────────────
+// Arms from POH Section 6, Table 6-1 (meters from datum = wing leading edge)
+var WB_ARMS = {
+  pilot:    -0.893,
+  copilot:  -0.893,
+  pax1:      0.226,
+  pax2:      0.226,
+  baggage:   1.215,
+  fuel:      0.755,
+};
+
+// CG limits (m from datum)
+var WB_FWD_LIMIT = 0.221;  // forward limit (all weights)
+var WB_AFT_LIMIT = 0.415;  // aft limit (all weights)
+var WB_MAX_TOW   = 1180;  // base MTOW (1230/1290 with MOD)
+var WB_MAX_ZFW   = 1145;
+var WB_MAX_BAG   = 30;
+var WB_MAX_FUEL_L = 194.4;
+
+function calcWB() {
+  var bew      = parseFloat(document.getElementById('wb-bew') && document.getElementById('wb-bew').value)       || 878;
+  var frontPax = parseFloat(document.getElementById('wb-front-pax') && document.getElementById('wb-front-pax').value) || 0;
+  var rearPax  = parseFloat(document.getElementById('wb-rear-pax') && document.getElementById('wb-rear-pax').value)   || 0;
+  var baggage  = parseFloat(document.getElementById('wb-baggage') && document.getElementById('wb-baggage').value)     || 0;
+  var fobL     = parseFloat(document.getElementById('wb-fob') && document.getElementById('wb-fob').value)             || 0;
+  var trL      = parseFloat(document.getElementById('wb-tr-fuel') && document.getElementById('wb-tr-fuel').value)     || 0;
+  var tripL    = parseFloat(document.getElementById('wb-trip-fuel') && document.getElementById('wb-trip-fuel').value) || 0;
+
+  if (!document.getElementById('wb-bew')) return;
+
+  var fobKg  = fobL  * 0.72;
+  var trKg   = trL   * 0.72;
+  var tripKg = tripL * 0.72;
+
+  var zfw = bew + frontPax + rearPax + baggage;
+  var bewMoment = parseFloat(document.getElementById('wb-bew-moment') && document.getElementById('wb-bew-moment').value) || 345.76;
+  var mBew      = bewMoment;
+  var mFrontPax = frontPax * WB_ARMS.pilot;
+  var mRearPax  = rearPax  * WB_ARMS.pax1;
+  var mBaggage  = baggage  * WB_ARMS.baggage;
+  var mZfw      = mBew + mFrontPax + mRearPax + mBaggage;
+
+  var mFob  = fobKg  * WB_ARMS.fuel;
+  var mTr   = trKg   * WB_ARMS.fuel;
+  var mTrip = tripKg * WB_ARMS.fuel;
+
+  var atow  = zfw  + fobKg  - trKg;
+  var mAtow = mZfw + mFob   - mTr;
+  var alw   = atow  - tripKg;
+  var mAlw  = mAtow - mTrip;
+  var cg    = atow  > 0 ? mAtow / atow  : 0;
+  var cgAlw = alw   > 0 ? mAlw  / alw   : 0;
+
+  function setWbVal(id, val, ok) {
+    var el = document.getElementById(id);
+    if (el) { el.textContent = Math.round(val); el.style.color = ok ? 'var(--green)' : 'var(--red)'; }
+  }
+
+  var zfwOk  = zfw  <= WB_MAX_ZFW;
+  var atowOk = atow <= WB_MAX_TOW && cg >= WB_FWD_LIMIT && cg <= WB_AFT_LIMIT;
+  var alwOk  = alw  <= WB_MAX_TOW && cgAlw >= WB_FWD_LIMIT && cgAlw <= WB_AFT_LIMIT;
+
+  setWbVal('wb-zfw',  zfw,  zfwOk);
+  setWbVal('wb-atow', atow, atowOk);
+  setWbVal('wb-alw',  alw,  alwOk);
+
+  var cgEl = document.getElementById('wb-cg');
+  if (cgEl) { cgEl.textContent = cg.toFixed(3); cgEl.style.color = atowOk ? 'var(--green)' : 'var(--red)'; }
+
+  var status = document.getElementById('wb-status');
+  if (status) {
+    if (atow > 0) {
+      if (!zfwOk)           { status.textContent = 'ZFW EXCEEDS LIMIT (' + WB_MAX_ZFW + ' kg)'; }
+      else if (atow > WB_MAX_TOW) { status.textContent = 'ATOW EXCEEDS MAX (' + WB_MAX_TOW + ' kg)'; }
+      else if (cg < WB_FWD_LIMIT) { status.textContent = 'CG TOO FORWARD (min ' + WB_FWD_LIMIT + ' m)'; }
+      else if (cg > WB_AFT_LIMIT) { status.textContent = 'CG TOO AFT (max ' + WB_AFT_LIMIT + ' m)'; }
+      else { status.textContent = 'WITHIN LIMITS'; }
+      status.style.color = atowOk ? 'var(--green)' : 'var(--red)';
+    } else {
+      status.textContent = 'Enter weights above';
+      status.style.color = 'var(--text-dim)';
+    }
+  }
+
+  drawEnvelope(atow, mAtow, alw, mAlw);
+}
+
+function sendATOW() {
+  var atow = parseFloat(document.getElementById('wb-atow').textContent) || 0;
+  if (atow > 0) {
+    var el = document.getElementById('to-weight');
+    if (el) { el.value = Math.min(Math.round(atow), 1180); calcTakeoff(); }
+    showScreen('screen-perf');
+    showPerfTab('to', document.getElementById('ptab-to'));
+  }
+}
+
+function sendALW() {
+  var alw = parseFloat(document.getElementById('wb-alw').textContent) || 0;
+  if (alw > 0) {
+    var el = document.getElementById('ld-weight');
+    if (el) { el.value = Math.min(Math.round(alw), 1180); calcLanding(); }
+    showScreen('screen-perf');
+    showPerfTab('ld', document.getElementById('ptab-ld'));
+  }
+}
+
+
+function drawEnvelope(tow, mTow, alw, mAlw) {
+  var canvas = document.getElementById('wb-canvas');
+  if (!canvas) return;
+  var ctx = canvas.getContext('2d');
+  var dpr = window.devicePixelRatio || 1;
+  // Retina support
+  var rect = canvas.getBoundingClientRect();
+  canvas.width  = rect.width  * dpr;
+  canvas.height = 320 * dpr;
+  ctx.scale(dpr, dpr);
+  var W = rect.width, H = 320;
+
+  // Layout margins
+  var ml = 52, mr = 16, mt = 16, mb = 36;
+  var pw = W - ml - mr, ph = H - mt - mb;
+
+  // Data ranges — matching POH Figure 6-2
+  var wMin = 700,  wMax = 1320;
+  var mMin = 100,  mMax = 580;
+
+  function toX(m) { return ml + (m - mMin) / (mMax - mMin) * pw; }
+  function toY(w) { return mt + ph - (w - wMin) / (wMax - wMin) * ph; }
+
+  // ── Background ──────────────────────────────────────────
+  ctx.fillStyle = '#0B0F1A';
+  ctx.fillRect(0, 0, W, H);
+
+  // ── Grid ────────────────────────────────────────────────
+  ctx.strokeStyle = 'rgba(46,53,79,0.6)';
+  ctx.lineWidth = 1;
+  ctx.font = '10px monospace';
+  ctx.fillStyle = '#4A5568';
+  ctx.textAlign = 'center';
+
+  // Vertical grid (moment)
+  [150,200,250,300,350,400,450,500,550].forEach(function(m) {
+    var x = toX(m);
+    if (x < ml || x > ml+pw) return;
+    ctx.beginPath(); ctx.moveTo(x, mt); ctx.lineTo(x, mt+ph); ctx.stroke();
+    ctx.fillText(m, x, H - mb + 14);
+  });
+
+  // Horizontal grid (weight)
+  [800,850,900,950,1000,1050,1100,1150,1180,1230,1290].forEach(function(w) {
+    var y = toY(w);
+    ctx.beginPath(); ctx.moveTo(ml, y); ctx.lineTo(ml+pw, y); ctx.stroke();
+    ctx.textAlign = 'right';
+    ctx.fillText(w, ml - 6, y + 4);
+    ctx.textAlign = 'center';
+  });
+
+  // Axes
+  ctx.strokeStyle = 'rgba(138,151,176,0.4)';
+  ctx.lineWidth = 1.5;
+  ctx.beginPath(); ctx.moveTo(ml, mt); ctx.lineTo(ml, mt+ph); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(ml, mt+ph); ctx.lineTo(ml+pw, mt+ph); ctx.stroke();
+
+  // Axis labels
+  ctx.fillStyle = '#8A97B0';
+  ctx.font = 'bold 9px monospace';
+  ctx.textAlign = 'center';
+  ctx.fillText('MOMENT  (kg · m)', ml + pw/2, H - 2);
+  ctx.save();
+  ctx.translate(12, mt + ph/2);
+  ctx.rotate(-Math.PI/2);
+  ctx.fillText('WEIGHT  (kg)', 0, 0);
+  ctx.restore();
+
+  // ── Envelope ────────────────────────────────────────────
+  // From POH Figure 6-2 — exact corner points (Weight kg, Moment kg*m)
+  // Forward limit: CG 16.5% = 0.221m  |  Aft limit: CG 31% = 0.415m
+  // Full envelope including MOD2006/416 (up to 1290kg, CG 19.5% = 0.261m)
+  var envPts = [
+    {w: 790,  m: 790  * 0.221},   // bottom-left  (fwd limit at min weight)
+    {w: 1180, m: 1180 * 0.221},   // fwd limit at MTOW 1180
+    {w: 1230, m: 1230 * 0.261},   // kink point (fwd limit CG 19.5% for MOD)
+    {w: 1290, m: 1290 * 0.261},   // top-right fwd (MOD max weight)
+    {w: 1290, m: 1290 * 0.415},   // top-right aft (MOD max weight)
+    {w: 790,  m: 790  * 0.415},   // top-left (aft limit at min weight)
+  ];
+
+  // Separate envelope for our MTOW=1180kg limit (highlighted)
+  var envPtsBase = [
+    {w: 790,  m: 790  * 0.221},
+    {w: 1180, m: 1180 * 0.221},
+    {w: 1180, m: 1180 * 0.415},
+    {w: 790,  m: 790  * 0.415},
+  ];
+
+  // Fill full envelope (with MOD)
+  ctx.beginPath();
+  ctx.moveTo(toX(envPts[0].m), toY(envPts[0].w));
+  envPts.forEach(function(p) { ctx.lineTo(toX(p.m), toY(p.w)); });
+  ctx.closePath();
+  ctx.fillStyle = 'rgba(34,197,94,0.06)';
+  ctx.fill();
+
+  // Full envelope — single solid border with glow
+  ctx.shadowColor = '#22C55E';
+  ctx.shadowBlur = 6;
+  ctx.strokeStyle = '#22C55E';
+  ctx.lineWidth = 2.5;
+  ctx.beginPath();
+  ctx.moveTo(toX(envPts[0].m), toY(envPts[0].w));
+  envPts.forEach(function(p) { ctx.lineTo(toX(p.m), toY(p.w)); });
+  ctx.closePath();
+  ctx.stroke();
+  ctx.shadowBlur = 0;
+
+  // ── MTOW/MLW horizontal lines ──────────────────────────
+  var mtowLines = [
+    {w: 1180, lb: 2601, color: 'rgba(255,255,255,0.55)'},
+    {w: 1230, lb: 2712, color: 'rgba(255,255,255,0.35)'},
+    {w: 1290, lb: 2844, color: 'rgba(255,255,255,0.25)'},
+  ];
+
+  ctx.font = 'bold 8.5px monospace';
+  var mtowColor = 'rgba(255,255,255,0.45)';
+  mtowLines.forEach(function(line) {
+    var y = toY(line.w);
+    var xEnd = toX(line.w * 0.415);
+    ctx.strokeStyle = mtowColor;
+    ctx.lineWidth = 1;
+    ctx.setLineDash([6, 3]);
+    ctx.beginPath();
+    ctx.moveTo(ml, y);
+    ctx.lineTo(xEnd, y);
+    ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.fillStyle = mtowColor;
+    ctx.textAlign = 'left';
+    ctx.fillText('MTOW/MLW = ' + line.w + ' Kg (' + line.lb + ' lb)', ml + 4, y - 4);
+  });
+
+
+
+  // ── Data points ──────────────────────────────────────────
+  if (tow > 0) {
+
+
+    // TOW point
+    var cgTow = mTow / tow;
+    var inEnv = tow <= WB_MAX_TOW && cgTow >= WB_FWD_LIMIT && cgTow <= WB_AFT_LIMIT;
+    var ptColor = inEnv ? '#22C55E' : '#EF4444';
+
+    // Crosshair
+    ctx.strokeStyle = inEnv ? 'rgba(34,197,94,0.3)' : 'rgba(239,68,68,0.3)';
+    ctx.lineWidth = 1;
+    ctx.setLineDash([3, 3]);
+    ctx.beginPath(); ctx.moveTo(toX(mTow), mt); ctx.lineTo(toX(mTow), toY(tow)); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(ml, toY(tow)); ctx.lineTo(toX(mTow), toY(tow)); ctx.stroke();
+    ctx.setLineDash([]);
+
+    // TOW dot with glow
+    ctx.shadowColor = ptColor;
+    ctx.shadowBlur = 12;
+    ctx.beginPath();
+    ctx.arc(toX(mTow), toY(tow), 8, 0, 2*Math.PI);
+    ctx.fillStyle = ptColor;
+    ctx.fill();
+    ctx.strokeStyle = 'white';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+    ctx.shadowBlur = 0;
+
+    // TOW label
+    ctx.fillStyle = ptColor;
+    ctx.font = 'bold 10px monospace';
+    ctx.textAlign = 'left';
+    var labelX = toX(mTow) + 12;
+    if (labelX + 80 > ml+pw) labelX = toX(mTow) - 90;
+    ctx.fillText('ATOW ' + tow.toFixed(0) + ' kg', labelX, toY(tow) - 6);
+    ctx.fillText('CG ' + cgTow.toFixed(3) + ' m', labelX, toY(tow) + 8);
+
+    // ALW point (amber)
+    if (alw > 0 && mAlw !== undefined) {
+      var cgAlw = mAlw / alw;
+      var alwInEnv = alw <= WB_MAX_TOW && cgAlw >= WB_FWD_LIMIT && cgAlw <= WB_AFT_LIMIT;
+      ctx.shadowColor = '#F59E0B';
+      ctx.shadowBlur = 8;
+      ctx.beginPath();
+      ctx.arc(toX(mAlw), toY(alw), 6, 0, 2*Math.PI);
+      ctx.fillStyle = '#F59E0B';
+      ctx.fill();
+      ctx.strokeStyle = 'white';
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
+      ctx.shadowBlur = 0;
+      ctx.fillStyle = '#FCD34D';
+      ctx.font = 'bold 9px monospace';
+      ctx.textAlign = 'right';
+      var alwLabelX = toX(mAlw) - 10;
+      ctx.fillText('ALW ' + alw.toFixed(0) + ' kg', alwLabelX, toY(alw) + 4);
+    }
+  }
+}
+
+
 // ── SCREEN NAVIGATION ──────────────────────────────
-var screens = ['screen-home','screen-checklist','screen-perf','screen-docs'];
-var navBtns = {'screen-checklist':'nav-checklist','screen-perf':'nav-perf','screen-docs':'nav-docs'};
+var screens = ['screen-home','screen-checklist','screen-perf','screen-wb','screen-docs'];
+var navBtns = {'screen-checklist':'nav-checklist','screen-perf':'nav-perf','screen-wb':'nav-wb','screen-docs':'nav-docs'};
 
 function showScreen(id) {
   screens.forEach(function(s){
@@ -1211,6 +1448,7 @@ document.body.classList.add('on-home');
 
 buildClGrid();
 buildEmergGrid();
+if(document.getElementById("wb-bew")) calcWB();
 buildDocsGrid();
 calcTakeoff();
 calcLanding();
