@@ -774,16 +774,16 @@ input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-
           </div>
 
           <div class="input-grid" style="margin-bottom:8px;">
-            <div class="input-card"><div class="input-card-label">Weight · kg</div><div class="input-card-val"><input type="number" id="to-weight" value="1180" step="1" min="930" max="1180" oninput="calcTakeoff()"></div></div>
-            <div class="input-card"><div class="input-card-label">QNH · hPa</div><div class="input-card-val"><input type="number" id="to-qnh" value="1013" step="1" min="900" max="1050" oninput="calcDensityAlt('to')"></div></div>
-            <div class="input-card"><div class="input-card-label">OAT · °C</div><div class="input-card-val"><input type="number" id="to-oat" value="15" step="1" min="-40" max="60" oninput="calcDensityAlt('to')"></div></div>
+            <div class="input-card"><div class="input-card-label">Weight · kg</div><div class="input-card-val"><input type="number" id="to-weight" value="1180" step="1" min="930" max="1180"></div></div>
+            <div class="input-card"><div class="input-card-label">QNH · hPa</div><div class="input-card-val"><input type="number" id="to-qnh" value="1013" step="1" min="900" max="1050"></div></div>
+            <div class="input-card"><div class="input-card-label">OAT · °C</div><div class="input-card-val"><input type="number" id="to-oat" value="15" step="1" min="-40" max="60"></div></div>
           </div>
           <input type="hidden" id="to-alt" value="0">
 
           <div class="input-grid" style="margin-bottom:8px;">
-            <div class="input-card"><div class="input-card-label">Wind · kt</div><div class="input-card-val"><input type="number" id="to-wind" value="0" step="1" min="-30" max="30" oninput="calcTakeoff()"></div></div>
-            <div class="input-card"><div class="input-card-label">Runway</div><div class="input-card-val"><select id="to-runway" onchange="calcTakeoff()" style="pointer-events:none;color:var(--text-dim);"><option value="0">GRASS</option><option value="1">PAVED</option></select></div></div>
-            <div class="input-card"><div class="input-card-label">Slope · %</div><div class="input-card-val"><input type="number" id="to-slope" value="0" step="0.1" min="-5" max="5" oninput="calcTakeoff()"></div></div>
+            <div class="input-card"><div class="input-card-label">Wind · kt</div><div class="input-card-val"><input type="number" id="to-wind" value="0" step="1" min="-30" max="30"></div></div>
+            <div class="input-card"><div class="input-card-label">Runway</div><div class="input-card-val"><select id="to-runway" style="pointer-events:none;color:var(--text-dim);"><option value="0">GRASS</option><option value="1">PAVED</option></select></div></div>
+            <div class="input-card"><div class="input-card-label">Slope · %</div><div class="input-card-val"><input type="number" id="to-slope" value="0" step="0.1" min="-5" max="5"></div></div>
           </div>
 
           <div class="wx-panel">
@@ -2189,19 +2189,39 @@ function syncLiveWX(prefix) {
     restoreBtn();
   })
   .catch(function() {
-    // Fallback: allorigins proxy
-    var targetUrl = 'https://aviationweather.gov/api/data/metar?ids=' + icao + '&format=raw&hours=1';
-    fetch('https://api.allorigins.win/get?url=' + encodeURIComponent(targetUrl))
-      .then(function(r) { return r.json(); })
-      .then(function(json) {
-        var txt = json.contents || '';
-        if (!txt) throw new Error('empty');
-        var lines = txt.split('\n').map(function(l){ return l.trim(); }).filter(Boolean);
-        var line = lines.find(function(l){ return l.indexOf(icao) === 0 && l.match(/\d{6}Z/); });
-        if (!line) throw new Error('no metar');
-        applyMetar(line);
-      })
-      .catch(function() { fail(); });
+    // Try nearest station via CheckWX
+    fetch('https://api.checkwx.com/metar/' + icao + '/nearest/decoded', {
+      headers: { 'X-API-Key': 'd77cca3714884c8ab4c75df71e381ad6' }
+    })
+    .then(function(r) { return r.json(); })
+    .then(function(json) {
+      if (!json.data || !json.data.length) throw new Error('No nearest data');
+      var m = json.data[0];
+      var nearestIcao = m.icao || icao;
+      var raw = m.raw_text || '';
+      // Show note about nearest station
+      var metatText = document.getElementById(prefix + '-metar-text');
+      if (metatText && nearestIcao !== icao) {
+        metatText.style.color = 'var(--amber)';
+      }
+      if (raw) { applyMetar(raw); return; }
+      throw new Error('no raw');
+    })
+    .catch(function() {
+      // Final fallback: allorigins proxy
+      var targetUrl = 'https://aviationweather.gov/api/data/metar?ids=' + icao + '&format=raw&hours=1';
+      fetch('https://api.allorigins.win/get?url=' + encodeURIComponent(targetUrl))
+        .then(function(r) { return r.json(); })
+        .then(function(json) {
+          var txt = json.contents || '';
+          if (!txt) throw new Error('empty');
+          var lines = txt.split('\n').map(function(l){ return l.trim(); }).filter(Boolean);
+          var line = lines.find(function(l){ return l.indexOf(icao) === 0 && l.match(/\d{6}Z/); });
+          if (!line) throw new Error('no metar');
+          applyMetar(line);
+        })
+        .catch(function() { fail(); });
+    });
   });
 }
 
