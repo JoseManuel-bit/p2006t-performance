@@ -2308,25 +2308,28 @@ function drawRunwayDiagram(canvasId, rwyName, windKt, windDir, lda, ldr) {
     ctx.stroke();
     ctx.setLineDash([]);
 
-    // Touchdown zone stripes (bottom = threshold)
-    ctx.fillStyle = isActive ? 'rgba(255,255,255,0.55)' : 'rgba(255,255,255,0.15)';
-    var strH = 5, strGap = 5, strW = Math.round(rwyW * 0.3);
-    var strX1 = rwyX + Math.round(rwyW*0.18), strX2 = rwyX + rwyW - strX1 + rwyX - strW;
-    for (var i = 0; i < 5; i++) {
-      var sy = mt + rwyH - 12 - i*(strH + strGap);
-      ctx.fillRect(strX1, sy, strW, strH);
-      ctx.fillRect(strX2, sy, strW, strH);
-    }
-
-    // Threshold bar
-    ctx.fillStyle = isActive ? 'rgba(255,255,255,0.45)' : 'rgba(255,255,255,0.1)';
-    ctx.fillRect(rwyX, mt + rwyH - 6, rwyW, 4);
-
-    // Runway number
+    // Runway number — inside runway, above threshold lines
     ctx.fillStyle = isActive ? 'rgba(255,255,255,0.9)' : 'rgba(255,255,255,0.25)';
-    ctx.font = 'bold 13px monospace';
+    ctx.font = 'bold ' + Math.round(rwyW * 0.22) + 'px monospace';
     ctx.textAlign = 'center';
-    ctx.fillText(isActive ? rwyName : '—', rwyX + rwyW/2, H - 14);
+    ctx.fillText(isActive ? rwyName : '—', rwyX + rwyW/2, mt + rwyH - Math.round(rwyH * 0.18));
+
+    // Threshold lines (bottom) — 6 vertical lines, 3 each side, Fenix style
+    var thLineH  = Math.round(rwyH * 0.13);
+    var thLineW  = Math.round(rwyW * 0.07);
+    var thY      = mt + rwyH - thLineH;
+    var thColor  = isActive ? 'rgba(255,255,255,0.85)' : 'rgba(255,255,255,0.2)';
+    ctx.fillStyle = thColor;
+    // Left group (3 lines)
+    var lx = rwyX + Math.round(rwyW * 0.10);
+    ctx.fillRect(lx,                        thY, thLineW, thLineH);
+    ctx.fillRect(lx + thLineW * 2,          thY, thLineW, thLineH);
+    ctx.fillRect(lx + thLineW * 4,          thY, thLineW, thLineH);
+    // Right group (3 lines, mirrored)
+    var rx2 = rwyX + rwyW - Math.round(rwyW * 0.10) - thLineW;
+    ctx.fillRect(rx2,                        thY, thLineW, thLineH);
+    ctx.fillRect(rx2 - thLineW * 2,          thY, thLineW, thLineH);
+    ctx.fillRect(rx2 - thLineW * 4,          thY, thLineW, thLineH);
 
     // ── LDR Fenix-style lines ────────────────────────
     if (isActive && lda && lda > 0 && ldr && ldr > 0) {
