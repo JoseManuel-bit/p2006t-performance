@@ -725,7 +725,7 @@ input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-
       </div>
     </div>
   </div>
-  <div style="text-align:right;padding:8px 16px 4px;font-family:var(--mono);font-size:10px;color:rgba(255,255,255,0.35);letter-spacing:1px;">EFB 2026 V1.4</div>
+  <div style="text-align:right;padding:8px 16px 4px;font-family:var(--mono);font-size:10px;color:rgba(255,255,255,0.35);letter-spacing:1px;">EFB 2026 V1.5</div>
 </div>
 <!-- AIRCRAFT HOME -->
 <div class="screen" id="screen-ac-home" style="position:relative;overflow:hidden;">
@@ -1293,8 +1293,15 @@ input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-
             </tr>
             <tr style="border-bottom:1px solid var(--border);">
               <td style="font-family:var(--mono);font-size:13px;font-weight:700;color:var(--text);padding:8px 4px;">VA / VO</td>
-              <td style="font-family:var(--head);font-size:10px;color:var(--text-dim);padding:8px 4px;">Manoeuvring Speed (@ 1180 kg)</td>
-              <td style="font-family:var(--mono);font-size:18px;font-weight:700;color:var(--text);padding:8px 4px;text-align:right;">118 kt</td>
+              <td style="font-family:var(--head);font-size:10px;color:var(--text-dim);padding:8px 4px;">
+                <div style="display:flex;align-items:center;gap:8px;">
+                  <span>Manoeuvring Speed</span>
+                  <span style="font-family:var(--head);font-size:9px;color:var(--text-dim);letter-spacing:1px;">·  WEIGHT</span>
+                  <input id="va-weight-input" type="number" min="930" max="1180" value="1180" oninput="calcVASpeed()" style="background:var(--bg3);border:1px solid var(--border);border-radius:4px;color:var(--text);font-family:var(--mono);font-size:13px;font-weight:700;text-align:center;width:72px;padding:3px 4px;outline:none;">
+                  <span style="font-family:var(--head);font-size:9px;color:var(--text-dim);letter-spacing:1px;">KG</span>
+                </div>
+              </td>
+              <td style="font-family:var(--mono);font-size:18px;font-weight:700;color:var(--text);padding:8px 4px;text-align:right;" id="va-speed-result">118 kt</td>
             </tr>
             <tr style="border-bottom:1px solid var(--border);">
               <td style="font-family:var(--mono);font-size:13px;font-weight:700;color:var(--text);padding:8px 4px;">VFE T/O</td>
@@ -1719,6 +1726,14 @@ function lookupAirport(prefix) {
 function userEdit(el) {
   el.classList.remove('metar-synced');
   el.classList.add('user-edited');
+}
+function calcVASpeed() {
+  var w = parseFloat(document.getElementById('va-weight-input').value) || 1180;
+  if (w < 930) w = 930;
+  if (w > 1180) w = 1180;
+  var va = Math.round(118 * Math.sqrt(w / 1180));
+  var el = document.getElementById('va-speed-result');
+  if (el) el.textContent = va + ' kt';
 }
 function openRwyOverlay(prefix) {
   var icao = document.getElementById(prefix+'-icao').value.toUpperCase().trim();
