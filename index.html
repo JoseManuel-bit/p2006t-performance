@@ -128,7 +128,9 @@ body{font-family:var(--body);background:var(--bg);color:var(--text);display:flex
 .airport-name{font-family:var(--head);font-size:14px;font-weight:600;color:var(--text);letter-spacing:0.5px;}
 .airport-elev{font-family:var(--mono);font-size:11px;color:var(--amber);margin-top:3px;}
 .rwy-wrap{display:flex;flex-direction:column;gap:4px;flex-shrink:0;}
-.rwy-select{background:var(--bg3);border:1px solid var(--border);border-radius:4px;font-family:var(--mono);font-size:22px;font-weight:700;color:var(--amber);text-align:center;text-align-last:center;padding:6px 4px;outline:none;-webkit-appearance:none;appearance:none;width:90px;}
+.rwy-overlay-btn{background:#131929;border:1px solid #26354F;border-radius:6px;width:100px;height:80px;display:flex;align-items:center;justify-content:center;font-size:36px;font-weight:700;color:#8A97B0;cursor:pointer;font-family:var(--mono);transition:border-color 0.15s,color 0.15s;}
+.rwy-overlay-btn:hover{border-color:var(--amber);color:var(--amber);}
+.rwy-overlay-btn.selected{border-color:var(--green);color:var(--green);background:rgba(34,197,94,0.08);}
 .rwy-select.empty{color:#8A97B0;}
 .icao-input::placeholder{color:#8A97B0;}
 .rwy-avail{font-family:var(--mono);font-size:11px;color:var(--green);text-align:center;font-weight:700;}
@@ -723,7 +725,7 @@ input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-
       </div>
     </div>
   </div>
-  <div style="text-align:right;padding:8px 16px 4px;font-family:var(--mono);font-size:10px;color:rgba(255,255,255,0.35);letter-spacing:1px;">EFB 2026 V1.1</div>
+  <div style="text-align:right;padding:8px 16px 4px;font-family:var(--mono);font-size:10px;color:rgba(255,255,255,0.35);letter-spacing:1px;">EFB 2026 V1.4</div>
 </div>
 <!-- AIRCRAFT HOME -->
 <div class="screen" id="screen-ac-home" style="position:relative;overflow:hidden;">
@@ -879,28 +881,20 @@ input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-
         <div class="perf-left" style="flex:1;overflow-y:auto;">
 
           <div class="airport-selector" style="margin-bottom:8px;">
-            <div style="display:flex;align-items:flex-start;gap:12px;">
-              <!-- ICAO -->
+            <div style="display:flex;align-items:center;gap:10px;">
               <div class="airport-icao-wrap" style="flex-shrink:0;">
-                <div class="airport-label">DEPARTURE AIRPORT</div>
                 <input type="text" id="to-icao" placeholder="ICAO" maxlength="4" oninput="if(window.lookupAirport)lookupAirport('to')" class="icao-input">
               </div>
-              <!-- RUNWAY selector right after ICAO -->
               <div class="airport-icao-wrap">
-                <div class="airport-label">RUNWAY</div>
-                <select id="to-rwy-sel" onchange="selectRunway('to')" class="rwy-select" style="min-width:80px;"><option value="">—</option></select>
-
+                <button id="to-rwy-btn" onclick="openRwyOverlay('to')" class="icao-input" style="cursor:pointer;background:var(--bg3);border:1px solid var(--border);color:#8A97B0;letter-spacing:3px;width:90px;">RWY</button>
+                <select id="to-rwy-sel" style="display:none;"><option value="">—</option></select>
               </div>
-              <!-- Name + Elev + TORA -->
-              <div style="flex:1;min-width:0;display:flex;flex-direction:column;justify-content:center;padding-top:18px;">
+              <div style="flex:1;min-width:0;display:flex;flex-direction:column;justify-content:center;">
                 <div class="airport-name" id="to-airport-name">—</div>
-                <div style="display:flex;align-items:center;gap:12px;margin-top:3px;">
+                <div style="display:flex;align-items:center;gap:10px;margin-top:2px;">
                   <div class="airport-elev" id="to-airport-elev">Elev: — ft</div>
-                  <div style="font-family:var(--head);font-size:10px;color:var(--text-dim);">·</div>
-                  <div style="font-family:var(--head);font-size:10px;color:var(--text-dim);">TORA <span style="color:var(--green);font-family:var(--mono);" id="to-tora-label">—</span> m</div>
                 </div>
               </div>
-              <!-- PA / DA chips -->
               <div class="airport-alt-chips" style="flex-shrink:0;">
                 <div class="alt-chip"><span class="alt-chip-label">PRESS ALT</span><span class="alt-chip-val" id="to-press-alt">— ft</span></div>
                 <div class="alt-chip"><span class="alt-chip-label">DENSITY ALT</span><span class="alt-chip-val" id="to-density-alt">— ft</span></div>
@@ -943,7 +937,7 @@ input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-
           <div style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;display:flex;flex-direction:column;height:100%;">
             <div style="background:var(--panel);border-bottom:1px solid var(--border);padding:18px;text-align:center;">
               <div style="font-family:var(--head);font-size:20px;font-weight:600;letter-spacing:4px;color:var(--text-dim);text-transform:uppercase;">
-                TAKE OFF · RWY <span style="color:var(--amber);" id="to-card-rwy">—</span>
+                TAKE OFF · RWY <span style="color:var(--green);" id="to-card-rwy">—</span>
               </div>
             </div>
             <div style="padding:14px 16px;display:flex;flex-direction:column;gap:10px;flex:1;">
@@ -1006,7 +1000,8 @@ input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-
                 <input type="text" id="ld-icao" placeholder="ICAO" maxlength="4" oninput="if(window.lookupAirport)lookupAirport('ld')" class="icao-input">
               </div>
               <div class="airport-icao-wrap">
-                <select id="ld-rwy-sel" onchange="selectRunway('ld')" class="rwy-select" style="min-width:80px;"><option value="">RWY</option></select>
+                <button id="ld-rwy-btn" onclick="openRwyOverlay('ld')" class="icao-input" style="cursor:pointer;background:var(--bg3);border:1px solid var(--border);color:#8A97B0;letter-spacing:3px;width:90px;">RWY</button>
+                <select id="ld-rwy-sel" style="display:none;"><option value="">RWY</option></select>
               </div>
               <div style="flex:1;min-width:0;display:flex;flex-direction:column;justify-content:center;">
                 <div class="airport-name" id="ld-airport-name">—</div>
@@ -1274,6 +1269,136 @@ input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-
         <div style="font-family:var(--head);font-size:10px;letter-spacing:2px;color:rgba(138,151,176,0.3);">SELECT A DOCUMENT</div>
       </div>
       <iframe id="docs-iframe" src="" style="display:none;flex:1;border:none;width:100%;height:100%;"></iframe>
+
+      <!-- LIMITATIONS PANEL -->
+      <div id="limitations-panel" style="display:none;flex:1;overflow-y:auto;padding:20px;background:var(--bg);">
+        <div style="max-width:700px;margin:0 auto;">
+
+          <!-- Header -->
+          <div style="font-family:var(--head);font-size:18px;font-weight:700;letter-spacing:2px;color:var(--amber);margin-bottom:4px;">TECNAM P2006T</div>
+          <div style="font-family:var(--head);font-size:11px;letter-spacing:2px;color:var(--text-dim);margin-bottom:20px;">LIMITATIONS & AIRSPEEDS · QUICK REFERENCE</div>
+
+          <!-- VELOCIDADES -->
+          <div style="font-family:var(--head);font-size:10px;letter-spacing:2px;color:var(--amber);margin-bottom:8px;padding-bottom:4px;border-bottom:1px solid var(--border);">AIRSPEEDS</div>
+          <table style="width:100%;border-collapse:collapse;margin-bottom:20px;">
+            <tr style="border-bottom:1px solid var(--border);">
+              <td style="font-family:var(--mono);font-size:13px;font-weight:700;color:var(--text);padding:8px 4px;width:80px;">VNE</td>
+              <td style="font-family:var(--head);font-size:10px;color:var(--text-dim);padding:8px 4px;">Never Exceed Speed</td>
+              <td style="font-family:var(--mono);font-size:18px;font-weight:700;color:var(--text);padding:8px 4px;text-align:right;">167 kt</td>
+            </tr>
+            <tr style="border-bottom:1px solid var(--border);">
+              <td style="font-family:var(--mono);font-size:13px;font-weight:700;color:var(--text);padding:8px 4px;">VNO</td>
+              <td style="font-family:var(--head);font-size:10px;color:var(--text-dim);padding:8px 4px;">Max Structural Cruising Speed</td>
+              <td style="font-family:var(--mono);font-size:18px;font-weight:700;color:var(--text);padding:8px 4px;text-align:right;">135 kt</td>
+            </tr>
+            <tr style="border-bottom:1px solid var(--border);">
+              <td style="font-family:var(--mono);font-size:13px;font-weight:700;color:var(--text);padding:8px 4px;">VA / VO</td>
+              <td style="font-family:var(--head);font-size:10px;color:var(--text-dim);padding:8px 4px;">Manoeuvring Speed (@ 1180 kg)</td>
+              <td style="font-family:var(--mono);font-size:18px;font-weight:700;color:var(--text);padding:8px 4px;text-align:right;">118 kt</td>
+            </tr>
+            <tr style="border-bottom:1px solid var(--border);">
+              <td style="font-family:var(--mono);font-size:13px;font-weight:700;color:var(--text);padding:8px 4px;">VFE T/O</td>
+              <td style="font-family:var(--head);font-size:10px;color:var(--text-dim);padding:8px 4px;">Max Flaps Extended Speed (T/O)</td>
+              <td style="font-family:var(--mono);font-size:18px;font-weight:700;color:var(--text);padding:8px 4px;text-align:right;">119 kt</td>
+            </tr>
+            <tr style="border-bottom:1px solid var(--border);">
+              <td style="font-family:var(--mono);font-size:13px;font-weight:700;color:var(--text);padding:8px 4px;">VFE FULL</td>
+              <td style="font-family:var(--head);font-size:10px;color:var(--text-dim);padding:8px 4px;">Max Flaps Extended Speed (FULL)</td>
+              <td style="font-family:var(--mono);font-size:18px;font-weight:700;color:var(--text);padding:8px 4px;text-align:right;">93 kt</td>
+            </tr>
+            <tr style="border-bottom:1px solid var(--border);">
+              <td style="font-family:var(--mono);font-size:13px;font-weight:700;color:var(--text);padding:8px 4px;">VLO / VLE</td>
+              <td style="font-family:var(--head);font-size:10px;color:var(--text-dim);padding:8px 4px;">Max Landing Gear Operating / Extended Speed</td>
+              <td style="font-family:var(--mono);font-size:18px;font-weight:700;color:var(--text);padding:8px 4px;text-align:right;">93 kt</td>
+            </tr>
+            <tr style="border-bottom:1px solid var(--border);">
+              <td style="font-family:var(--mono);font-size:13px;font-weight:700;color:var(--text);padding:8px 4px;">VMC</td>
+              <td style="font-family:var(--head);font-size:10px;color:var(--text-dim);padding:8px 4px;">Min Control Speed with One Engine Inoperative</td>
+              <td style="font-family:var(--mono);font-size:18px;font-weight:700;color:var(--text);padding:8px 4px;text-align:right;">62 kt</td>
+            </tr>
+            <tr style="border-bottom:1px solid var(--border);">
+              <td style="font-family:var(--mono);font-size:13px;font-weight:700;color:var(--text);padding:8px 4px;">VS1</td>
+              <td style="font-family:var(--head);font-size:10px;color:var(--text-dim);padding:8px 4px;">Stall Speed (clean configuration)</td>
+              <td style="font-family:var(--mono);font-size:18px;font-weight:700;color:var(--text);padding:8px 4px;text-align:right;">66 kt</td>
+            </tr>
+            <tr style="border-bottom:1px solid var(--border);">
+              <td style="font-family:var(--mono);font-size:13px;font-weight:700;color:var(--text);padding:8px 4px;">VS0</td>
+              <td style="font-family:var(--head);font-size:10px;color:var(--text-dim);padding:8px 4px;">Stall Speed (flaps full)</td>
+              <td style="font-family:var(--mono);font-size:18px;font-weight:700;color:var(--text);padding:8px 4px;text-align:right;">53 kt</td>
+            </tr>
+            <tr style="border-bottom:1px solid var(--border);">
+              <td style="font-family:var(--mono);font-size:13px;font-weight:700;color:var(--text);padding:8px 4px;">VR</td>
+              <td style="font-family:var(--head);font-size:10px;color:var(--text-dim);padding:8px 4px;">Rotation Speed (T/O flaps, @ 1180 kg)</td>
+              <td style="font-family:var(--mono);font-size:18px;font-weight:700;color:var(--text);padding:8px 4px;text-align:right;">64 kt</td>
+            </tr>
+            <tr style="border-bottom:1px solid var(--border);">
+              <td style="font-family:var(--mono);font-size:13px;font-weight:700;color:var(--text);padding:8px 4px;">VX</td>
+              <td style="font-family:var(--head);font-size:10px;color:var(--text-dim);padding:8px 4px;">Best Angle of Climb Speed (@ 1180 kg)</td>
+              <td style="font-family:var(--mono);font-size:18px;font-weight:700;color:var(--text);padding:8px 4px;text-align:right;">73 kt</td>
+            </tr>
+            <tr style="border-bottom:1px solid var(--border);">
+              <td style="font-family:var(--mono);font-size:13px;font-weight:700;color:var(--text);padding:8px 4px;">VY</td>
+              <td style="font-family:var(--head);font-size:10px;color:var(--text-dim);padding:8px 4px;">Best Rate of Climb Speed (@ 1180 kg)</td>
+              <td style="font-family:var(--mono);font-size:18px;font-weight:700;color:var(--text);padding:8px 4px;text-align:right;">80 kt</td>
+            </tr>
+            <tr style="border-bottom:1px solid var(--border);">
+              <td style="font-family:var(--mono);font-size:13px;font-weight:700;color:var(--text);padding:8px 4px;">VYSE</td>
+              <td style="font-family:var(--head);font-size:10px;color:var(--text-dim);padding:8px 4px;">Best Rate of Climb Speed OEI (blue line)</td>
+              <td style="font-family:var(--mono);font-size:18px;font-weight:700;color:var(--text);padding:8px 4px;text-align:right;">80 kt</td>
+            </tr>
+            <tr style="border-bottom:1px solid var(--border);">
+              <td style="font-family:var(--mono);font-size:13px;font-weight:700;color:var(--text);padding:8px 4px;">VSSE</td>
+              <td style="font-family:var(--head);font-size:10px;color:var(--text-dim);padding:8px 4px;">Safe OEI Training Speed</td>
+              <td style="font-family:var(--mono);font-size:18px;font-weight:700;color:var(--text);padding:8px 4px;text-align:right;">70 kt</td>
+            </tr>
+            <tr>
+              <td style="font-family:var(--mono);font-size:13px;font-weight:700;color:var(--text);padding:8px 4px;">VAPP</td>
+              <td style="font-family:var(--head);font-size:10px;color:var(--text-dim);padding:8px 4px;">Final Approach Speed (flaps FULL)</td>
+              <td style="font-family:var(--mono);font-size:18px;font-weight:700;color:var(--text);padding:8px 4px;text-align:right;">70 kt</td>
+            </tr>
+          </table>
+
+          <!-- WEIGHT LIMITATIONS -->
+          <div style="font-family:var(--head);font-size:10px;letter-spacing:2px;color:var(--amber);margin-bottom:8px;padding-bottom:4px;border-bottom:1px solid var(--border);">WEIGHT LIMITATIONS</div>
+          <table style="width:100%;border-collapse:collapse;margin-bottom:20px;">
+            <tr style="border-bottom:1px solid var(--border);">
+              <td style="font-family:var(--head);font-size:10px;color:var(--text-dim);padding:8px 4px;">Maximum Takeoff Weight (MTOW)</td>
+              <td style="font-family:var(--mono);font-size:18px;font-weight:700;color:var(--text);padding:8px 4px;text-align:right;">1180 kg</td>
+            </tr>
+            <tr style="border-bottom:1px solid var(--border);">
+              <td style="font-family:var(--head);font-size:10px;color:var(--text-dim);padding:8px 4px;">Maximum Landing Weight (MLW)</td>
+              <td style="font-family:var(--mono);font-size:18px;font-weight:700;color:var(--text);padding:8px 4px;text-align:right;">1180 kg</td>
+            </tr>
+            <tr>
+              <td style="font-family:var(--head);font-size:10px;color:var(--text-dim);padding:8px 4px;">Maximum Zero Wing Fuel Weight (MZFW)</td>
+              <td style="font-family:var(--mono);font-size:18px;font-weight:700;color:var(--text);padding:8px 4px;text-align:right;">1145 kg</td>
+            </tr>
+          </table>
+
+          <!-- ENVIRONMENTAL LIMITATIONS -->
+          <div style="font-family:var(--head);font-size:10px;letter-spacing:2px;color:var(--amber);margin-bottom:8px;padding-bottom:4px;border-bottom:1px solid var(--border);">ENVIRONMENTAL LIMITATIONS</div>
+          <table style="width:100%;border-collapse:collapse;margin-bottom:20px;">
+            <tr style="border-bottom:1px solid var(--border);">
+              <td style="font-family:var(--head);font-size:10px;color:var(--text-dim);padding:8px 4px;">Max Demonstrated Crosswind</td>
+              <td style="font-family:var(--mono);font-size:18px;font-weight:700;color:var(--text);padding:8px 4px;text-align:right;">17 kt</td>
+            </tr>
+            <tr style="border-bottom:1px solid var(--border);">
+              <td style="font-family:var(--head);font-size:10px;color:var(--text-dim);padding:8px 4px;">Ambient Temperature Range</td>
+              <td style="font-family:var(--mono);font-size:18px;font-weight:700;color:var(--text);padding:8px 4px;text-align:right;">-25°C / +50°C</td>
+            </tr>
+            <tr style="border-bottom:1px solid var(--border);">
+              <td style="font-family:var(--head);font-size:10px;color:var(--text-dim);padding:8px 4px;">Maximum Operating Altitude</td>
+              <td style="font-family:var(--mono);font-size:18px;font-weight:700;color:var(--text);padding:8px 4px;text-align:right;">14,000 ft</td>
+            </tr>
+            <tr>
+              <td style="font-family:var(--head);font-size:10px;color:var(--text-dim);padding:8px 4px;">Flight in known / expected icing conditions</td>
+              <td style="font-family:var(--mono);font-size:14px;font-weight:700;color:#EF4444;padding:8px 4px;text-align:right;">PROHIBITED</td>
+            </tr>
+          </table>
+
+          <div style="font-family:var(--head);font-size:9px;color:var(--text-dim);text-align:center;margin-top:8px;">AFM 4th Edition Rev. 22 · For reference only · Always consult the official AFM for operations</div>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -1595,6 +1720,35 @@ function userEdit(el) {
   el.classList.remove('metar-synced');
   el.classList.add('user-edited');
 }
+function openRwyOverlay(prefix) {
+  var icao = document.getElementById(prefix+'-icao').value.toUpperCase().trim();
+  var rwys = RUNWAYS[icao];
+  if (!rwys || Object.keys(rwys).length === 0) return;
+  var overlay = document.getElementById('rwy-overlay');
+  var grid = document.getElementById('rwy-overlay-grid');
+  var currentVal = document.getElementById(prefix+'-rwy-sel').value;
+  grid.innerHTML = '';
+  Object.keys(rwys).forEach(function(rwy) {
+    var btn = document.createElement('button');
+    btn.className = 'rwy-overlay-btn' + (rwy === currentVal ? ' selected' : '');
+    btn.textContent = rwy;
+    btn.onclick = function() {
+      var sel = document.getElementById(prefix+'-rwy-sel');
+      sel.innerHTML = '<option value="'+rwy+'">'+rwy+'</option>';
+      sel.value = rwy;
+      var btn2 = document.getElementById(prefix+'-rwy-btn');
+      if (btn2) { btn2.textContent = rwy; btn2.style.color = 'var(--amber)'; }      closeRwyOverlay();
+      selectRunway(prefix);
+    };
+    grid.appendChild(btn);
+  });
+  overlay.style.display = 'flex';
+  overlay.onclick = function(e) { if (e.target === overlay) closeRwyOverlay(); };
+}
+function closeRwyOverlay() {
+  var overlay = document.getElementById('rwy-overlay');
+  if (overlay) overlay.style.display = 'none';
+}
 function updateRwySelColor(prefix) {
   var sel = document.getElementById(prefix+'-rwy-sel');
   if (!sel) return;
@@ -1676,6 +1830,13 @@ const DOCUMENTS = [
     file: 'poh.pdf',
     type: 'PDF',
   },
+  {
+    name: 'Limitations & Airspeeds',
+    subtitle: 'P2006T Quick Reference',
+    file: null,
+    type: 'REF',
+    internal: 'limitations',
+  },
 ];
 
 function buildDocsGrid() {
@@ -1697,20 +1858,21 @@ function buildDocsGrid() {
 }
 
 function openDoc(doc, idx) {
-  // Highlight selected
   document.querySelectorAll('#docs-list > div').forEach(function(b, i) {
     b.style.background = i === idx ? 'var(--panel)' : 'var(--bg2)';
     b.style.borderColor = i === idx ? 'var(--amber)' : 'var(--border)';
   });
-  // Update title and link
-
-  // Show iframe, hide placeholder
   var iframe = document.getElementById('docs-iframe');
   var placeholder = document.getElementById('docs-placeholder');
-  if (iframe && placeholder) {
-    placeholder.style.display = 'none';
-    iframe.style.display = 'block';
-    iframe.src = doc.file;
+  var limPanel = document.getElementById('limitations-panel');
+  if (doc.internal === 'limitations') {
+    if (iframe) iframe.style.display = 'none';
+    if (placeholder) placeholder.style.display = 'none';
+    if (limPanel) limPanel.style.display = 'block';
+  } else if (doc.file) {
+    if (limPanel) limPanel.style.display = 'none';
+    if (placeholder) placeholder.style.display = 'none';
+    if (iframe) { iframe.style.display = 'block'; iframe.src = doc.file; }
   }
 }
 
@@ -2308,28 +2470,30 @@ function drawRunwayDiagram(canvasId, rwyName, windKt, windDir, lda, ldr) {
     ctx.stroke();
     ctx.setLineDash([]);
 
-    // Runway number — inside runway, above threshold lines
+    // Runway number — inside runway, just above threshold lines
     ctx.fillStyle = isActive ? 'rgba(255,255,255,0.9)' : 'rgba(255,255,255,0.25)';
     ctx.font = 'bold ' + Math.round(rwyW * 0.22) + 'px monospace';
     ctx.textAlign = 'center';
-    ctx.fillText(isActive ? rwyName : '—', rwyX + rwyW/2, mt + rwyH - Math.round(rwyH * 0.18));
+    var thLineH2 = Math.round(rwyH * 0.12);
+    ctx.fillText(isActive ? rwyName : '—', rwyX + rwyW/2, mt + rwyH - thLineH2 - 12);
 
     // Threshold lines (bottom) — 6 vertical lines, 3 each side, Fenix style
-    var thLineH  = Math.round(rwyH * 0.13);
-    var thLineW  = Math.round(rwyW * 0.07);
+    var thLineW  = Math.round(rwyW * 0.10);
+    var thLineH  = Math.round(rwyH * 0.12);
+    var thGap    = Math.round(thLineW * 0.6);
     var thY      = mt + rwyH - thLineH;
     var thColor  = isActive ? 'rgba(255,255,255,0.85)' : 'rgba(255,255,255,0.2)';
     ctx.fillStyle = thColor;
-    // Left group (3 lines)
-    var lx = rwyX + Math.round(rwyW * 0.10);
-    ctx.fillRect(lx,                        thY, thLineW, thLineH);
-    ctx.fillRect(lx + thLineW * 2,          thY, thLineW, thLineH);
-    ctx.fillRect(lx + thLineW * 4,          thY, thLineW, thLineH);
+    // Left group (3 lines) — starts at 6% from left edge
+    var lx = rwyX + Math.round(rwyW * 0.06);
+    ctx.fillRect(lx,                           thY, thLineW, thLineH);
+    ctx.fillRect(lx + thLineW + thGap,         thY, thLineW, thLineH);
+    ctx.fillRect(lx + (thLineW + thGap) * 2,   thY, thLineW, thLineH);
     // Right group (3 lines, mirrored)
-    var rx2 = rwyX + rwyW - Math.round(rwyW * 0.10) - thLineW;
-    ctx.fillRect(rx2,                        thY, thLineW, thLineH);
-    ctx.fillRect(rx2 - thLineW * 2,          thY, thLineW, thLineH);
-    ctx.fillRect(rx2 - thLineW * 4,          thY, thLineW, thLineH);
+    var rx2 = rwyX + rwyW - Math.round(rwyW * 0.06) - thLineW;
+    ctx.fillRect(rx2,                           thY, thLineW, thLineH);
+    ctx.fillRect(rx2 - thLineW - thGap,         thY, thLineW, thLineH);
+    ctx.fillRect(rx2 - (thLineW + thGap) * 2,   thY, thLineW, thLineH);
 
     // ── LDR Fenix-style lines ────────────────────────
     if (isActive && lda && lda > 0 && ldr && ldr > 0) {
@@ -2744,6 +2908,8 @@ function resetPerfTO() {
   // Reset runway selector
   var rwySel = document.getElementById('to-rwy-sel');
   if (rwySel) { rwySel.innerHTML = '<option value="">—</option>'; }
+  var rwyBtn = document.getElementById('to-rwy-btn');
+  if (rwyBtn) { rwyBtn.textContent = 'RWY'; rwyBtn.style.color = '#8A97B0'; }
   // Reset WX
   ['to-wx-wind','to-wx-temp','to-wx-qnh'].forEach(function(id,i){
     var e=document.getElementById(id); if(e) e.textContent=['—/—','—','—'][i];
@@ -2779,6 +2945,8 @@ function resetPerfLD() {
   // Reset runway selector
   var rwySel = document.getElementById('ld-rwy-sel');
   if (rwySel) { rwySel.innerHTML = '<option value="">RWY</option>'; rwySel.style.color = 'var(--text-dim)'; }
+  var rwyBtn = document.getElementById('ld-rwy-btn');
+  if (rwyBtn) { rwyBtn.textContent = 'RWY'; rwyBtn.style.color = '#8A97B0'; }
   // Reset WX
   ['ld-wx-wind','ld-wx-temp','ld-wx-qnh'].forEach(function(id,i){
     var e=document.getElementById(id); if(e) e.textContent=['—/—','—','—'][i];
@@ -3196,11 +3364,17 @@ updateRunwayDiagrams();
 setRWYCC(6);
 if(document.getElementById("wb-bew")) calcWB();
 ['to-rwy-sel','ld-rwy-sel'].forEach(function(id){var el=document.getElementById(id);if(el)el.classList.add('empty');});
+['to-rwy-btn','ld-rwy-btn'].forEach(function(id){var el=document.getElementById(id);if(el)el.style.color='#8A97B0';});
   updateRwySelColor('to'); updateRwySelColor('ld');
 buildDocsGrid();
 calcTakeoff();
 calcLanding();
 
 </script>
+<!-- RUNWAY OVERLAY -->
+<div id="rwy-overlay" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(11,15,26,0.55);z-index:9999;align-items:center;justify-content:center;">
+  <div id="rwy-overlay-grid" style="display:flex;flex-wrap:nowrap;gap:16px;justify-content:center;padding:20px;overflow-x:auto;max-width:90vw;"></div>
+</div>
+
 </body>
 </html>
