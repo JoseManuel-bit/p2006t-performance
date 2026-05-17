@@ -1008,8 +1008,6 @@ input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-
                 <div class="airport-name" id="ld-airport-name">—</div>
                 <div style="display:flex;align-items:center;gap:10px;margin-top:2px;">
                   <div class="airport-elev" id="ld-airport-elev">Elev: — ft</div>
-                  <div style="font-family:var(--head);font-size:10px;color:var(--text-dim);">·</div>
-                  <div style="font-family:var(--head);font-size:10px;color:var(--text-dim);">LDA <span style="color:var(--green);font-family:var(--mono);" id="ld-rwy-avail">—</span> m</div>
                 </div>
               </div>
               <div class="airport-alt-chips" style="flex-shrink:0;">
@@ -1097,6 +1095,8 @@ input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-
             </div>
           </div>
 
+          <button onclick="resetPerfLD()" style="width:100%;padding:11px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);font-family:var(--head);font-size:12px;font-weight:600;letter-spacing:2px;color:var(--text-dim);cursor:pointer;margin-bottom:6px;">RESET</button>
+
           <span id="ld-lda-avail" style="display:none;"></span>
           <span id="ld-ldr-req" style="display:none;"></span>
           <span id="ld-ldr-115" style="display:none;"></span>
@@ -1105,9 +1105,9 @@ input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-
         </div><!-- /left col -->
 
         <!-- RIGHT col: runway canvas only -->
-        <div class="perf-right" style="width:300px;display:flex;flex-direction:column;align-items:center;justify-content:space-between;padding:12px 12px 6px;background:transparent;">
-          <canvas id="ld-rwy-canvas" width="180" height="100" style="display:block;width:200px;flex:1;min-height:0;border-radius:6px;"></canvas>
-          <div id="ld-lda-table" style="display:none;width:100%;margin-top:6px;">
+        <div class="perf-right" style="width:360px;display:flex;flex-direction:column;align-items:center;justify-content:space-between;padding:8px 8px 6px;background:transparent;">
+          <canvas id="ld-rwy-canvas" width="180" height="100" style="display:block;width:344px;flex:1;min-height:0;border-radius:6px;"></canvas>
+          <div id="ld-lda-table" style="display:block;width:100%;margin-top:6px;">
             <div style="display:grid;grid-template-columns:1fr 1fr 1fr;border:1px solid var(--border);border-radius:6px;overflow:hidden;">
               <div style="background:var(--panel);padding:6px 4px;text-align:center;border-right:1px solid var(--border);">
                 <div style="font-family:var(--head);font-size:8px;letter-spacing:1px;color:var(--text-dim);">LDA (M)</div>
@@ -2268,6 +2268,180 @@ function drawRunwayDiagram(canvasId, rwyName, windKt, windDir, lda, ldr) {
   ctx.fillStyle = '#0B0F1A';
   ctx.fillRect(0, 0, W, H);
 
+  // ── ARRIVAL CANVAS: full Fenix-style diagram ──────────────────────
+  if (canvasId === 'ld-rwy-canvas') {
+    var isActive = rwyName && rwyName !== '—' && rwyName !== '' && rwyName !== null;
+
+    // Layout constants — proportional to W
+    var ldrBarW  = Math.round(W * 0.18);
+    var ldrBarX  = W - ldrBarW - Math.round(W * 0.03);
+    var rwyW     = Math.round(W * 0.43);
+    var rwyX     = Math.round(W * 0.30);
+    var windBoxW = Math.round(W * 0.22);
+    var windBoxX = Math.round((rwyX - windBoxW) / 2);
+    var mt = 16, mb = 36;
+    var rwyH = H - mt - mb;
+
+    // ── Runway surface ──────────────────────────────
+    ctx.fillStyle = isActive ? '#1E2A3A' : '#141C2A';
+    ctx.fillRect(rwyX, mt, rwyW, rwyH);
+    ctx.strokeStyle = isActive ? 'rgba(255,255,255,0.6)' : 'rgba(255,255,255,0.2)';
+    ctx.lineWidth = 1.5;
+    ctx.strokeRect(rwyX, mt, rwyW, rwyH);
+
+    // Centre line dashes
+    ctx.strokeStyle = isActive ? 'rgba(255,255,255,0.35)' : 'rgba(255,255,255,0.12)';
+    ctx.lineWidth = 1.5;
+    ctx.setLineDash([10, 8]);
+    ctx.beginPath();
+    ctx.moveTo(rwyX + rwyW/2, mt + 12);
+    ctx.lineTo(rwyX + rwyW/2, mt + rwyH - 32);
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    // Touchdown zone stripes (bottom = threshold)
+    ctx.fillStyle = isActive ? 'rgba(255,255,255,0.55)' : 'rgba(255,255,255,0.15)';
+    var strH = 5, strGap = 5, strW = Math.round(rwyW * 0.3);
+    var strX1 = rwyX + Math.round(rwyW*0.18), strX2 = rwyX + rwyW - strX1 + rwyX - strW;
+    for (var i = 0; i < 5; i++) {
+      var sy = mt + rwyH - 12 - i*(strH + strGap);
+      ctx.fillRect(strX1, sy, strW, strH);
+      ctx.fillRect(strX2, sy, strW, strH);
+    }
+
+    // Threshold bar
+    ctx.fillStyle = isActive ? 'rgba(255,255,255,0.45)' : 'rgba(255,255,255,0.1)';
+    ctx.fillRect(rwyX, mt + rwyH - 6, rwyW, 4);
+
+    // Runway number
+    ctx.fillStyle = isActive ? 'rgba(255,255,255,0.9)' : 'rgba(255,255,255,0.25)';
+    ctx.font = 'bold 13px monospace';
+    ctx.textAlign = 'center';
+    ctx.fillText(isActive ? rwyName : '—', rwyX + rwyW/2, H - 14);
+
+    // ── LDR side bar (right) ────────────────────────
+    if (isActive && lda && lda > 0) {
+      var ldrFrac = ldr ? Math.min(1, ldr / lda) : 0;
+      var ldr115Frac = ldr ? Math.min(1, (ldr * 1.15) / lda) : 0;
+      var ok = ldr ? (ldr * 1.15) <= lda : true;
+
+      // LDA full bar (grey background)
+      ctx.fillStyle = 'rgba(100,116,139,0.25)';
+      ctx.fillRect(ldrBarX, mt, ldrBarW, rwyH);
+      ctx.strokeStyle = 'rgba(100,116,139,0.5)';
+      ctx.lineWidth = 1;
+      ctx.strokeRect(ldrBarX, mt, ldrBarW, rwyH);
+
+      // 1.15 LDR fill
+      if (ldr115Frac > 0) {
+        var ldr115H = Math.round(rwyH * ldr115Frac);
+        ctx.fillStyle = ok ? 'rgba(34,197,94,0.25)' : 'rgba(239,68,68,0.25)';
+        ctx.fillRect(ldrBarX, mt + rwyH - ldr115H, ldrBarW, ldr115H);
+      }
+
+      // LDR fill (darker)
+      if (ldrFrac > 0) {
+        var ldrH2 = Math.round(rwyH * ldrFrac);
+        ctx.fillStyle = ok ? 'rgba(34,197,94,0.55)' : 'rgba(239,68,68,0.55)';
+        ctx.fillRect(ldrBarX, mt + rwyH - ldrH2, ldrBarW, ldrH2);
+      }
+
+      // LDA label (top)
+      ctx.fillStyle = 'rgba(255,255,255,0.7)';
+      ctx.font = 'bold 10px monospace';
+      ctx.textAlign = 'center';
+      ctx.fillText(lda, ldrBarX + ldrBarW/2, mt - 4);
+      ctx.font = '8px monospace';
+      ctx.fillText('M', ldrBarX + ldrBarW/2, mt + 8);
+
+      // LDR tick line
+      if (ldr && ldrFrac > 0) {
+        var ldrTickY = mt + rwyH - Math.round(rwyH * ldrFrac);
+        ctx.strokeStyle = ok ? 'rgba(34,197,94,0.9)' : 'rgba(239,68,68,0.9)';
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        ctx.moveTo(ldrBarX - 4, ldrTickY);
+        ctx.lineTo(ldrBarX + ldrBarW + 4, ldrTickY);
+        ctx.stroke();
+      }
+    } else {
+      // Empty LDR bar placeholder
+      ctx.fillStyle = 'rgba(100,116,139,0.1)';
+      ctx.fillRect(ldrBarX, mt, ldrBarW, rwyH);
+      ctx.strokeStyle = 'rgba(100,116,139,0.25)';
+      ctx.lineWidth = 1;
+      ctx.strokeRect(ldrBarX, mt, ldrBarW, rwyH);
+    }
+
+    // ── Wind info box (left) ────────────────────────
+    var wbH = Math.round(rwyH * 0.50);
+    var wbY = mt + Math.round(rwyH * 0.25);
+    var windBoxW = rwyX - 6;
+    var windBoxX = 2;
+    ctx.strokeStyle = 'rgba(255,255,255,0.15)';
+    ctx.lineWidth = 1;
+    ctx.strokeRect(windBoxX, wbY, windBoxW, wbH);
+
+    var wd = windData && windData['ld'];
+    var hwKt = 0, xwKt = 0, rawSpd = 0, rawDir = '---';
+    if (wd && wd.spd > 0 && isActive) {
+      rawSpd = wd.spd; rawDir = wd.dir;
+      var rwySel = document.getElementById('ld-rwy-sel');
+      if (rwySel && rwySel.value) {
+        var comp = calcWindComponents(wd.dir, wd.spd, rwySel.value);
+        hwKt = comp.headwind; xwKt = comp.crosswind;
+      } else {
+        hwKt = windKt;
+      }
+    }
+
+    ctx.font = 'bold 7px monospace';
+    ctx.textAlign = 'center';
+    ctx.fillStyle = 'rgba(255,255,255,0.5)';
+    ctx.fillText('WIND', windBoxX + windBoxW/2, wbY + 13);
+
+    // Wind direction/speed
+    ctx.font = 'bold 8px monospace';
+    ctx.fillStyle = rawSpd > 0 ? 'var(--amber)' : 'rgba(255,255,255,0.3)';
+    var windStr = rawSpd > 0 ? (String(rawDir).padStart(3,'0') + '/' + String(rawSpd).padStart(2,'0')) : '--/--';
+    ctx.fillText(windStr, windBoxX + windBoxW/2, wbY + 27);
+
+    // Divider
+    ctx.strokeStyle = 'rgba(255,255,255,0.1)';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(windBoxX + 4, wbY + 33);
+    ctx.lineTo(windBoxX + windBoxW - 4, wbY + 33);
+    ctx.stroke();
+
+    // Headwind / Tailwind
+    var hwColor = hwKt > 0 ? '#22C55E' : (hwKt < 0 ? '#EF4444' : 'rgba(255,255,255,0.3)');
+    var hwLabel = hwKt > 0 ? '↓' : (hwKt < 0 ? '↑' : '');
+    ctx.font = 'bold 8px monospace';
+    ctx.fillStyle = hwColor;
+    ctx.fillText(hwLabel + Math.abs(hwKt)+'K', windBoxX + windBoxW/2, wbY + 47);
+    ctx.font = '6px monospace';
+    ctx.fillStyle = 'rgba(255,255,255,0.4)';
+    ctx.fillText(hwKt >= 0 ? 'HW' : 'TW', windBoxX + windBoxW/2, wbY + 57);
+
+    // Divider
+    ctx.beginPath();
+    ctx.moveTo(windBoxX + 4, wbY + 62);
+    ctx.lineTo(windBoxX + windBoxW - 4, wbY + 62);
+    ctx.stroke();
+
+    // Crosswind
+    ctx.font = 'bold 8px monospace';
+    ctx.fillStyle = xwKt > 15 ? '#EF4444' : (xwKt > 8 ? '#F5A800' : '#22C55E');
+    ctx.fillText('↔'+xwKt+'K', windBoxX + windBoxW/2, wbY + 76);
+    ctx.font = '6px monospace';
+    ctx.fillStyle = 'rgba(255,255,255,0.4)';
+    ctx.fillText('XW', windBoxX + windBoxW/2, wbY + 86);
+
+    return;
+  }
+
+  // ── DEPARTURE CANVAS (original logic) ────────────────────────────
   if (!rwyName || rwyName === '—' || rwyName === '') {
     ctx.fillStyle = '#2A3550';
     ctx.font = '10px monospace';
@@ -2276,67 +2450,53 @@ function drawRunwayDiagram(canvasId, rwyName, windKt, windDir, lda, ldr) {
     return;
   }
 
-  var ml = 28, mr = 28, mt = 16, mb = 36;
-  var rw = W - ml - mr;   // runway width on screen
-  var rh = H - mt - mb;   // runway height on screen
+  var ml = 28, mr = 28, mt2 = 16, mb2 = 36;
+  var rw = W - ml - mr;
+  var rh = H - mt2 - mb2;
 
-  // Runway surface
   ctx.fillStyle = '#1E2A3A';
-  ctx.fillRect(ml, mt, rw, rh);
-
-  // Runway border
+  ctx.fillRect(ml, mt2, rw, rh);
   ctx.strokeStyle = 'rgba(255,255,255,0.6)';
   ctx.lineWidth = 2;
-  ctx.strokeRect(ml, mt, rw, rh);
+  ctx.strokeRect(ml, mt2, rw, rh);
 
-  // Centre line dashes
   ctx.strokeStyle = 'rgba(255,255,255,0.4)';
   ctx.lineWidth = 1.5;
   ctx.setLineDash([10, 8]);
   ctx.beginPath();
-  ctx.moveTo(W/2, mt + 20);
-  ctx.lineTo(W/2, mt + rh - 20);
+  ctx.moveTo(W/2, mt2 + 20);
+  ctx.lineTo(W/2, mt2 + rh - 20);
   ctx.stroke();
   ctx.setLineDash([]);
 
-  // Touchdown zone stripes (bottom = threshold)
   ctx.fillStyle = 'rgba(255,255,255,0.25)';
   var stripeW = 8, stripeH = 4, gap = 7;
   var sx = ml + (rw - stripeW*2 - 6)/2;
   for (var i = 0; i < 4; i++) {
-    var sy = mt + rh - 30 - i * (stripeH + gap);
+    var sy = mt2 + rh - 30 - i * (stripeH + gap);
     ctx.fillRect(sx, sy, stripeW, stripeH);
     ctx.fillRect(sx + stripeW + 6, sy, stripeW, stripeH);
   }
 
-  // Threshold bar
   ctx.fillStyle = 'rgba(255,255,255,0.5)';
-  ctx.fillRect(ml, mt + rh - 8, rw, 4);
+  ctx.fillRect(ml, mt2 + rh - 8, rw, 4);
 
-  // LDA bar if available
   if (lda && ldr) {
-    var ldaFrac = Math.min(1, lda / lda);
-    var ldrFrac = Math.min(1, ldr / lda);
+    var ldrFrac2 = Math.min(1, ldr / lda);
     var barX = ml - 18;
     var barH_total = rh;
-
-    // LDA bar (grey)
     ctx.fillStyle = 'rgba(100,116,139,0.4)';
-    ctx.fillRect(barX, mt, 6, barH_total);
-
-    // LDR used portion (green or red)
-    var ldrH = Math.round(barH_total * ldrFrac);
+    ctx.fillRect(barX, mt2, 6, barH_total);
+    var ldrH3 = Math.round(barH_total * ldrFrac2);
     ctx.fillStyle = ldr <= lda ? 'rgba(34,197,94,0.8)' : 'rgba(239,68,68,0.8)';
-    ctx.fillRect(barX, mt + barH_total - ldrH, 6, ldrH);
+    ctx.fillRect(barX, mt2 + barH_total - ldrH3, 6, ldrH3);
   }
 
-  // Runway number
   ctx.fillStyle = 'white';
   ctx.font = 'bold 16px monospace';
   ctx.textAlign = 'center';
   ctx.fillText(rwyName, W/2, H - 12);
 
-  // Wind arrow (if wind data available)
   if (windKt && Math.abs(windKt) > 0) {
     var arrowColor = windKt > 0 ? '#22C55E' : '#EF4444';
     var arrowLen = Math.min(20, Math.abs(windKt) * 1.5);
@@ -2346,14 +2506,12 @@ function drawRunwayDiagram(canvasId, rwyName, windKt, windDir, lda, ldr) {
     ctx.lineWidth = 2;
     ctx.beginPath();
     if (windKt > 0) {
-      // Headwind — arrow pointing down (toward aircraft)
       ctx.moveTo(arrowX, arrowY - arrowLen);
       ctx.lineTo(arrowX, arrowY + arrowLen);
       ctx.moveTo(arrowX - 4, arrowY + arrowLen - 6);
       ctx.lineTo(arrowX, arrowY + arrowLen);
       ctx.lineTo(arrowX + 4, arrowY + arrowLen - 6);
     } else {
-      // Tailwind — arrow pointing up
       ctx.moveTo(arrowX, arrowY + arrowLen);
       ctx.lineTo(arrowX, arrowY - arrowLen);
       ctx.moveTo(arrowX - 4, arrowY - arrowLen + 6);
@@ -2370,21 +2528,20 @@ function drawRunwayDiagram(canvasId, rwyName, windKt, windDir, lda, ldr) {
 
 function updateRunwayDiagrams() {
   // T/O diagram
-  var toIcao = document.getElementById('to-icao') ? document.getElementById('to-icao').value.toUpperCase() : '';
   var toRwySel = document.getElementById('to-rwy-sel');
   var toRwy = toRwySel ? toRwySel.value : '';
   var toWind = parseFloat(document.getElementById('to-wind') ? document.getElementById('to-wind').value : 0) || 0;
   drawRunwayDiagram('to-rwy-canvas', toRwy, toWind, 0, null, null);
 
-  // Landing diagram
-  var ldIcao = document.getElementById('ld-icao') ? document.getElementById('ld-icao').value.toUpperCase() : '';
+  // Landing diagram — always draw, even with no runway
   var ldRwySel = document.getElementById('ld-rwy-sel');
   var ldRwy = ldRwySel ? ldRwySel.value : '';
   var ldWind = parseFloat(document.getElementById('ld-wind') ? document.getElementById('ld-wind').value : 0) || 0;
   var ldaAvail = getRwyAvailable('ld');
   var ldrEl = document.getElementById('ld-ldr-req');
   var ldr = ldrEl ? parseFloat(ldrEl.textContent) : null;
-  drawRunwayDiagram('ld-rwy-canvas', ldRwy, ldWind, 0, ldaAvail, ldr);
+  var ldWindDir = (windData && windData['ld']) ? windData['ld'].dir : 0;
+  drawRunwayDiagram('ld-rwy-canvas', ldRwy, ldWind, ldWindDir, ldaAvail, ldr);
 }
 
 
@@ -2592,6 +2749,46 @@ function resetPerfTO() {
     var e=document.getElementById(id); if(e) e.textContent='—';
   });
   if (toIcao) lookupAirport('to');
+}
+
+function resetPerfLD() {
+  var ldIcao = document.getElementById('ld-icao'); if (ldIcao) ldIcao.value = '';
+  var ldWeight = document.getElementById('ld-weight'); if (ldWeight) ldWeight.value = 1180;
+  var ldQnh = document.getElementById('ld-qnh'); if (ldQnh) ldQnh.value = 1013;
+  var ldOat = document.getElementById('ld-oat'); if (ldOat) ldOat.value = 15;
+  var ldWind = document.getElementById('ld-wind'); if (ldWind) ldWind.value = 0;
+  var ldSlope = document.getElementById('ld-slope'); if (ldSlope) ldSlope.value = 0;
+  // Reset displays
+  var els = ['ld-airport-name','ld-airport-elev','ld-press-alt','ld-density-alt','ld-rwy-avail'];
+  var defs = ['—','Elev: — ft','— ft','— ft','—'];
+  els.forEach(function(id,i){ var e=document.getElementById(id); if(e) e.textContent=defs[i]; });
+  // Reset runway selector
+  var rwySel = document.getElementById('ld-rwy-sel');
+  if (rwySel) { rwySel.innerHTML = '<option value="">—</option>'; }
+  // Reset WX
+  ['ld-wx-wind','ld-wx-temp','ld-wx-qnh'].forEach(function(id,i){
+    var e=document.getElementById(id); if(e) e.textContent=['—/—','—','—'][i];
+  });
+  var metarText = document.getElementById('ld-metar-text');
+  if (metarText) { metarText.textContent = 'LIVE METAR'; metarText.style.color = 'var(--text-dim)'; metarText.style.fontFamily = 'var(--head)'; metarText.style.fontSize = '10px'; metarText.style.fontWeight = '600'; metarText.style.letterSpacing = '2px'; }
+  // Reset results
+  ['ld-base-gr-m','ld-base-gr-ft','ld-corr-gr-m','ld-corr-gr-ft','ld-base-50-m','ld-base-50-ft','ld-corr-50-m','ld-corr-50-ft'].forEach(function(id){
+    var e=document.getElementById(id); if(e) e.textContent='–';
+  });
+  ['ld-delta-gr','ld-delta-50'].forEach(function(id){
+    var e=document.getElementById(id); if(e){ e.textContent='±0'; e.className='delta-badge zero'; }
+  });
+  // Reset runway info
+  ['ld-ri-ident','ld-ri-lda','ld-ri-coord','ld-ri-elev'].forEach(function(id){
+    var e=document.getElementById(id); if(e) e.textContent='—';
+  });
+  // Reset LDA table
+  ['ld-lda-tbl','ld-ldr-tbl','ld-ldr115-tbl'].forEach(function(id){
+    var e=document.getElementById(id); if(e) e.textContent='–';
+  });
+  // Reset wind data
+  if (windData) windData['ld'] = {dir: 0, spd: 0};
+  updateRunwayDiagrams();
 }
 
 
@@ -2889,7 +3086,10 @@ function calcLanding(){
   } else if (ldaSection) {
     ldaSection.style.display = 'none';
     var tbl = document.getElementById('ld-lda-table');
-    if (tbl) tbl.style.display = 'none';
+    if (tbl) tbl.style.display = 'block';
+    var ldaTbl2 = document.getElementById('ld-lda-tbl'); if(ldaTbl2) { ldaTbl2.textContent = '–'; ldaTbl2.style.color = 'var(--text)'; }
+    var ldrTbl2 = document.getElementById('ld-ldr-tbl'); if(ldrTbl2) { ldrTbl2.textContent = '–'; ldrTbl2.style.color = 'var(--text)'; }
+    var l115Tbl2 = document.getElementById('ld-ldr115-tbl'); if(l115Tbl2) { l115Tbl2.textContent = '–'; l115Tbl2.style.color = 'var(--text)'; }
   }
   updateRunwayDiagrams();
 }
