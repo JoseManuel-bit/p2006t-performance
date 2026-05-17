@@ -2907,14 +2907,17 @@ function syncLiveWX(prefix) {
           if (!line) throw new Error('no metar');
           applyMetar(line);
           // Also fetch TAF
-          var tafUrl = 'https://aviationweather.gov/api/data/taf?ids=' + icao + '&format=raw&hours=24';
+          var tafUrl = 'https://aviationweather.gov/api/data/taf?ids=' + icao + '&format=raw';
           fetch('https://api.allorigins.win/get?url=' + encodeURIComponent(tafUrl))
             .then(function(r) { return r.json(); })
             .then(function(tj) {
               var tafTxt = (tj.contents || '').trim();
               if (tafTxt) {
+                var tafLines = tafTxt.split('\n').map(function(l){ return l.trim(); }).filter(Boolean);
+                var tafLine = tafLines.find(function(l){ return l.indexOf('TAF') === 0 || l.indexOf(icao) === 0; });
+                if (!tafLine) tafLine = tafLines[0];
                 var tafEl = document.getElementById(prefix + '-taf-text');
-                if (tafEl) { tafEl.textContent = tafTxt.split('\n')[0].trim(); tafEl.style.color = 'rgba(255,255,255,0.4)'; }
+                if (tafEl && tafLine) { tafEl.textContent = tafLine; tafEl.style.color = 'rgba(255,255,255,0.4)'; }
               }
             })
             .catch(function() {});
