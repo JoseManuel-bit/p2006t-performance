@@ -129,6 +129,8 @@ body{font-family:var(--body);background:var(--bg);color:var(--text);display:flex
 .airport-elev{font-family:var(--mono);font-size:11px;color:var(--amber);margin-top:3px;}
 .rwy-wrap{display:flex;flex-direction:column;gap:4px;flex-shrink:0;}
 .rwy-select{background:var(--bg3);border:1px solid var(--border);border-radius:4px;font-family:var(--mono);font-size:22px;font-weight:700;color:var(--amber);text-align:center;text-align-last:center;padding:6px 4px;outline:none;-webkit-appearance:none;appearance:none;width:90px;}
+.rwy-select.empty{color:#8A97B0;}
+.icao-input::placeholder{color:#8A97B0;}
 .rwy-avail{font-family:var(--mono);font-size:11px;color:var(--green);text-align:center;font-weight:700;}
 /* DENSITY ALT */
 
@@ -137,7 +139,9 @@ body{font-family:var(--body);background:var(--bg);color:var(--text);display:flex
 .input-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;}
 .input-card-label{background:var(--panel);font-family:var(--head);font-size:10px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--text-dim);text-align:center;padding:5px 4px;border-bottom:1px solid var(--border);}
 .input-card-val{display:flex;align-items:center;justify-content:center;background:var(--bg3);}
-.input-card-val select,.input-card-val input[type="number"]{width:100%;background:transparent;border:none;font-family:var(--mono);font-size:26px;color:var(--amber);text-align:center;text-align-last:center;padding:8px 4px;outline:none;cursor:pointer;-webkit-appearance:none;appearance:none;display:block;margin:0 auto;}
+.input-card-val select,.input-card-val input[type="number"]{width:100%;background:transparent;border:none;font-family:var(--mono);font-size:26px;color:#8A97B0;text-align:center;text-align-last:center;padding:8px 4px;outline:none;cursor:pointer;-webkit-appearance:none;appearance:none;display:block;margin:0 auto;}
+.input-card-val input[type="number"].user-edited{color:var(--amber);}
+.input-card-val input[type="number"].metar-synced{color:var(--green);}
 .input-card-val select option{background:#1a2030;color:var(--text);font-size:14px;}
 input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-spin-button{opacity:0;}
 /* CORRECTIONS */
@@ -421,7 +425,7 @@ input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-
 }
 .wx-field-val {
   font-family: var(--mono); font-size: 22px; font-weight: 700;
-  color: var(--amber);
+  color: var(--green);
 }
 .wx-field-unit {
   font-family: var(--head); font-size: 8px; color: var(--text-dim);
@@ -903,16 +907,16 @@ input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-
           </div>
 
           <div class="input-grid" style="margin-bottom:8px;">
-            <div class="input-card"><div class="input-card-label">Weight · kg</div><div class="input-card-val"><input type="number" id="to-weight" value="1180" step="1" min="930" max="1180"></div></div>
-            <div class="input-card"><div class="input-card-label">QNH · hPa</div><div class="input-card-val"><input type="number" id="to-qnh" value="1013" step="1" min="900" max="1050"></div></div>
-            <div class="input-card"><div class="input-card-label">OAT · °C</div><div class="input-card-val"><input type="number" id="to-oat" value="15" step="1" min="-40" max="60"></div></div>
+            <div class="input-card"><div class="input-card-label">Weight · kg</div><div class="input-card-val"><input type="number" id="to-weight" value="1180" step="1" min="930" max="1180" oninput="userEdit(this);calcTakeoff()"></div></div>
+            <div class="input-card"><div class="input-card-label">QNH · hPa</div><div class="input-card-val"><input type="number" id="to-qnh" value="1013" step="1" min="900" max="1050" oninput="userEdit(this);calcDensityAlt('to')"></div></div>
+            <div class="input-card"><div class="input-card-label">OAT · °C</div><div class="input-card-val"><input type="number" id="to-oat" value="15" step="1" min="-40" max="60" oninput="userEdit(this);calcDensityAlt('to')"></div></div>
           </div>
           <input type="hidden" id="to-alt" value="0">
 
           <div class="input-grid" style="margin-bottom:8px;">
-            <div class="input-card"><div class="input-card-label">Wind · kt <span id="to-wind-info" style="font-size:8px;letter-spacing:0;text-transform:none;font-family:var(--body);font-weight:400;margin-left:4px;"></span></div><div class="input-card-val"><input type="number" id="to-wind" value="0" step="1" min="-30" max="30"></div></div>
+            <div class="input-card"><div class="input-card-label">Wind · kt <span id="to-wind-info" style="font-size:8px;letter-spacing:0;text-transform:none;font-family:var(--body);font-weight:400;margin-left:4px;"></span></div><div class="input-card-val"><input type="number" id="to-wind" value="0" step="1" min="-30" max="30" oninput="userEdit(this);calcTakeoff()"></div></div>
             <div class="input-card"><div class="input-card-label">Runway</div><div class="input-card-val"><select id="to-runway" style="pointer-events:none;color:var(--text-dim);"><option value="0">GRASS</option><option value="1">PAVED</option></select></div></div>
-            <div class="input-card"><div class="input-card-label">Slope · %</div><div class="input-card-val"><input type="number" id="to-slope" value="0" step="0.1" min="-5" max="5"></div></div>
+            <div class="input-card"><div class="input-card-label">Slope · %</div><div class="input-card-val"><input type="number" id="to-slope" value="0" step="0.1" min="-5" max="5" oninput="userEdit(this);calcTakeoff()"></div></div>
           </div>
 
           <div class="wx-panel">
@@ -992,19 +996,17 @@ input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-
     <div class="perf-page" id="perf-ld" style="flex-direction:row;">
 
         <!-- LEFT col: all inputs and results -->
-        <div class="perf-left" style="flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:0;">
+        <div class="perf-left" style="flex:1;max-width:600px;overflow-y:auto;display:flex;flex-direction:column;gap:0;">
 
           <div class="airport-selector" style="margin-bottom:6px;">
-            <div style="display:flex;align-items:flex-start;gap:10px;">
+            <div style="display:flex;align-items:center;gap:10px;">
               <div class="airport-icao-wrap" style="flex-shrink:0;">
-                <div class="airport-label">DESTINATION AIRPORT</div>
                 <input type="text" id="ld-icao" placeholder="ICAO" maxlength="4" oninput="if(window.lookupAirport)lookupAirport('ld')" class="icao-input">
               </div>
               <div class="airport-icao-wrap">
-                <div class="airport-label">RUNWAY</div>
-                <select id="ld-rwy-sel" onchange="selectRunway('ld')" class="rwy-select" style="min-width:80px;"><option value="">—</option></select>
+                <select id="ld-rwy-sel" onchange="selectRunway('ld')" class="rwy-select" style="min-width:80px;"><option value="">RWY</option></select>
               </div>
-              <div style="flex:1;min-width:0;display:flex;flex-direction:column;justify-content:center;padding-top:16px;">
+              <div style="flex:1;min-width:0;display:flex;flex-direction:column;justify-content:center;">
                 <div class="airport-name" id="ld-airport-name">—</div>
                 <div style="display:flex;align-items:center;gap:10px;margin-top:2px;">
                   <div class="airport-elev" id="ld-airport-elev">Elev: — ft</div>
@@ -1020,15 +1022,15 @@ input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-
           <input type="hidden" id="ld-alt" value="0">
 
           <div class="input-grid" style="margin-bottom:6px;">
-            <div class="input-card"><div class="input-card-label">Weight · kg</div><div class="input-card-val"><input type="number" id="ld-weight" value="1180" step="1" min="930" max="1180" oninput="calcLanding()"></div></div>
-            <div class="input-card"><div class="input-card-label">QNH · hPa</div><div class="input-card-val"><input type="number" id="ld-qnh" value="1013" step="1" min="900" max="1050" oninput="calcDensityAlt('ld')"></div></div>
-            <div class="input-card"><div class="input-card-label">OAT · °C</div><div class="input-card-val"><input type="number" id="ld-oat" value="15" step="1" min="-40" max="60" oninput="calcDensityAlt('ld')"></div></div>
+            <div class="input-card"><div class="input-card-label">Weight · kg</div><div class="input-card-val"><input type="number" id="ld-weight" value="0" step="1" min="930" max="1180" oninput="userEdit(this);calcLanding()"></div></div>
+            <div class="input-card"><div class="input-card-label">QNH · hPa</div><div class="input-card-val"><input type="number" id="ld-qnh" value="0" step="1" min="900" max="1050" oninput="userEdit(this);calcDensityAlt('ld')"></div></div>
+            <div class="input-card"><div class="input-card-label">OAT · °C</div><div class="input-card-val"><input type="number" id="ld-oat" value="0" step="1" min="-40" max="60" oninput="userEdit(this);calcDensityAlt('ld')"></div></div>
           </div>
 
           <div class="input-grid" style="margin-bottom:6px;">
-            <div class="input-card"><div class="input-card-label">Wind · kt <span id="ld-wind-info" style="font-size:8px;letter-spacing:0;text-transform:none;font-family:var(--body);font-weight:400;margin-left:4px;"></span></div><div class="input-card-val"><input type="number" id="ld-wind" value="0" step="1" min="-30" max="30" oninput="calcLanding()"></div></div>
+            <div class="input-card"><div class="input-card-label">Wind · kt <span id="ld-wind-info" style="font-size:8px;letter-spacing:0;text-transform:none;font-family:var(--body);font-weight:400;margin-left:4px;"></span></div><div class="input-card-val"><input type="number" id="ld-wind" value="0" step="1" min="-30" max="30" oninput="userEdit(this);calcLanding()"></div></div>
             <div class="input-card"><div class="input-card-label">Runway</div><div class="input-card-val"><select id="ld-runway" onchange="calcLanding()" style="pointer-events:none;color:var(--text-dim);"><option value="0">GRASS</option><option value="1">PAVED</option></select></div></div>
-            <div class="input-card"><div class="input-card-label">Slope · %</div><div class="input-card-val"><input type="number" id="ld-slope" value="0" step="0.1" min="-5" max="5" oninput="calcLanding()"></div></div>
+            <div class="input-card"><div class="input-card-label">Slope · %</div><div class="input-card-val"><input type="number" id="ld-slope" value="0" step="0.1" min="-5" max="5" oninput="userEdit(this);calcLanding()"></div></div>
           </div>
 
           <div class="wx-panel" style="margin-bottom:6px;">
@@ -1066,25 +1068,6 @@ input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-
             </div>
           </div>
 
-          <div class="results-compact" style="margin-bottom:6px;">
-            <div class="results-compact-header">
-              <div class="results-compact-col-title">BASE VALUES</div>
-              <div class="results-compact-col-title corrected-title">WITH ALL CORRECTIONS</div>
-            </div>
-            <div class="results-compact-row">
-              <div class="results-compact-label">Ground Roll</div>
-              <div class="results-compact-val"><span class="rcv-num" id="ld-base-gr-m">–</span><span class="rcv-ft" id="ld-base-gr-ft">– ft</span></div>
-              <div class="results-compact-divider"></div>
-              <div class="results-compact-val corrected"><span class="rcv-num green" id="ld-corr-gr-m">–</span><span class="rcv-ft" id="ld-corr-gr-ft">– ft</span><span class="delta-badge zero" id="ld-delta-gr">±0</span></div>
-            </div>
-            <div class="results-compact-row">
-              <div class="results-compact-label">Landing Dist.</div>
-              <div class="results-compact-val"><span class="rcv-num" id="ld-base-50-m">–</span><span class="rcv-ft" id="ld-base-50-ft">– ft</span></div>
-              <div class="results-compact-divider"></div>
-              <div class="results-compact-val corrected"><span class="rcv-num green" id="ld-corr-50-m">–</span><span class="rcv-ft" id="ld-corr-50-ft">– ft</span><span class="delta-badge zero" id="ld-delta-50">±0</span></div>
-            </div>
-          </div>
-
           <div style="display:flex;align-items:stretch;background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:6px;">
             <div style="font-family:var(--head);font-size:9px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--text-dim);background:var(--panel);padding:8px 12px;border-right:1px solid var(--border);white-space:nowrap;display:flex;align-items:center;flex-shrink:0;min-width:110px;">RUNWAY INFO</div>
             <div style="flex:1;display:flex;">
@@ -1094,6 +1077,20 @@ input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-
               <div class="rwy-info-cell" style="border-right:none;"><div class="rwy-info-label">ELEV (FT)</div><div class="rwy-info-val" id="ld-ri-elev">—</div></div>
             </div>
           </div>
+
+          <button onclick="ldCalculated=true;calcLanding();" style="width:100%;padding:11px;background:var(--blue);border:1px solid var(--blue);border-radius:var(--radius);font-family:var(--head);font-size:12px;font-weight:600;letter-spacing:2px;color:white;cursor:pointer;margin-bottom:6px;">CALCULATE</button>
+
+          <!-- Hidden result elements kept for JS compatibility -->
+          <span id="ld-base-gr-m" style="display:none;"></span>
+          <span id="ld-base-gr-ft" style="display:none;"></span>
+          <span id="ld-corr-gr-m" style="display:none;"></span>
+          <span id="ld-corr-gr-ft" style="display:none;"></span>
+          <span id="ld-delta-gr" style="display:none;"></span>
+          <span id="ld-base-50-m" style="display:none;"></span>
+          <span id="ld-base-50-ft" style="display:none;"></span>
+          <span id="ld-corr-50-m" style="display:none;"></span>
+          <span id="ld-corr-50-ft" style="display:none;"></span>
+          <span id="ld-delta-50" style="display:none;"></span>
 
           <button onclick="resetPerfLD()" style="width:100%;padding:11px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);font-family:var(--head);font-size:12px;font-weight:600;letter-spacing:2px;color:var(--text-dim);cursor:pointer;margin-bottom:6px;">RESET</button>
 
@@ -1105,8 +1102,8 @@ input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-
         </div><!-- /left col -->
 
         <!-- RIGHT col: runway canvas only -->
-        <div class="perf-right" style="width:360px;display:flex;flex-direction:column;align-items:center;justify-content:space-between;padding:8px 8px 6px;background:transparent;">
-          <canvas id="ld-rwy-canvas" width="180" height="100" style="display:block;width:344px;flex:1;min-height:0;border-radius:6px;"></canvas>
+        <div class="perf-right" style="width:360px;min-width:360px;flex-shrink:0;display:flex;flex-direction:column;align-items:center;justify-content:space-between;padding:8px 8px 6px;background:transparent;">
+          <canvas id="ld-rwy-canvas" width="344" height="100" style="display:block;width:344px;flex:1;min-height:0;border-radius:6px;"></canvas>
           <div id="ld-lda-table" style="display:block;width:100%;margin-top:6px;">
             <div style="display:grid;grid-template-columns:1fr 1fr 1fr;border:1px solid var(--border);border-radius:6px;overflow:hidden;">
               <div style="background:var(--panel);padding:6px 4px;text-align:center;border-right:1px solid var(--border);">
@@ -1592,10 +1589,21 @@ function lookupAirport(prefix) {
   }
 }
 
+function userEdit(el) {
+  el.classList.remove('metar-synced');
+  el.classList.add('user-edited');
+}
+function updateRwySelColor(prefix) {
+  var sel = document.getElementById(prefix+'-rwy-sel');
+  if (!sel) return;
+  sel.style.color = sel.value ? 'var(--amber)' : '#8A97B0';
+  sel.classList.toggle('empty', !sel.value);
+}
 function selectRunway(prefix) {
   var icao = document.getElementById(prefix+'-icao').value.toUpperCase().trim();
   var rwySel = document.getElementById(prefix+'-rwy-sel');
   var rwyAvail = document.getElementById(prefix+'-rwy-avail');
+  updateRwySelColor(prefix);
   var rwyData = RUNWAYS[icao] && RUNWAYS[icao][rwySel.value];
   if (rwyData) {
     if (rwyAvail) { rwyAvail.textContent = rwyData.tora + ' m'; rwyAvail.style.color = 'var(--green)'; }
@@ -1896,6 +1904,7 @@ var RWYCC = {
 
 
 var currentRWYCC = 6;
+var ldCalculated = false;
 
 function setRWYCC(code) {
   currentRWYCC = code;
@@ -2259,6 +2268,7 @@ function drawRunwayDiagram(canvasId, rwyName, windKt, windDir, lda, ldr) {
   canvas.width  = W * dpr;
   var H = canvasId === 'ld-rwy-canvas' ? (canvas.offsetHeight > 20 ? canvas.offsetHeight : 400) : (canvas.offsetHeight > 20 ? canvas.offsetHeight : 220);
   var CW = canvas.offsetWidth > 20 ? canvas.offsetWidth : W;
+  if (canvasId === 'ld-rwy-canvas' && CW < 180) CW = 180;
   W = CW;
   canvas.width  = CW * dpr;
   canvas.height = H * dpr;
@@ -2278,7 +2288,7 @@ function drawRunwayDiagram(canvasId, rwyName, windKt, windDir, lda, ldr) {
     var rwyW     = Math.round(W * 0.43);
     var rwyX     = Math.round(W * 0.30);
     var windBoxW = Math.round(W * 0.22);
-    var windBoxX = Math.round((rwyX - windBoxW) / 2);
+    var windBoxX = Math.round((rwyX - windBoxW) / 2) - 2;
     var mt = 16, mb = 36;
     var rwyH = H - mt - mb;
 
@@ -2319,63 +2329,66 @@ function drawRunwayDiagram(canvasId, rwyName, windKt, windDir, lda, ldr) {
     ctx.textAlign = 'center';
     ctx.fillText(isActive ? rwyName : '—', rwyX + rwyW/2, H - 14);
 
-    // ── LDR side bar (right) ────────────────────────
-    if (isActive && lda && lda > 0) {
-      var ldrFrac = ldr ? Math.min(1, ldr / lda) : 0;
-      var ldr115Frac = ldr ? Math.min(1, (ldr * 1.15) / lda) : 0;
-      var ok = ldr ? (ldr * 1.15) <= lda : true;
+    // ── LDR Fenix-style lines ────────────────────────
+    if (isActive && lda && lda > 0 && ldr && ldr > 0) {
+      var ok = (ldr * 1.15) <= lda;
+      var ldrColor = ok ? '#22C55E' : '#EF4444';
 
-      // LDA full bar (grey background)
-      ctx.fillStyle = 'rgba(100,116,139,0.25)';
-      ctx.fillRect(ldrBarX, mt, ldrBarW, rwyH);
-      ctx.strokeStyle = 'rgba(100,116,139,0.5)';
-      ctx.lineWidth = 1;
-      ctx.strokeRect(ldrBarX, mt, ldrBarW, rwyH);
+      // Calculate Y positions from bottom of runway
+      var ldrFrac    = Math.min(1, ldr / lda);
+      var ldr115Frac = Math.min(1, (ldr * 1.15) / lda);
+      var bottomY    = mt + rwyH;
+      var ldrY       = bottomY - Math.round(rwyH * ldrFrac);
+      var ldr115Y    = bottomY - Math.round(rwyH * ldr115Frac);
 
-      // 1.15 LDR fill
-      if (ldr115Frac > 0) {
-        var ldr115H = Math.round(rwyH * ldr115Frac);
-        ctx.fillStyle = ok ? 'rgba(34,197,94,0.25)' : 'rgba(239,68,68,0.25)';
-        ctx.fillRect(ldrBarX, mt + rwyH - ldr115H, ldrBarW, ldr115H);
-      }
+      // Vertical line — from 1.15LDR down to bottom of runway
+      var vx = ldrBarX + Math.round(ldrBarW / 2);
+      ctx.strokeStyle = 'rgba(255,255,255,0.4)';
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.moveTo(vx, ldr115Y);
+      ctx.lineTo(vx, bottomY);
+      ctx.stroke();
 
-      // LDR fill (darker)
-      if (ldrFrac > 0) {
-        var ldrH2 = Math.round(rwyH * ldrFrac);
-        ctx.fillStyle = ok ? 'rgba(34,197,94,0.55)' : 'rgba(239,68,68,0.55)';
-        ctx.fillRect(ldrBarX, mt + rwyH - ldrH2, ldrBarW, ldrH2);
-      }
+      // 1.15 LDR horizontal line — longer, goes further left, white
+      ctx.strokeStyle = 'rgba(255,255,255,0.85)';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(rwyX + Math.round(rwyW * 0.3), ldr115Y);
+      ctx.lineTo(vx, ldr115Y);
+      ctx.stroke();
 
-      // LDA label (top)
-      ctx.fillStyle = 'rgba(255,255,255,0.7)';
-      ctx.font = 'bold 10px monospace';
-      ctx.textAlign = 'center';
-      ctx.fillText(lda, ldrBarX + ldrBarW/2, mt - 4);
+      // LDR horizontal line — shorter, green
+      ctx.strokeStyle = ldrColor;
+      ctx.lineWidth = 2.5;
+      ctx.beginPath();
+      ctx.moveTo(rwyX + Math.round(rwyW * 0.6), ldrY);
+      ctx.lineTo(vx, ldrY);
+      ctx.stroke();
+
+      // Labels to the right of vertical line
+      ctx.textAlign = 'left';
+      // 1.15 LDR label
+      ctx.fillStyle = 'rgba(255,255,255,0.85)';
+      ctx.font = 'bold 9px monospace';
+      ctx.fillText(Math.round(ldr * 1.15) + 'm', vx + 4, ldr115Y - 2);
+      ctx.fillStyle = 'rgba(255,255,255,0.45)';
       ctx.font = '8px monospace';
-      ctx.fillText('M', ldrBarX + ldrBarW/2, mt + 8);
+      ctx.fillText('1.15LDR', vx + 4, ldr115Y + 8);
 
-      // LDR tick line
-      if (ldr && ldrFrac > 0) {
-        var ldrTickY = mt + rwyH - Math.round(rwyH * ldrFrac);
-        ctx.strokeStyle = ok ? 'rgba(34,197,94,0.9)' : 'rgba(239,68,68,0.9)';
-        ctx.lineWidth = 1.5;
-        ctx.beginPath();
-        ctx.moveTo(ldrBarX - 4, ldrTickY);
-        ctx.lineTo(ldrBarX + ldrBarW + 4, ldrTickY);
-        ctx.stroke();
-      }
-    } else {
-      // Empty LDR bar placeholder
-      ctx.fillStyle = 'rgba(100,116,139,0.1)';
-      ctx.fillRect(ldrBarX, mt, ldrBarW, rwyH);
-      ctx.strokeStyle = 'rgba(100,116,139,0.25)';
-      ctx.lineWidth = 1;
-      ctx.strokeRect(ldrBarX, mt, ldrBarW, rwyH);
+      // LDR label
+      ctx.fillStyle = ldrColor;
+      ctx.font = 'bold 9px monospace';
+      ctx.fillText(Math.round(ldr) + 'm', vx + 4, ldrY + 10);
+      ctx.fillStyle = 'rgba(255,255,255,0.45)';
+      ctx.font = '8px monospace';
+      ctx.fillText('LDR', vx + 4, ldrY + 20);
+
     }
 
     // ── Wind info box (left) ────────────────────────
-    var wbH = Math.round(rwyH * 0.50);
-    var wbY = mt + Math.round(rwyH * 0.25);
+    var wbH = 105;
+    var wbY = mt + Math.round((rwyH - wbH) / 2);
     var windBoxW = rwyX - 6;
     var windBoxX = 2;
     ctx.strokeStyle = 'rgba(255,255,255,0.15)';
@@ -2395,48 +2408,48 @@ function drawRunwayDiagram(canvasId, rwyName, windKt, windDir, lda, ldr) {
       }
     }
 
-    ctx.font = 'bold 7px monospace';
+    ctx.font = 'bold 9px monospace';
     ctx.textAlign = 'center';
     ctx.fillStyle = 'rgba(255,255,255,0.5)';
-    ctx.fillText('WIND', windBoxX + windBoxW/2, wbY + 13);
+    ctx.fillText('WIND', windBoxX + windBoxW/2, wbY + 14);
 
     // Wind direction/speed
-    ctx.font = 'bold 8px monospace';
+    ctx.font = 'bold 10px monospace';
     ctx.fillStyle = rawSpd > 0 ? 'var(--amber)' : 'rgba(255,255,255,0.3)';
     var windStr = rawSpd > 0 ? (String(rawDir).padStart(3,'0') + '/' + String(rawSpd).padStart(2,'0')) : '--/--';
-    ctx.fillText(windStr, windBoxX + windBoxW/2, wbY + 27);
+    ctx.fillText(windStr, windBoxX + windBoxW/2, wbY + 28);
 
     // Divider
     ctx.strokeStyle = 'rgba(255,255,255,0.1)';
     ctx.lineWidth = 1;
     ctx.beginPath();
-    ctx.moveTo(windBoxX + 4, wbY + 33);
-    ctx.lineTo(windBoxX + windBoxW - 4, wbY + 33);
+    ctx.moveTo(windBoxX + 4, wbY + 35);
+    ctx.lineTo(windBoxX + windBoxW - 4, wbY + 35);
     ctx.stroke();
 
     // Headwind / Tailwind
     var hwColor = hwKt > 0 ? '#22C55E' : (hwKt < 0 ? '#EF4444' : 'rgba(255,255,255,0.3)');
     var hwLabel = hwKt > 0 ? '↓' : (hwKt < 0 ? '↑' : '');
-    ctx.font = 'bold 8px monospace';
+    ctx.font = 'bold 10px monospace';
     ctx.fillStyle = hwColor;
-    ctx.fillText(hwLabel + Math.abs(hwKt)+'K', windBoxX + windBoxW/2, wbY + 47);
-    ctx.font = '6px monospace';
+    ctx.fillText(hwLabel + Math.abs(hwKt)+'K', windBoxX + windBoxW/2, wbY + 50);
+    ctx.font = '8px monospace';
     ctx.fillStyle = 'rgba(255,255,255,0.4)';
-    ctx.fillText(hwKt >= 0 ? 'HW' : 'TW', windBoxX + windBoxW/2, wbY + 57);
+    ctx.fillText(hwKt >= 0 ? 'HW' : 'TW', windBoxX + windBoxW/2, wbY + 62);
 
     // Divider
     ctx.beginPath();
-    ctx.moveTo(windBoxX + 4, wbY + 62);
-    ctx.lineTo(windBoxX + windBoxW - 4, wbY + 62);
+    ctx.moveTo(windBoxX + 4, wbY + 68);
+    ctx.lineTo(windBoxX + windBoxW - 4, wbY + 68);
     ctx.stroke();
 
     // Crosswind
-    ctx.font = 'bold 8px monospace';
+    ctx.font = 'bold 10px monospace';
     ctx.fillStyle = xwKt > 15 ? '#EF4444' : (xwKt > 8 ? '#F5A800' : '#22C55E');
-    ctx.fillText('↔'+xwKt+'K', windBoxX + windBoxW/2, wbY + 76);
-    ctx.font = '6px monospace';
+    ctx.fillText('↔'+xwKt+'K', windBoxX + windBoxW/2, wbY + 83);
+    ctx.font = '8px monospace';
     ctx.fillStyle = 'rgba(255,255,255,0.4)';
-    ctx.fillText('XW', windBoxX + windBoxW/2, wbY + 86);
+    ctx.fillText('XW', windBoxX + windBoxW/2, wbY + 95);
 
     return;
   }
@@ -2606,7 +2619,7 @@ function syncLiveWX(prefix) {
       var temp = tempStr.startsWith('M') ? -parseInt(tempStr.slice(1)) : parseInt(tempStr);
       document.getElementById(prefix + '-wx-temp').textContent = temp;
       var oatEl = document.getElementById(prefix + '-oat');
-      if (oatEl) oatEl.value = temp;
+      if (oatEl) { oatEl.value = temp; oatEl.classList.remove('user-edited'); oatEl.classList.add('metar-synced'); }
     }
 
     var qnhMatch = raw.match(/\bQ(\d{4})\b/);
@@ -2614,11 +2627,11 @@ function syncLiveWX(prefix) {
       var qnh = parseInt(qnhMatch[1]);
       document.getElementById(prefix + '-wx-qnh').textContent = qnh;
       var qnhEl = document.getElementById(prefix + '-qnh');
-      if (qnhEl) qnhEl.value = qnh;
+      if (qnhEl) { qnhEl.value = qnh; qnhEl.classList.remove('user-edited'); qnhEl.classList.add('metar-synced'); }
     }
 
     var windEl = document.getElementById(prefix + '-wind');
-    if (windEl) windEl.value = windSpd;
+    if (windEl) { windEl.value = windSpd; windEl.classList.remove('user-edited'); windEl.classList.add('metar-synced'); }
 
     calcDensityAlt(prefix);
     if (prefix === 'to') calcTakeoff(); else calcLanding();
@@ -2719,11 +2732,11 @@ function calcTakeoffManual() {
 function resetPerfTO() {
   // Reset all editable inputs in T/O page
   var toIcao = document.getElementById('to-icao'); if (toIcao) toIcao.value = '';
-  var toWeight = document.getElementById('to-weight'); if (toWeight) toWeight.value = 1180;
-  var toQnh = document.getElementById('to-qnh'); if (toQnh) toQnh.value = 1013;
-  var toOat = document.getElementById('to-oat'); if (toOat) toOat.value = 15;
-  var toWind = document.getElementById('to-wind'); if (toWind) toWind.value = 0;
-  var toSlope = document.getElementById('to-slope'); if (toSlope) toSlope.value = 0;
+  var toWeight = document.getElementById('to-weight'); if (toWeight) { toWeight.value = 1180; toWeight.className = ''; }
+  var toQnh = document.getElementById('to-qnh'); if (toQnh) { toQnh.value = 1013; toQnh.className = ''; }
+  var toOat = document.getElementById('to-oat'); if (toOat) { toOat.value = 15; toOat.className = ''; }
+  var toWind = document.getElementById('to-wind'); if (toWind) { toWind.value = 0; toWind.className = ''; }
+  var toSlope = document.getElementById('to-slope'); if (toSlope) { toSlope.value = 0; toSlope.className = ''; }
   // Reset displays
   var els = ['to-airport-name','to-airport-elev','to-press-alt','to-density-alt','to-card-rwy','to-tora-val','to-tora-label'];
   var defaults = ['—','Elev: — ft','— ft','— ft','—','–','—'];
@@ -2752,19 +2765,20 @@ function resetPerfTO() {
 }
 
 function resetPerfLD() {
+  ldCalculated = false;
   var ldIcao = document.getElementById('ld-icao'); if (ldIcao) ldIcao.value = '';
-  var ldWeight = document.getElementById('ld-weight'); if (ldWeight) ldWeight.value = 1180;
-  var ldQnh = document.getElementById('ld-qnh'); if (ldQnh) ldQnh.value = 1013;
-  var ldOat = document.getElementById('ld-oat'); if (ldOat) ldOat.value = 15;
-  var ldWind = document.getElementById('ld-wind'); if (ldWind) ldWind.value = 0;
-  var ldSlope = document.getElementById('ld-slope'); if (ldSlope) ldSlope.value = 0;
+  var ldWeight = document.getElementById('ld-weight'); if (ldWeight) { ldWeight.value = 0; ldWeight.className = ''; }
+  var ldQnh = document.getElementById('ld-qnh'); if (ldQnh) { ldQnh.value = 0; ldQnh.className = ''; }
+  var ldOat = document.getElementById('ld-oat'); if (ldOat) { ldOat.value = 0; ldOat.className = ''; }
+  var ldWind = document.getElementById('ld-wind'); if (ldWind) { ldWind.value = 0; ldWind.className = ''; }
+  var ldSlope = document.getElementById('ld-slope'); if (ldSlope) { ldSlope.value = 0; ldSlope.className = ''; }
   // Reset displays
   var els = ['ld-airport-name','ld-airport-elev','ld-press-alt','ld-density-alt','ld-rwy-avail'];
   var defs = ['—','Elev: — ft','— ft','— ft','—'];
   els.forEach(function(id,i){ var e=document.getElementById(id); if(e) e.textContent=defs[i]; });
   // Reset runway selector
   var rwySel = document.getElementById('ld-rwy-sel');
-  if (rwySel) { rwySel.innerHTML = '<option value="">—</option>'; }
+  if (rwySel) { rwySel.innerHTML = '<option value="">RWY</option>'; rwySel.style.color = 'var(--text-dim)'; }
   // Reset WX
   ['ld-wx-wind','ld-wx-temp','ld-wx-qnh'].forEach(function(id,i){
     var e=document.getElementById(id); if(e) e.textContent=['—/—','—','—'][i];
@@ -3006,7 +3020,11 @@ function setDelta(id,base,corr){
   else{el.textContent='±0';el.className='delta-badge zero';}
 }
 function calcTakeoff(){
-  var weight=document.getElementById('to-weight').value;
+  var weightEl = document.getElementById('to-weight');
+  var weight = parseFloat(weightEl.value) || 1180;
+  if (weight > 1180) { weightEl.value = 1180; weight = 1180; weightEl.style.color = 'var(--red)'; }
+  else if (weight < 930) { weightEl.value = 930; weight = 930; weightEl.style.color = 'var(--red)'; }
+  else { weightEl.style.color = ''; }
   var altEl=document.getElementById('to-alt');
   var alt = altEl.dataset.densityAlt !== undefined && altEl.dataset.densityAlt !== ''
     ? altEl.dataset.densityAlt : altEl.value;
@@ -3034,7 +3052,13 @@ function calcTakeoff(){
   updateRunwayDiagrams();
 }
 function calcLanding(){
-  var weight=document.getElementById('ld-weight').value;
+  if (!ldCalculated) return;
+  var weightEl = document.getElementById('ld-weight');
+  var weight = parseFloat(weightEl.value) || 1180;
+  // Clamp and warn if out of range
+  if (weight > 1180) { weightEl.value = 1180; weight = 1180; weightEl.style.color = 'var(--red)'; }
+  else if (weight < 930) { weightEl.value = 930; weight = 930; weightEl.style.color = 'var(--red)'; }
+  else { weightEl.style.color = ''; }
   var altEl=document.getElementById('ld-alt');
   var alt = altEl.dataset.densityAlt !== undefined && altEl.dataset.densityAlt !== ''
     ? altEl.dataset.densityAlt : altEl.value;
@@ -3098,6 +3122,7 @@ function showPerfTab(name,btn){
   document.querySelectorAll('.perf-tab').forEach(function(t){t.classList.remove('active');});
   document.getElementById('perf-'+name).classList.add('active');
   btn.classList.add('active');
+  if (name === 'ld') { setTimeout(function(){ updateRunwayDiagrams(); }, 50); }
 }
 
 
@@ -3170,6 +3195,8 @@ buildEmergGrid();
 updateRunwayDiagrams();
 setRWYCC(6);
 if(document.getElementById("wb-bew")) calcWB();
+['to-rwy-sel','ld-rwy-sel'].forEach(function(id){var el=document.getElementById(id);if(el)el.classList.add('empty');});
+  updateRwySelColor('to'); updateRwySelColor('ld');
 buildDocsGrid();
 calcTakeoff();
 calcLanding();
