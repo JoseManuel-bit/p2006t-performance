@@ -972,6 +972,12 @@ input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-
           </div>
         </div>
 
+        <!-- TAF line -->
+        <div id="to-taf-row" style="display:flex;align-items:baseline;gap:10px;padding:6px 14px;border-radius:var(--radius);background:var(--bg2);justify-content:center;">
+          <span style="font-family:var(--head);font-size:9px;font-weight:600;letter-spacing:2px;color:var(--text-dim);flex-shrink:0;">TAF</span>
+          <span id="to-taf-text" style="font-size:10px;color:rgba(255,255,255,0.25);letter-spacing:0.5px;line-height:1.5;">—</span>
+        </div>
+
         <div style="display:flex;align-items:stretch;background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;">
           <div style="font-family:var(--head);font-size:9px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--text-dim);background:var(--panel);padding:10px 14px;border-right:1px solid var(--border);white-space:nowrap;display:flex;align-items:center;flex-shrink:0;min-width:120px;">RUNWAY INFO</div>
           <div style="flex:1;display:flex;">
@@ -2900,6 +2906,18 @@ function syncLiveWX(prefix) {
           var line = lines.find(function(l){ return l.indexOf(icao) === 0 && l.match(/\d{6}Z/); });
           if (!line) throw new Error('no metar');
           applyMetar(line);
+          // Also fetch TAF
+          var tafUrl = 'https://aviationweather.gov/api/data/taf?ids=' + icao + '&format=raw&hours=24';
+          fetch('https://api.allorigins.win/get?url=' + encodeURIComponent(tafUrl))
+            .then(function(r) { return r.json(); })
+            .then(function(tj) {
+              var tafTxt = (tj.contents || '').trim();
+              if (tafTxt) {
+                var tafEl = document.getElementById(prefix + '-taf-text');
+                if (tafEl) { tafEl.textContent = tafTxt.split('\n')[0].trim(); tafEl.style.color = 'rgba(255,255,255,0.4)'; }
+              }
+            })
+            .catch(function() {});
         })
         .catch(function() { fail(); });
     });
