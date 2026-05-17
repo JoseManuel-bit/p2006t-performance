@@ -255,6 +255,7 @@ input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-
 .perf-page.active { display: flex; }
 .perf-left { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; padding: 10px; border-right: 1px solid var(--border); }
 .perf-right { width: 340px; flex-shrink: 0; overflow-y: auto; -webkit-overflow-scrolling: touch; padding: 10px; background: var(--bg2); }
+#perf-ld .perf-right { width: auto; flex-shrink: 1; padding: 0; background: transparent; overflow-y: visible; }
 
 /* ── W&B — two column layout ─────────────────────── */
 .wb-layout { display: flex; flex-direction: row; gap: 0; flex: 1; overflow: hidden; }
@@ -722,7 +723,7 @@ input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-
       </div>
     </div>
   </div>
-  <div style="text-align:right;padding:8px 16px 4px;font-family:var(--mono);font-size:10px;color:rgba(255,255,255,0.35);letter-spacing:1px;">EFB 2026 V1.0</div>
+  <div style="text-align:right;padding:8px 16px 4px;font-family:var(--mono);font-size:10px;color:rgba(255,255,255,0.35);letter-spacing:1px;">EFB 2026 V1.1</div>
 </div>
 <!-- AIRCRAFT HOME -->
 <div class="screen" id="screen-ac-home" style="position:relative;overflow:hidden;">
@@ -1103,7 +1104,7 @@ input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-
         </div><!-- /left col -->
 
         <!-- RIGHT col: runway canvas only -->
-        <div class="perf-right" style="flex:1;min-width:200px;max-width:280px;display:flex;flex-direction:column;align-items:center;justify-content:space-between;padding:8px 8px 6px;background:transparent;">
+        <div class="perf-right" style="flex:1;min-width:200px;max-width:280px;display:flex;flex-direction:column;align-items:center;justify-content:space-between;padding:0;background:transparent;">
           <canvas id="ld-rwy-canvas" width="800" height="100" style="display:block;width:100%;flex:1;min-height:0;border-radius:6px;"></canvas>
           <div id="ld-lda-table" style="display:block;width:100%;margin-top:6px;">
             <div style="display:grid;grid-template-columns:1fr 1fr 1fr;border:1px solid var(--border);border-radius:6px;overflow:hidden;">
@@ -2265,13 +2266,10 @@ function drawRunwayDiagram(canvasId, rwyName, windKt, windDir, lda, ldr) {
   if (!canvas) return;
   var ctx = canvas.getContext('2d');
   var dpr = window.devicePixelRatio || 1;
-  var W = 120, H = 220;
-  canvas.width  = W * dpr;
+  var W = canvas.offsetWidth > 20 ? canvas.offsetWidth : 200;
   var H = canvasId === 'ld-rwy-canvas' ? (canvas.offsetHeight > 20 ? canvas.offsetHeight : 400) : (canvas.offsetHeight > 20 ? canvas.offsetHeight : 220);
-  var CW = canvas.offsetWidth > 20 ? canvas.offsetWidth : W;
-  if (canvasId === 'ld-rwy-canvas' && CW < 180) CW = 180;
-  W = CW;
-  canvas.width  = CW * dpr;
+  if (canvasId === 'ld-rwy-canvas' && W < 180) W = 180;
+  canvas.width  = W * dpr;
   canvas.height = H * dpr;
   ctx.scale(dpr, dpr);
 
@@ -2390,8 +2388,6 @@ function drawRunwayDiagram(canvasId, rwyName, windKt, windDir, lda, ldr) {
     // ── Wind info box (left) ────────────────────────
     var wbH = 105;
     var wbY = mt + Math.round((rwyH - wbH) / 2);
-    var windBoxW = rwyX - 6;
-    var windBoxX = 2;
     ctx.strokeStyle = 'rgba(255,255,255,0.15)';
     ctx.lineWidth = 1;
     ctx.strokeRect(windBoxX, wbY, windBoxW, wbH);
