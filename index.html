@@ -2774,6 +2774,22 @@ function syncLiveWX(prefix) {
   var METAR_AIRPORTS = ['LEMD','LEAL','LEBL','LEBB','LECO','LEAM','LEBZ','LERT','GCFV','GCHI','LEAB','LEBG','LECH','LERL','LEBA','LEVD'];
   var hasMETAR = METAR_AIRPORTS.indexOf(icao) !== -1;
 
+  // Fetch TAF independently — always runs
+  var tafUrl = 'https://aviationweather.gov/api/data/taf?ids=' + icao + '&format=raw';
+  fetch('https://api.allorigins.win/get?url=' + encodeURIComponent(tafUrl))
+    .then(function(r) { return r.json(); })
+    .then(function(tj) {
+      var tafTxt = (tj.contents || '').trim();
+      if (tafTxt) {
+        var tafLines = tafTxt.split('\n').map(function(l){ return l.trim(); }).filter(Boolean);
+        var tafLine = tafLines.find(function(l){ return l.indexOf('TAF') === 0 || l.indexOf(icao) === 0; });
+        if (!tafLine) tafLine = tafLines[0];
+        var tafEl = document.getElementById(prefix + '-taf-text');
+        if (tafEl && tafLine) { tafEl.textContent = tafLine; tafEl.style.color = 'rgba(255,255,255,0.4)'; }
+      }
+    })
+    .catch(function() {});
+
   function fail() {
     restoreBtn();
     var el = document.getElementById(prefix + '-metar-text');
@@ -2845,6 +2861,23 @@ function syncLiveWX(prefix) {
       metatText.style.fontWeight = 'normal';
       metatText.style.letterSpacing = '0';
     }
+
+    // Fetch TAF
+    var tafUrl = 'https://aviationweather.gov/api/data/taf?ids=' + icao + '&format=raw';
+    fetch('https://api.allorigins.win/get?url=' + encodeURIComponent(tafUrl))
+      .then(function(r) { return r.json(); })
+      .then(function(tj) {
+        var tafTxt = (tj.contents || '').trim();
+        if (tafTxt) {
+          var tafLines = tafTxt.split('\n').map(function(l){ return l.trim(); }).filter(Boolean);
+          var tafLine = tafLines.find(function(l){ return l.indexOf('TAF') === 0 || l.indexOf(icao) === 0; });
+          if (!tafLine) tafLine = tafLines[0];
+          var tafEl = document.getElementById(prefix + '-taf-text');
+          if (tafEl && tafLine) { tafEl.textContent = tafLine; tafEl.style.color = 'rgba(255,255,255,0.4)'; }
+        }
+      })
+      .catch(function() {});
+
     restoreBtn();
   }
 
@@ -2906,23 +2939,6 @@ function syncLiveWX(prefix) {
           var line = lines.find(function(l){ return l.indexOf(icao) === 0 && l.match(/\d{6}Z/); });
           if (!line) throw new Error('no metar');
           applyMetar(line);
-          // Also fetch TAF
-          var tafUrl = 'https://aviationweather.gov/api/data/taf?ids=' + icao + '&format=raw';
-          fetch('https://api.allorigins.win/get?url=' + encodeURIComponent(tafUrl))
-            .then(function(r) { return r.json(); })
-            .then(function(tj) {
-              console.log('TAF raw:', tj.contents);
-              var tafTxt = (tj.contents || '').trim();
-              if (tafTxt) {
-                var tafLines = tafTxt.split('\n').map(function(l){ return l.trim(); }).filter(Boolean);
-                var tafLine = tafLines.find(function(l){ return l.indexOf('TAF') === 0 || l.indexOf(icao) === 0; });
-                if (!tafLine) tafLine = tafLines[0];
-                console.log('TAF line:', tafLine);
-                var tafEl = document.getElementById(prefix + '-taf-text');
-                if (tafEl && tafLine) { tafEl.textContent = tafLine; tafEl.style.color = 'rgba(255,255,255,0.4)'; }
-              }
-            })
-            .catch(function(e) { console.log('TAF error:', e); });
         })
         .catch(function() { fail(); });
     });
