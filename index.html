@@ -262,7 +262,7 @@ input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-
 /* ── W&B — two column layout ─────────────────────── */
 .wb-layout { display: flex; flex-direction: row; gap: 0; flex: 1; overflow: hidden; }
 .wb-left { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; padding: 10px; border-right: 1px solid var(--border); }
-.wb-right { width: 380px; flex-shrink: 0; overflow-y: auto; -webkit-overflow-scrolling: touch; padding: 10px; background: var(--bg2); }
+.wb-right { flex:1; min-width:260px; max-width:400px; display:flex; flex-direction:column; overflow:hidden; }
 
 /* ── DOCS — 4 column grid ────────────────────────── */
 .docs-grid { grid-template-columns: repeat(4, 1fr); }
@@ -725,7 +725,7 @@ input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-
       </div>
     </div>
   </div>
-  <div style="text-align:right;padding:8px 16px 4px;font-family:var(--mono);font-size:10px;color:rgba(255,255,255,0.35);letter-spacing:1px;">EFB 2026 V1.5</div>
+  <div style="text-align:right;padding:8px 16px 4px;font-family:var(--mono);font-size:10px;color:rgba(255,255,255,0.35);letter-spacing:1px;">EFB 2026 V1.6</div>
 </div>
 <!-- AIRCRAFT HOME -->
 <div class="screen" id="screen-ac-home" style="position:relative;overflow:hidden;">
@@ -903,7 +903,7 @@ input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-
           </div>
 
           <div class="input-grid" style="margin-bottom:8px;">
-            <div class="input-card"><div class="input-card-label">Weight · kg</div><div class="input-card-val"><input type="number" id="to-weight" value="1180" step="1" min="930" max="1180" oninput="userEdit(this);calcTakeoff()"></div></div>
+            <div class="input-card"><div class="input-card-label">Weight · kg</div><div class="input-card-val"><input type="number" id="to-weight" value="0" step="1" min="930" max="1180" readonly style="color:var(--text-dim);cursor:default;"></div></div>
             <div class="input-card"><div class="input-card-label">QNH · hPa</div><div class="input-card-val"><input type="number" id="to-qnh" value="1013" step="1" min="900" max="1050" oninput="userEdit(this);calcDensityAlt('to')"></div></div>
             <div class="input-card"><div class="input-card-label">OAT · °C</div><div class="input-card-val"><input type="number" id="to-oat" value="15" step="1" min="-40" max="60" oninput="userEdit(this);calcDensityAlt('to')"></div></div>
           </div>
@@ -1019,7 +1019,7 @@ input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-
           <input type="hidden" id="ld-alt" value="0">
 
           <div class="input-grid" style="margin-bottom:6px;">
-            <div class="input-card"><div class="input-card-label">Weight · kg</div><div class="input-card-val"><input type="number" id="ld-weight" value="0" step="1" min="930" max="1180" oninput="userEdit(this);calcLanding()"></div></div>
+            <div class="input-card"><div class="input-card-label">Weight · kg</div><div class="input-card-val"><input type="number" id="ld-weight" value="0" step="1" min="930" max="1180" readonly style="color:var(--text-dim);cursor:default;"></div></div>
             <div class="input-card"><div class="input-card-label">QNH · hPa</div><div class="input-card-val"><input type="number" id="ld-qnh" value="0" step="1" min="900" max="1050" oninput="userEdit(this);calcDensityAlt('ld')"></div></div>
             <div class="input-card"><div class="input-card-label">OAT · °C</div><div class="input-card-val"><input type="number" id="ld-oat" value="0" step="1" min="-40" max="60" oninput="userEdit(this);calcDensityAlt('ld')"></div></div>
           </div>
@@ -1124,12 +1124,13 @@ input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-
 </div>
 
 <!-- WEIGHT & BALANCE -->
-<div class="screen" id="screen-wb">
+<div class="screen" id="screen-wb" style="flex-direction:column;">
   <div class="cl-header">
     <button class="cl-back-btn" onclick="goBackToAC()">BACK</button>
     <div class="cl-header-title" style="text-align:right;flex:1;">P2006T · WEIGHT &amp; BALANCE</div>
   </div>
-  <div class="wb-layout">
+  <div style="display:flex;flex:1;overflow:hidden;">
+  <div class="wb-layout" style="flex:1;overflow:hidden;">
     <div class="wb-left">
 
     <!-- W&B TABLE -->
@@ -1143,7 +1144,7 @@ input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-
       </div>
       <div class="wb-row wb-header-row">
         <div class="wb-label" style="font-size:11px;">BEW Moment</div>
-        <div class="wb-input-cell"><input type="number" id="wb-bew-moment" value="345.76" step="0.01" oninput="calcWB()" class="wb-input" style="font-size:16px;"></div>
+        <div class="wb-input-cell"><div style="font-family:var(--mono);font-size:20px;color:var(--text-dim);text-align:center;padding:6px 4px;width:100%;">346</div><input type="hidden" id="wb-bew-moment" value="346"></div>
         <div class="wb-unit">kg·m</div>
       </div>
 
@@ -1182,6 +1183,7 @@ input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-
         <div class="wb-label">FOB</div>
         <div class="wb-input-cell"><input type="number" id="wb-fob" value="100" step="1" min="0" max="194" oninput="calcWB()" class="wb-input"></div>
         <div class="wb-unit">l</div>
+        <div style="width:60px;font-family:var(--mono);font-size:13px;color:var(--text-dim);text-align:center;padding:0 4px;" id="wb-fob-kg">72 kg</div>
       </div>
 
       <!-- T&R FUEL -->
@@ -1189,6 +1191,7 @@ input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-
         <div class="wb-label">T &amp; R Fuel</div>
         <div class="wb-input-cell"><input type="number" id="wb-tr-fuel" value="0" step="0.1" min="0" max="20" oninput="calcWB()" class="wb-input"></div>
         <div class="wb-unit">l</div>
+        <div style="width:60px;font-family:var(--mono);font-size:13px;color:var(--text-dim);text-align:center;padding:0 4px;" id="wb-tr-kg">0 kg</div>
       </div>
 
       <!-- ATOW -->
@@ -1197,6 +1200,7 @@ input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-
         <div class="wb-result-val" id="wb-atow">—</div>
         <div class="wb-unit">kg</div>
       </div>
+      <div id="wb-atow-warn" style="display:none;background:#EF4444;color:white;font-family:var(--head);font-size:11px;font-weight:700;letter-spacing:2px;text-align:center;padding:8px 12px;">⚠ ATOW EXCEEDS MTOW (1180 kg)</div>
 
       <div class="wb-divider"></div>
 
@@ -1205,6 +1209,7 @@ input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-
         <div class="wb-label">Trip Fuel</div>
         <div class="wb-input-cell"><input type="number" id="wb-trip-fuel" value="0" step="0.1" min="0" max="194" oninput="calcWB()" class="wb-input"></div>
         <div class="wb-unit">l</div>
+        <div style="width:60px;font-family:var(--mono);font-size:13px;color:var(--text-dim);text-align:center;padding:0 4px;" id="wb-trip-kg">0 kg</div>
       </div>
 
       <!-- ALW -->
@@ -1213,41 +1218,33 @@ input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-
         <div class="wb-result-val" id="wb-alw">—</div>
         <div class="wb-unit">kg</div>
       </div>
+      <div id="wb-alw-warn" style="display:none;background:#EF4444;color:white;font-family:var(--head);font-size:11px;font-weight:700;letter-spacing:2px;text-align:center;padding:8px 12px;">⚠ ALW EXCEEDS MLW (1180 kg)</div>
 
-
-
-    </div>
+      <!-- Action buttons -->
+      <div style="display:flex;flex-direction:column;gap:6px;margin-top:10px;">
+        <button onclick="sendATOW()" style="width:100%;padding:12px;background:#F5A800;border:1px solid #F5A800;border-radius:var(--radius);font-family:var(--head);font-size:11px;font-weight:600;letter-spacing:2px;color:#0B0F1A;cursor:pointer;">SEND ATOW / DEPARTURE</button>
+        <button onclick="sendALW()" style="width:100%;padding:12px;background:#E05A2B;border:1px solid #E05A2B;border-radius:var(--radius);font-family:var(--head);font-size:11px;font-weight:600;letter-spacing:2px;color:white;cursor:pointer;">SEND ALW / ARRIVAL</button>
+        <button onclick="resetWB()" style="width:100%;padding:12px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);font-family:var(--head);font-size:11px;font-weight:600;letter-spacing:2px;color:var(--text-dim);cursor:pointer;">RESET</button>
+      </div>
 
     </div><!-- /wb-left -->
-    <div class="wb-right">
-    <!-- STATUS -->
-    <div id="wb-status" style="text-align:center;font-family:var(--head);font-size:13px;font-weight:700;letter-spacing:1px;color:var(--text-dim);padding:10px 0;">Enter weights above</div>
-
-    <!-- CG ENVELOPE -->
-    <div style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:10px;">
-      <div style="padding:10px 12px 6px;display:flex;align-items:center;justify-content:space-between;">
+  </div><!-- /wb-layout -->
+  </div><!-- /wb-layout -->
+  <!-- CG right panel -->
+  <div style="flex:1;display:flex;flex-direction:column;padding:12px 12px 12px 8px;background:transparent;">
+    <div style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;">
+      <div style="padding:8px 12px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);">
         <div style="font-family:var(--head);font-size:10px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--text-dim);">CG ENVELOPE</div>
         <div style="display:flex;gap:12px;">
           <div style="display:flex;align-items:center;gap:4px;font-family:var(--body);font-size:9px;color:var(--text-dim);"><div style="width:8px;height:8px;border-radius:50%;background:#22C55E;"></div>ATOW</div>
           <div style="display:flex;align-items:center;gap:4px;font-family:var(--body);font-size:9px;color:var(--text-dim);"><div style="width:8px;height:8px;border-radius:50%;background:#F59E0B;"></div>ALW</div>
-
         </div>
       </div>
-      <canvas id="wb-canvas" width="600" height="300" style="width:100%;display:block;"></canvas>
+      <canvas id="wb-canvas" width="600" height="300" style="width:100%;height:380px;display:block;"></canvas>
     </div>
-
-    <!-- BUTTONS -->
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;">
-      <button id="btn-send-atow" onclick="sendATOW()" style="padding:14px 8px;background:var(--blue);border:none;border-radius:var(--radius);font-family:var(--head);font-size:14px;font-weight:700;letter-spacing:2px;color:white;cursor:pointer;transition:all 0.3s;">
-        SEND ATOW
-      </button>
-      <button id="btn-send-alw" onclick="sendALW()" style="padding:14px 8px;background:var(--blue);border:none;border-radius:var(--radius);font-family:var(--head);font-size:14px;font-weight:700;letter-spacing:2px;color:white;cursor:pointer;transition:all 0.3s;">
-        SEND ALW
-      </button>
-    </div>
-    </div><!-- /wb-right -->
-  </div><!-- /wb-layout -->
-</div>
+  </div>
+  </div><!-- /inner flex -->
+</div><!-- /screen-wb -->
 
 <!-- DOCS -->
 <div class="screen" id="screen-docs" style="flex-direction:row;background:var(--bg);">
@@ -1727,6 +1724,30 @@ function userEdit(el) {
   el.classList.remove('metar-synced');
   el.classList.add('user-edited');
 }
+function sendATOW() {
+  var atow = parseFloat(document.getElementById('wb-atow').textContent) || 0;
+  if (atow <= 0) return;
+  var el = document.getElementById('to-weight');
+  if (el) { el.value = Math.round(atow); el.style.color = 'var(--green)'; }
+  calcTakeoff();
+}
+function sendALW() {
+  var alw = parseFloat(document.getElementById('wb-alw').textContent) || 0;
+  if (alw <= 0) return;
+  var el = document.getElementById('ld-weight');
+  if (el) { el.value = Math.round(alw); el.style.color = 'var(--green)'; }
+  calcLanding();
+}
+function resetWB() {
+  ['wb-front-pax','wb-rear-pax','wb-baggage','wb-trip-fuel'].forEach(function(id) {
+    var el = document.getElementById(id); if (el) el.value = 0;
+  });
+  var fob = document.getElementById('wb-fob'); if (fob) fob.value = 100;
+  var tr = document.getElementById('wb-tr-fuel'); if (tr) tr.value = 0;
+  var toW = document.getElementById('to-weight'); if (toW) { toW.value = 0; toW.style.color = 'var(--text-dim)'; }
+  var ldW = document.getElementById('ld-weight'); if (ldW) { ldW.value = 0; ldW.style.color = 'var(--text-dim)'; }
+  calcWB();
+}
 function calcVASpeed() {
   var w = parseFloat(document.getElementById('va-weight-input').value) || 1180;
   if (w < 930) w = 930;
@@ -2176,10 +2197,20 @@ function calcWB() {
   setWbVal('wb-zfw',  zfw,  zfwOk);
   setWbVal('wb-atow', atow, atowOk);
   setWbVal('wb-alw',  alw,  alwOk);
+
+  // Fuel kg conversions
+  var fobKgEl = document.getElementById('wb-fob-kg'); if (fobKgEl) fobKgEl.textContent = Math.round(fobL * 0.72) + ' kg';
+  var trKgEl = document.getElementById('wb-tr-kg'); if (trKgEl) trKgEl.textContent = Math.round(trL * 0.72) + ' kg';
+  var tripL = parseFloat(document.getElementById('wb-trip-fuel') && document.getElementById('wb-trip-fuel').value) || 0;
+  var tripKgEl = document.getElementById('wb-trip-kg'); if (tripKgEl) tripKgEl.textContent = Math.round(tripL * 0.72) + ' kg';
+
+  // Warnings
+  var atowWarn = document.getElementById('wb-atow-warn'); if (atowWarn) atowWarn.style.display = atow > 1180 ? 'block' : 'none';
+  var alwWarn = document.getElementById('wb-alw-warn'); if (alwWarn) alwWarn.style.display = alw > 1180 ? 'block' : 'none';
   // Also color ATOW red if ALW is out of limits
   if (atowOk && !alwOk) {
     var atowEl = document.getElementById('wb-atow');
-    if (atowEl) atowEl.style.color = 'var(--amber)'; // amber = atow ok but alw not
+    if (atowEl) atowEl.style.color = 'var(--amber)';
   }
 
   var cgEl = document.getElementById('wb-cg');
@@ -2249,9 +2280,9 @@ function drawEnvelope(tow, mTow, alw, mAlw) {
 
 
 
-  // Data ranges — matching POH Figure 6-2
-  var wMin = 700,  wMax = 1320;
-  var mMin = 100,  mMax = 580;
+  // Data ranges — EC-NTJ without MOD, max 1180kg
+  var wMin = 700,  wMax = 1250;
+  var mMin = 100,  mMax = 540;
 
   function toX(m) { return ml + (m - mMin) / (mMax - mMin) * pw; }
   function toY(w) { return mt + ph - (w - wMin) / (wMax - wMin) * ph; }
@@ -2276,7 +2307,7 @@ function drawEnvelope(tow, mTow, alw, mAlw) {
   });
 
   // Horizontal grid (weight)
-  [800,850,900,950,1000,1050,1100,1150,1180,1230,1290].forEach(function(w) {
+  [800,850,900,950,1000,1050,1100,1150,1180].forEach(function(w) {
     var y = toY(w);
     ctx.beginPath(); ctx.moveTo(ml, y); ctx.lineTo(ml+pw, y); ctx.stroke();
     ctx.textAlign = 'right';
@@ -2302,30 +2333,16 @@ function drawEnvelope(tow, mTow, alw, mAlw) {
   ctx.restore();
 
   // ── Envelope ────────────────────────────────────────────
-  // From POH Figure 6-2 — exact corner points (Weight kg, Moment kg*m)
-  // Forward limit: CG 16.5% = 0.221m  |  Aft limit: CG 31% = 0.415m
-  // Full envelope including MOD2006/416 (up to 1290kg, CG 19.5% = 0.261m)
-  // Full envelope from POH Figure 6-2 including MOD2006/416
-  // Forward: CG 16.5% (0.221m) up to 1180kg, then horizontal jump,
-  //          then CG 19.5% (0.261m) from 1180 to 1290kg
-  // Aft: CG 31% (0.415m) for all weights
+  // EC-NTJ — no MOD2006/416 — MTOW = 1180 kg
+  // Forward limit: 16.5% MAC = 0.221m for all weights
+  // Aft limit:     31%   MAC = 0.415m for all weights
   var envPts = [
-    {w: 790,  m: 790  * 0.221},   // fwd 16.5%, min weight
+    {w: 790,  m: 790  * 0.221},   // fwd 16.5%, BEW
     {w: 1180, m: 1180 * 0.221},   // fwd 16.5%, MTOW
-    {w: 1180, m: 1180 * 0.261},   // horizontal to 19.5% line at same weight
-    {w: 1230, m: 1230 * 0.261},   // fwd 19.5%, 1230kg
-    {w: 1290, m: 1290 * 0.261},   // fwd 19.5%, MOD max
-    {w: 1290, m: 1290 * 0.415},   // aft 31%, MOD max
-    {w: 790,  m: 790  * 0.415},   // aft 31%, min weight
+    {w: 1180, m: 1180 * 0.415},   // aft 31%, MTOW
+    {w: 790,  m: 790  * 0.415},   // aft 31%, BEW
   ];
-
-  // Base envelope MTOW=1180kg
-  var envPtsBase = [
-    {w: 790,  m: 790  * 0.221},
-    {w: 1180, m: 1180 * 0.221},
-    {w: 1180, m: 1180 * 0.415},
-    {w: 790,  m: 790  * 0.415},
-  ];
+  var envPtsBase = envPts;
 
   // Fill full envelope (with MOD)
   ctx.beginPath();
@@ -2350,8 +2367,6 @@ function drawEnvelope(tow, mTow, alw, mAlw) {
   // ── MTOW/MLW horizontal lines ──────────────────────────
   var mtowLines = [
     {w: 1180, lb: 2601, color: 'rgba(255,255,255,0.55)'},
-    {w: 1230, lb: 2712, color: 'rgba(255,255,255,0.35)'},
-    {w: 1290, lb: 2844, color: 'rgba(255,255,255,0.25)'},
   ];
 
   ctx.font = 'bold 8.5px monospace';
@@ -2911,7 +2926,7 @@ function calcTakeoffManual() {
 function resetPerfTO() {
   // Reset all editable inputs in T/O page
   var toIcao = document.getElementById('to-icao'); if (toIcao) toIcao.value = '';
-  var toWeight = document.getElementById('to-weight'); if (toWeight) { toWeight.value = 1180; toWeight.className = ''; }
+  var toWeight = document.getElementById('to-weight'); if (toWeight) { toWeight.value = 0; toWeight.style.color = 'var(--text-dim)'; }
   var toQnh = document.getElementById('to-qnh'); if (toQnh) { toQnh.value = 1013; toQnh.className = ''; }
   var toOat = document.getElementById('to-oat'); if (toOat) { toOat.value = 15; toOat.className = ''; }
   var toWind = document.getElementById('to-wind'); if (toWind) { toWind.value = 0; toWind.className = ''; }
@@ -2948,7 +2963,7 @@ function resetPerfTO() {
 function resetPerfLD() {
   ldCalculated = false;
   var ldIcao = document.getElementById('ld-icao'); if (ldIcao) ldIcao.value = '';
-  var ldWeight = document.getElementById('ld-weight'); if (ldWeight) { ldWeight.value = 0; ldWeight.className = ''; }
+  var ldWeight = document.getElementById('ld-weight'); if (ldWeight) { ldWeight.value = 0; ldWeight.style.color = 'var(--text-dim)'; }
   var ldQnh = document.getElementById('ld-qnh'); if (ldQnh) { ldQnh.value = 0; ldQnh.className = ''; }
   var ldOat = document.getElementById('ld-oat'); if (ldOat) { ldOat.value = 0; ldOat.className = ''; }
   var ldWind = document.getElementById('ld-wind'); if (ldWind) { ldWind.value = 0; ldWind.className = ''; }
