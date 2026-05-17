@@ -2911,16 +2911,18 @@ function syncLiveWX(prefix) {
           fetch('https://api.allorigins.win/get?url=' + encodeURIComponent(tafUrl))
             .then(function(r) { return r.json(); })
             .then(function(tj) {
+              console.log('TAF raw:', tj.contents);
               var tafTxt = (tj.contents || '').trim();
               if (tafTxt) {
                 var tafLines = tafTxt.split('\n').map(function(l){ return l.trim(); }).filter(Boolean);
                 var tafLine = tafLines.find(function(l){ return l.indexOf('TAF') === 0 || l.indexOf(icao) === 0; });
                 if (!tafLine) tafLine = tafLines[0];
+                console.log('TAF line:', tafLine);
                 var tafEl = document.getElementById(prefix + '-taf-text');
                 if (tafEl && tafLine) { tafEl.textContent = tafLine; tafEl.style.color = 'rgba(255,255,255,0.4)'; }
               }
             })
-            .catch(function() {});
+            .catch(function(e) { console.log('TAF error:', e); });
         })
         .catch(function() { fail(); });
     });
